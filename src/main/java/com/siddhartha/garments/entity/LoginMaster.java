@@ -56,8 +56,7 @@ import lombok.ToString;
 @DynamicInsert
 @DynamicUpdate
 @Builder
-@Table(name="CLAIMS_LOGIN_MASTER")
-@IdClass(LoginMasterId.class)
+@Table(name="LOGIN_MASTER")
 public class LoginMaster implements Serializable {
  
 private static final long serialVersionUID = 1L;
@@ -87,8 +86,6 @@ private static final long serialVersionUID = 1L;
     @Column(name="ENTRY_DATE", length=1)
     private Date   entryDate ;
    
-
-
 }
 
 

@@ -1,10 +1,16 @@
 package com.siddhartha.garments.serviceImpl;
 
 
+
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,13 +19,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.util.CollectionUtils;
 
-import com.maan.claim.bean.ClaimLoginMaster;
+import com.siddhartha.garments.auth.EncryDecryService;
 import com.siddhartha.garments.auth.JwtTokenUtil;
 import com.siddhartha.garments.auth.passwordEnc;
+import com.siddhartha.garments.entity.LoginMaster;
 import com.siddhartha.garments.entity.SessionDetails;
+import com.siddhartha.garments.repository.LoginMasterRepository;
+import com.siddhartha.garments.repository.SessionDetailsRepository;
 import com.siddhartha.garments.request.LoginRequest;
+import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.LoginService;
 
 public class LoginServiceImpl implements LoginService,UserDetailsService {
@@ -32,53 +41,72 @@ public class LoginServiceImpl implements LoginService,UserDetailsService {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
+	@Autowired
+	private LoginMasterRepository loginMasterRepository;
+	
+	@Autowired
+	private SessionDetailsRepository sessionDetailsRepository;
+	
+	@Autowired
+	private EncryDecryService endecryService;
+
+
 	@Override
-	public Object login(LoginRequest request) {
-		CommonLoginResponse res = new CommonLoginResponse();
-		ClaimLoginResponse response = new ClaimLoginResponse();
+	public CommonResponse login(LoginRequest request,HttpServletRequest servletRequest) {
+		Map<String,String> response =new HashMap<String,String>();
+		CommonResponse commonResponse = new CommonResponse();
 		try {
 			passwordEnc passEnc = new passwordEnc();
-			String epass = passEnc.crypt(mslogin.getPassword().trim());
-			log.info("Encrpted password "+epass);
-			List<ClaimLoginMaster> login =loginRepo.findByLoginIdAndPassword(mslogin.getUserId(),epass);
-			if (!CollectionUtils.isEmpty(login)) {
-				String token = jwtTokenUtil.doGenerateToken(mslogin.getUserId());
-				log.info("-----token------" + token);
-				http.getSession().removeAttribute(mslogin.getUserId());
+			String epass = passEnc.crypt(request.getPassword().trim());
+			LoginMaster login =loginMasterRepository.findByLoginIdAndPassword(request.getUserName(),epass);
+			if (login!=null) {
+				String token = jwtTokenUtil.doGenerateToken(request.getUserName());
+				servletRequest.getSession().removeAttribute(request.getUserName());
 				SessionDetails session = new SessionDetails();
-				session.setLoginId(mslogin.getUserId());
+				session.setLoginId(request.getUserName());
 				session.setTokenId(token);
 				session.setStatus("Y");
-				//session.setUsertype(login.getUsertype());
+				session.setUserType(login.getUsertype());
 				String temptoken = bCryptPasswordEncoder.encode("CommercialClaim");
 				session.setTempTokenid(temptoken);
 				session.setEntryDate(new Date());
-				session =sessionRep.save(session);
+				session =sessionDetailsRepository.save(session);
 				response= setTokenResponse(session,login);
-				res.setLoginResponse(response);
 			}
+			commonResponse.setResponse(response);
+			commonResponse.setMessage("Success");
+			commonResponse.setError(null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return res;
+		return commonResponse;
+	}
+
+	private Map<String, String> setTokenResponse(SessionDetails session, LoginMaster login) {
+		Map<String, String> response = new HashMap<String,String>();
+		try {
+			String userType =session.getUserType();
+			response.put("Token", session.getTempTokenid());
+			response.put("UserName", session.getLoginId());
+			response.put("UserType", userType);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
 	}
 
 	@SuppressWarnings("static-access")
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		ClaimLoginMaster userList = new ClaimLoginMaster();
+		LoginMaster userList = new LoginMaster();
 		try {
-			log.info("loadUserByUsername==>" + username);
-			 userList =  loginRepo.findByLoginId(username);
+			 userList =  loginMasterRepository.findByLoginId(username);
 			if (userList!=null) {
-				//user = userList.get(0);
-				String pass = bCryptPasswordEncoder.encode(endecryService.decrypt("zQYgCo7GMZeX1tBQyzAi8Q=="));
+				String pass =bCryptPasswordEncoder.encode(endecryService.decrypt("zQYgCo7GMZeX1tBQyzAi8Q=="));
 				userList.setPassword(pass);
 				Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
 				grantedAuthorities.add(new SimpleGrantedAuthority("ADMIN"));
-				//log.info("loadUserByUserType==>" + user.getUsertype());
-				//log.info("loadUserByPassword==>" + user.getPassword());
-				log.info("loadUserByTokenEncrypt==>" + userList.getPassword());
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -86,4 +114,9 @@ public class LoginServiceImpl implements LoginService,UserDetailsService {
 		return new org.springframework.security.core.userdetails.User(userList.getLoginId(), userList.getPassword(),
 				getAuthority());
 	}
+	
+	private List<SimpleGrantedAuthority> getAuthority() {
+		return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
+	}
+
 }

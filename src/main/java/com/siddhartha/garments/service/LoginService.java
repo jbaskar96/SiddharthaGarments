@@ -1,9 +1,12 @@
 package com.siddhartha.garments.service;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.siddhartha.garments.request.LoginRequest;
+import com.siddhartha.garments.response.CommonResponse;
 
 public interface LoginService {
 
-	Object login(LoginRequest request);
+	CommonResponse login(LoginRequest request, HttpServletRequest servletRequest);
 
 }

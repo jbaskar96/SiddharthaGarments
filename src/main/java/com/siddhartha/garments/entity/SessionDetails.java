@@ -43,7 +43,7 @@ import javax.persistence.*;
 @DynamicUpdate
 @Builder
 @IdClass(SessionDetailsId.class)
-@Table(name = "CLAIMS_MARINE_SESSION_TABLE")
+@Table(name = "SESSION_TABLE")
 public class SessionDetails implements Serializable {
  
 private static final long serialVersionUID = 1L;
@@ -70,6 +70,8 @@ private static final long serialVersionUID = 1L;
     @Column(name="SESSION_ID")
     private String   sessionId; ;
 
+    @Column(name="USER_TYPE")
+    private String   userType; ;
 
 }
 
