@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import com.siddhartha.garments.auth.EncryDecryService;
 import com.siddhartha.garments.auth.JwtTokenUtil;
@@ -31,6 +32,7 @@ import com.siddhartha.garments.request.LoginRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.LoginService;
 
+@Service
 public class LoginServiceImpl implements LoginService,UserDetailsService {
 	
 	

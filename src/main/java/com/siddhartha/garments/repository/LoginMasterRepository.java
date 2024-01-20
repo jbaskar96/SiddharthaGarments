@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.siddhartha.garments.entity.LoginMaster;
 
 @Repository
-public interface LoginMasterRepository extends JpaRepository<String, LoginMaster>{
+public interface LoginMasterRepository extends JpaRepository<LoginMaster, String>{
 
 	LoginMaster findByLoginIdAndPassword(String userName, String epass);
 

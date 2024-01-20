@@ -73,10 +73,6 @@ private static final long serialVersionUID = 1L;
     @Column(name="USERTYPE", length=15)
     private String     usertype ;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name="PASSDATE")
-    private Date       passdate ;
-
     @Column(name="CREATED_BY", length=30)
     private String     createdBy ;
 

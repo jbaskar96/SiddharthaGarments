@@ -31,9 +31,10 @@ public class InputValidationServiceImpl {
 		List<ErrorList> errorList = new ArrayList<ErrorList>();
 		try {
 			if(StringUtils.isBlank(req.getUserName())) {
-				
+				errorList.add(new ErrorList("UserName","500","Please enter username"));
 			}if(StringUtils.isBlank(req.getPassword())) {
-				
+				errorList.add(new ErrorList("Password","500","Please enter password"));
+
 			}
 			if(StringUtils.isNotBlank(req.getUserName()) && StringUtils.isNotBlank(req.getPassword())) {
 				
@@ -42,7 +43,13 @@ public class InputValidationServiceImpl {
 				LoginMaster loginMaster =loginMasterRepository.findByLoginIdAndPassword(req.getUserName(), paswd);
 				
 				if(loginMaster==null) {
+					errorList.add(new ErrorList("User","401","Please enter valid username/password"));
+				}else {
 					
+					String status =loginMaster.getStatus();
+					if("N".equalsIgnoreCase(status)) {
+						errorList.add(new ErrorList("User","401","You were blocked by admin..Contact Admin...!"));
+					}
 				}
 			}
 		}catch (Exception e) {
