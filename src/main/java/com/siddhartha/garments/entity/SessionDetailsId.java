@@ -18,8 +18,11 @@ import java.util.List;
  *
  */
 
-@Getter
 @Setter
+@Getter
+@NoArgsConstructor
+@EqualsAndHashCode
+@AllArgsConstructor
 public class SessionDetailsId implements Serializable {
 
     private static final long serialVersionUID = 1L;

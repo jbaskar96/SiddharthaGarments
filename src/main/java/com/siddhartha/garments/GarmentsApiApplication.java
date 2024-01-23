@@ -1,5 +1,7 @@
 package com.siddhartha.garments;
 
+import java.text.SimpleDateFormat;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -24,5 +26,12 @@ public class GarmentsApiApplication {
                 .apis(RequestHandlerSelectors.basePackage("com.siddhartha.garments"))
                 .build();
     }
+	
+	
+	@Bean
+	public SimpleDateFormat getDateFromat() {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		return sdf;
+	}
 
 }

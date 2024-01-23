@@ -3,6 +3,8 @@ package com.siddhartha.garments.entity;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
@@ -19,19 +21,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+//@IdClass(DistrictMasterID.class)
 @Entity
 @Table(name="DISTRICT_MASTER")
-@IdClass(DistrictMasterID.class)
 public class DistrictMaster {
 	
 	
-	@Id
-	@Column(name="STATE_CODE")
-	private Integer stateCode;
-	
-	@Id
-	@Column(name="DISTRICT_CODE")
-	private Integer districtCode;
+	@EmbeddedId
+	private DistrictMasterID distId;
 	
 	@Column(name="DISTRICT_NAME")
 	private String districtName;

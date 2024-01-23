@@ -17,9 +17,11 @@ import javax.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.stereotype.Repository;
 
 import com.siddhartha.garments.entity.SessionDetails;
 import com.siddhartha.garments.entity.SessionDetailsId;
+
 /**
  * <h2>SessionDetailsRepository</h2>
  *
@@ -29,8 +31,8 @@ import com.siddhartha.garments.entity.SessionDetailsId;
  */
  
  
- 
-public interface SessionDetailsRepository  extends JpaRepository<SessionDetails,SessionDetailsId > , JpaSpecificationExecutor<SessionDetails> {
+@Repository
+public interface SessionDetailsRepository  extends JpaRepository<SessionDetails,SessionDetailsId> , JpaSpecificationExecutor<SessionDetails> {
 	SessionDetails findByTempTokenid(String authToken);
 	
 	@Modifying

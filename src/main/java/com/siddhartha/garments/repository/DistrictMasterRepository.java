@@ -11,8 +11,7 @@ import com.siddhartha.garments.entity.DistrictMasterID;
 @Repository
 public interface DistrictMasterRepository extends JpaRepository<DistrictMaster, DistrictMasterID> {
 
-	List<DistrictMaster> findByStateCode(Integer statecode);
 
-	DistrictMaster findByStateCodeAndDistrictCode(Integer stateCode, Integer districtCode);
+	List<DistrictMaster> findByDistIdStateCode(Integer statecode);
 
 }

@@ -39,9 +39,14 @@ public class DistrictMasterServiceImpl implements DistrictMasterService {
 			Integer districtCode =StringUtils.isBlank(req.getDistrictCode())?criteriaQuery.getMaxOfCodeByStateCode(req.getStateCode())
 					:Integer.valueOf(req.getDistrictCode());
 			
-			DistrictMaster districtMaster =DistrictMaster.builder()
+			
+			DistrictMasterID districtMasterID =DistrictMasterID.builder()
 					.stateCode(Integer.valueOf(req.getStateCode()))
 					.districtCode(districtCode)
+					.build();
+			
+			DistrictMaster districtMaster =DistrictMaster.builder()
+					.distId(districtMasterID)
 					.districtName(req.getDistrictName())
 					.entryDate(new Date())
 					.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
@@ -61,13 +66,13 @@ public class DistrictMasterServiceImpl implements DistrictMasterService {
 	public CommonResponse getAllDistrict(Integer statecode) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<DistrictMaster> list =repository.findByStateCode(statecode);
+			List<DistrictMaster> list =repository.findByDistIdStateCode(statecode);
 			if(!list.isEmpty()) {
 				List<HashMap<String,String>> listRes =new ArrayList<>();
 				list.forEach(p ->{
 					HashMap<String,String> map = new HashMap<>();
-					map.put("StateCode", p.getStateCode().toString());
-					map.put("DistrictCode", p.getDistrictCode().toString());
+					map.put("StateCode", p.getDistId().getStateCode().toString());
+					map.put("DistrictCode",  p.getDistId().getDistrictCode().toString());
 					map.put("DistrictName", p.getDistrictName());
 					map.put("Status", p.getStatus());
 					map.put("CreatedDate",sdf.format(p.getEntryDate()));
@@ -91,11 +96,16 @@ public class DistrictMasterServiceImpl implements DistrictMasterService {
 	public CommonResponse getAllDistrict(Integer stateCode, Integer districtCode) {
 		CommonResponse response = new CommonResponse();
 		try {
-			DistrictMaster p =repository.findByStateCodeAndDistrictCode(stateCode,districtCode);
+			DistrictMasterID districtMasterID =DistrictMasterID.builder()
+					.stateCode(stateCode)
+					.districtCode(districtCode)
+					.build();
+			
+			DistrictMaster p =repository.findById(districtMasterID).orElse(null);
 			if(p!=null) {
 				HashMap<String,String> map = new HashMap<>();
-				map.put("StateCode", p.getStateCode().toString());
-				map.put("DistrictCode", p.getDistrictCode().toString());
+				map.put("StateCode",  p.getDistId().getStateCode().toString());
+				map.put("DistrictCode",  p.getDistId().getDistrictCode().toString());
 				map.put("DistrictName", p.getDistrictName());
 				map.put("Status", p.getStatus());
 				map.put("CreatedDate",sdf.format(p.getEntryDate()));

@@ -31,7 +31,7 @@ public class CriteriaQueryServiceImpl {
 			CriteriaQuery <Integer>  query =cb.createQuery(Integer.class);
 			Root<DistrictMaster> root = query.from(DistrictMaster.class);
 			query.select(cb.count(root).as(Integer.class))
-				.where(cb.equal(root.get("stateCode"), stateCode)).distinct(true);
+				.where(cb.equal(root.get("distId").get("stateCode"), stateCode)).distinct(true);
 			TypedQuery<Integer> queryrst =em.createQuery(query);
 			count=queryrst.getSingleResult()+1;
 		}catch (Exception e) {

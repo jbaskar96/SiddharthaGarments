@@ -38,15 +38,14 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@IdClass(SessionDetailsId.class)
 @Entity
 @DynamicInsert
 @DynamicUpdate
 @Builder
-@IdClass(SessionDetailsId.class)
 @Table(name = "SESSION_TABLE")
-public class SessionDetails implements Serializable {
+public class SessionDetails {
  
-private static final long serialVersionUID = 1L;
  
     //--- ENTITY PRIMARY KEY 
     @Id

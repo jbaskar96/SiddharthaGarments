@@ -2,15 +2,20 @@ package com.siddhartha.garments.entity;
 
 import java.io.Serializable;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import javax.persistence.Embeddable;
 
-@Setter
-@Getter
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Data
 @NoArgsConstructor
+@EqualsAndHashCode
+@Embeddable
 @AllArgsConstructor
+@Builder
 public class DistrictMasterID implements Serializable {
 	
 	/**
