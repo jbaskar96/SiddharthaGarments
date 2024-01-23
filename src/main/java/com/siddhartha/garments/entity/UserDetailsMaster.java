@@ -28,6 +28,9 @@ public class UserDetailsMaster {
 	@Column(name="USER_ID")
 	private String userId;
 	
+	@Column(name="LOGIN_ID")
+	private String loginId;
+	
 	@Column(name="NAME")
 	private String name;
 	

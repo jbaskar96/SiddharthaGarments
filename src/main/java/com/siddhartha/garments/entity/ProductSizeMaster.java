@@ -28,7 +28,7 @@ public class ProductSizeMaster {
 	private Integer productSizeId;
 	
 	@Column(name="PRODUCT_SIZE")
-	private String productSize;
+	private Integer productSize;
 	
 	@Column(name="STATUS")
 	private String status;
