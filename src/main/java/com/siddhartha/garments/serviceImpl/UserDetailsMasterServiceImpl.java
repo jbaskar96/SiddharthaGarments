@@ -1,7 +1,13 @@
 package com.siddhartha.garments.serviceImpl;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.Tuple;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +38,15 @@ public class UserDetailsMasterServiceImpl implements UserDetailsMasterService{
 	
 	@Autowired
 	private SimpleDateFormat sdf;
+	
+	@Autowired
+	private CriteriaQueryServiceImpl criteriaQueryImpl;
 
 	@Override
 	public CommonResponse saveUserDetails(UserDetailsRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
 			Long userId =repository.count()+1;
-			UserTypeMaster userType =userTypeRepo.findById(Integer.valueOf(req.getUserType())).orElse(null);
 			UserDetailsMaster detailsMaster = UserDetailsMaster.builder()
 					.userId(StringUtils.isBlank(req.getUserId())?"SUPER_"+userId:req.getUserId())
 					.aadharNo(req.getAadharNo())
@@ -47,26 +55,119 @@ public class UserDetailsMasterServiceImpl implements UserDetailsMasterService{
 					.email(req.getEmail())
 					.entryDate(new Date())
 					.mobileNo(req.getMobileNo())
-					.name(req.getName())
+					.firstName(req.getFirstname())
+					.lastName(req.getLastName())
+					.stateCode(Integer.valueOf(req.getStateCode()))
+					.districtCode(Integer.valueOf(req.getDistrictCode()))
+					.city(req.getCity())
+					.address(req.getAddress())
 					.status(req.getStatus())
-					.userType(userType.getUserType())
-					.loginId(null)
+					.userType(Integer.valueOf(req.getUserType()))
+					.loginId(req.getUserName())
 					.build();
 			UserDetailsMaster savedData =repository.save(detailsMaster);
 			
-			if(savedData!=null) {
+			if(savedData!=null && "N".equalsIgnoreCase(req.getEditYn())) {
 				passwordEnc passwordEnc = new passwordEnc();
 				LoginMaster loginMaster =LoginMaster.builder().build();
-				loginMaster.setLoginId(req.getUserName());
+				loginMaster.setLoginId(savedData.getLoginId());
 				loginMaster.setPassword(passwordEnc.encrypt(req.getPassword()));
 				loginMaster.setUsertype(savedData.getStatus());
 				loginMaster.setEntryDate(new Date());
-				loginMaster.setCreatedBy(req.getCreatedBy());
-				loginMaster.setStatus(req.getStatus());
-				
+				loginMaster.setCreatedBy(savedData.getCreatedBy());
+				loginMaster.setStatus(savedData.getStatus());
 				loginrepo.save(loginMaster);
+			}else {
+				
+				LoginMaster loginMaster =loginrepo.findById(req.getUserName()).orElse(null);
+				loginMaster.setStatus(savedData.getStatus());
+				loginMaster.setUpdateDate(new Date());
+				loginrepo.save(loginMaster);
+
 			}
 			
+			response.setError(null);
+			response.setMessage("Success");
+			response.setResponse("Data saved Successfully");
+			
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+			response.setError(null);
+			response.setMessage("Failed");
+			response.setResponse("Data saved Failed");
+			
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse getAllUserDetails() {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<UserDetailsMaster> list =repository.findAll();
+			if(!list.isEmpty()) {
+				List<Map<String,String>> res = new ArrayList<>();
+				list.forEach(p ->{
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("FirstName", p.getFirstName());
+					map.put("MobileNo", p.getMobileNo());
+					map.put("AadharNo", p.getAadharNo());
+					map.put("UserName", p.getLoginId());
+					map.put("CreatedBy", p.getCreatedBy());
+					map.put("LastName", p.getLastName());
+					map.put("UserId", p.getUserId());
+					res.add(map);
+					
+				});
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(res);
+			}else {
+				response.setError(null);
+				response.setMessage("Failed");
+				response.setResponse("No data found");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse editUseDetails(String userId) {
+		CommonResponse response = new CommonResponse();
+		try {
+			passwordEnc passwordEnc = new passwordEnc();
+			List<Tuple> userList =criteriaQueryImpl.getUserList(userId);
+			if(!userList.isEmpty()) {
+				Tuple tuple =userList.get(0);
+				HashMap<String, String> map = new HashMap<String, String>();
+				map.put("UserId", tuple.get("userId")==null?"":tuple.get("userId").toString());
+				map.put("FirstName", tuple.get("firstName")==null?"":tuple.get("firstName").toString());
+				map.put("LastName", tuple.get("lastName")==null?"":tuple.get("lastName").toString());
+				map.put("Mobile", tuple.get("mobileNo")==null?"":tuple.get("mobileNo").toString());
+				map.put("Email", tuple.get("email")==null?"":tuple.get("email").toString());
+				map.put("AadharNo", tuple.get("aadharNo")==null?"":tuple.get("aadharNo").toString());
+				map.put("StateCode", tuple.get("stateCode")==null?"":tuple.get("stateCode").toString());
+				map.put("DistrictCode", tuple.get("districtCode")==null?"":tuple.get("districtCode").toString());
+				map.put("City", tuple.get("city")==null?"":tuple.get("city").toString());
+				map.put("Address", tuple.get("address")==null?"":tuple.get("address").toString());
+				map.put("UserName", tuple.get("loginId")==null?"":tuple.get("loginId").toString());
+				map.put("Password", tuple.get("password")==null?"":passwordEnc.crypt(tuple.get("password").toString()));
+				map.put("DateOfBirth", tuple.get("dateOfBirth")==null?"":tuple.get("dateOfBirth").toString());
+				map.put("Status", tuple.get("status")==null?"":tuple.get("status").toString());
+				map.put("CreatedBy", tuple.get("createdBy")==null?"":tuple.get("createdBy").toString());
+				map.put("UserType", tuple.get("userType")==null?"":tuple.get("userType").toString());
+				
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(map);
+			}else {
+				response.setError(null);
+				response.setMessage("Failed");
+				response.setResponse("No Data Found");
+			}
 		}catch (Exception e) {
 			e.printStackTrace();
 		}

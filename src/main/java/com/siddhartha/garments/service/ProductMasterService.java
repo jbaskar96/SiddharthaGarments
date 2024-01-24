@@ -13,4 +13,5 @@ public interface ProductMasterService {
 
 	CommonResponse deleteProduct(Integer productId);
 
+
 }

@@ -27,8 +27,12 @@ public class OperatorMaster {
 	@Column(name="OPERATOR_ID")
 	private String operatorId;
 	
-	@Column(name="OPERATOR_NAME")
-	private String operatorName;
+
+	@Column(name="FIRST_NAME")
+	private String firstName;
+	
+	@Column(name="LAST_NAME")
+	private String lastName;
 	
 	@Column(name="MOBILE_NO")
 	private String mobileNo;
@@ -50,5 +54,17 @@ public class OperatorMaster {
 	
 	@Column(name="STATUS")
 	private String status;
+	
+	@Column(name="STATE_CODE")
+	private Integer stateCode;
+	
+	@Column(name="DISTRICT_CODE")
+	private Integer districtCode;
+	
+	@Column(name="CITY")
+	private String city;
+	
+	@Column(name="ADDRESS")
+	private String address;
 
 }

@@ -1,6 +1,8 @@
 package com.siddhartha.garments.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,10 +20,21 @@ public class UserDetailMasterController {
 	private UserDetailsMasterService service;
 	
 	
-	
 	@PostMapping("/save")
 	public CommonResponse saveUserDetails(@RequestBody UserDetailsRequest req) {
 		return service.saveUserDetails(req);
 	}
+	
 
+	@GetMapping("/getAll")
+	public CommonResponse getAllUserDetails() {
+		return service.getAllUserDetails();
+	}
+
+	@GetMapping("/edit/{userId}")
+	public CommonResponse editUseDetails(@PathVariable("userId") String userId) {
+		return service.editUseDetails(userId);
+	}
+
+	
 }

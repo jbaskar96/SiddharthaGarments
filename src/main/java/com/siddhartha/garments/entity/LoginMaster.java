@@ -79,8 +79,11 @@ private static final long serialVersionUID = 1L;
     @Column(name="STATUS", length=1)
     private String     status ;
 
-    @Column(name="ENTRY_DATE", length=1)
+    @Column(name="ENTRY_DATE")
     private Date   entryDate ;
+    
+    @Column(name="UPDATED_DATE")
+    private Date   updateDate ;
    
 }
 

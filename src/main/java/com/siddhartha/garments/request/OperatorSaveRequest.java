@@ -39,4 +39,21 @@ public class OperatorSaveRequest {
 	@JsonProperty("Status")
 	private String status;
 	
+	@JsonProperty("StateCode")
+	private String stateCode;
+	
+	@JsonProperty("DistrictCode")
+	private String districtCode;
+	
+	@JsonProperty("City")
+	private String city;
+	
+	@JsonProperty("Address")
+	private String adress;
+	
+	@JsonProperty("FirstName")
+	private String firstname;
+	
+	@JsonProperty("LastName")
+	private String lastName;
 }

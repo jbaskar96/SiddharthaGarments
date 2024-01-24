@@ -31,8 +31,11 @@ public class UserDetailsMaster {
 	@Column(name="LOGIN_ID")
 	private String loginId;
 	
-	@Column(name="NAME")
-	private String name;
+	@Column(name="FIRST_NAME")
+	private String firstName;
+	
+	@Column(name="LAST_NAME")
+	private String lastName;
 	
 	@Column(name="MOBILE_NO")
 	private String mobileNo;
@@ -56,6 +59,18 @@ public class UserDetailsMaster {
 	private String status;
 	
 	@Column(name="USER_TYPE")
-	private String userType;
+	private Integer userType;
+	
+	@Column(name="STATE_CODE")
+	private Integer stateCode;
+	
+	@Column(name="DISTRICT_CODE")
+	private Integer districtCode;
+	
+	@Column(name="CITY")
+	private String city;
+	
+	@Column(name="ADDRESS")
+	private String address;
 	
 }

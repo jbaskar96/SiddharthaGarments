@@ -7,4 +7,8 @@ public interface UserDetailsMasterService {
 
 	CommonResponse saveUserDetails(UserDetailsRequest req);
 
+	CommonResponse getAllUserDetails();
+
+	CommonResponse editUseDetails(String userId);
+
 }

@@ -37,7 +37,12 @@ public class OperatorMasterServiceImpl implements OperatorMasterService {
 					.email(req.getEmail())
 					.entryDate(new Date())
 					.mobileNo(req.getMobileNo())
-					.operatorName(req.getOperatorName())
+					.firstName(req.getFirstname())
+					.lastName(req.getLastName())
+					.stateCode(Integer.valueOf(req.getStateCode()))
+					.districtCode(Integer.valueOf(req.getDistrictCode()))
+					.city(req.getCity())
+					.address(req.getAdress())
 					.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
 					.operatorId(StringUtils.isBlank(req.getOperatorId())?"OPT_"+optId:req.getOperatorId())
 					.build();
@@ -68,12 +73,18 @@ public class OperatorMasterServiceImpl implements OperatorMasterService {
 					map.put("AadharNo", p.getAadharNo());
 					map.put("MobileNo",p.getMobileNo());
 					map.put("OperatorId", p.getOperatorId());
-					map.put("OperatorName", p.getOperatorName());
+					map.put("FirstName",p.getFirstName());
+					map.put("LastName", p.getLastName());
 					map.put("Email", StringUtils.isBlank(p.getEmail())?"":p.getEmail());
 					map.put("DateOfBirth", sdf.format(p.getDateOfBirth()));
 					map.put("CreatedBy", p.getCreatedBy());
 					map.put("Status",p.getStatus());
 					map.put("CreatedDate", sdf.format(p.getEntryDate()));
+					map.put("StateCode", p.getStateCode().toString());
+					map.put("DistrictCode", p.getDistrictCode().toString());
+					map.put("City", p.getCity());
+					map.put("Address", p.getAddress());
+				
 					res.add(map);
 				});
 				response.setError(null);
@@ -100,12 +111,17 @@ public class OperatorMasterServiceImpl implements OperatorMasterService {
 				map.put("AadharNo", p.getAadharNo());
 				map.put("MobileNo",p.getMobileNo());
 				map.put("OperatorId", p.getOperatorId());
-				map.put("OperatorName", p.getOperatorName());
+				map.put("FirstName",p.getFirstName());
+				map.put("LastName", p.getLastName());
 				map.put("Email", StringUtils.isBlank(p.getEmail())?"":p.getEmail());
 				map.put("DateOfBirth", sdf.format(p.getDateOfBirth()));
 				map.put("CreatedBy", p.getCreatedBy());
 				map.put("Status",p.getStatus());
 				map.put("CreatedDate", sdf.format(p.getEntryDate()));
+				map.put("StateCode", p.getStateCode().toString());
+				map.put("DistrictCode", p.getDistrictCode().toString());
+				map.put("City", p.getCity());
+				map.put("Address", p.getAddress());
 				
 				response.setError(null);
 				response.setMessage("Success");
