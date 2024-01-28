@@ -10,6 +10,6 @@ import com.siddhartha.garments.entity.ProductMaster;
 @Repository
 public interface ProductMasterRepository  extends JpaRepository<ProductMaster, Integer>{
 
-	List<ProductMaster> findByStatusIgnorecase(String status);
+	List<ProductMaster> findByStatusIgnoreCase(String status);
 
 }

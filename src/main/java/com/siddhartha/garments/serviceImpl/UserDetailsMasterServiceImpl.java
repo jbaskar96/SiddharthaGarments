@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service;
 import com.siddhartha.garments.auth.passwordEnc;
 import com.siddhartha.garments.entity.LoginMaster;
 import com.siddhartha.garments.entity.UserDetailsMaster;
-import com.siddhartha.garments.entity.UserTypeMaster;
 import com.siddhartha.garments.repository.LoginMasterRepository;
 import com.siddhartha.garments.repository.UserDetailsMasterRepository;
 import com.siddhartha.garments.repository.UserTypeMasterRepository;
+import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.UserDetailsRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.UserDetailsMasterService;
@@ -41,55 +41,66 @@ public class UserDetailsMasterServiceImpl implements UserDetailsMasterService{
 	
 	@Autowired
 	private CriteriaQueryServiceImpl criteriaQueryImpl;
+	
+	@Autowired
+	private InputValidationServiceImpl validation;
 
 	@Override
 	public CommonResponse saveUserDetails(UserDetailsRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			Long userId =repository.count()+1;
-			UserDetailsMaster detailsMaster = UserDetailsMaster.builder()
-					.userId(StringUtils.isBlank(req.getUserId())?"SUPER_"+userId:req.getUserId())
-					.aadharNo(req.getAadharNo())
-					.createdBy(req.getCreatedBy())
-					.dateOfBirth(sdf.parse(req.getDateOfBirth()))
-					.email(req.getEmail())
-					.entryDate(new Date())
-					.mobileNo(req.getMobileNo())
-					.firstName(req.getFirstname())
-					.lastName(req.getLastName())
-					.stateCode(Integer.valueOf(req.getStateCode()))
-					.districtCode(Integer.valueOf(req.getDistrictCode()))
-					.city(req.getCity())
-					.address(req.getAddress())
-					.status(req.getStatus())
-					.userType(Integer.valueOf(req.getUserType()))
-					.loginId(req.getUserName())
-					.build();
-			UserDetailsMaster savedData =repository.save(detailsMaster);
 			
-			if(savedData!=null && "N".equalsIgnoreCase(req.getEditYn())) {
-				passwordEnc passwordEnc = new passwordEnc();
-				LoginMaster loginMaster =LoginMaster.builder().build();
-				loginMaster.setLoginId(savedData.getLoginId());
-				loginMaster.setPassword(passwordEnc.encrypt(req.getPassword()));
-				loginMaster.setUsertype(savedData.getStatus());
-				loginMaster.setEntryDate(new Date());
-				loginMaster.setCreatedBy(savedData.getCreatedBy());
-				loginMaster.setStatus(savedData.getStatus());
-				loginrepo.save(loginMaster);
-			}else {
+			List<ErrorList> error =validation.validateUserRequest(req);
+			
+			if(error.isEmpty()) {
+				Long userId =repository.count()+1;
+				UserDetailsMaster detailsMaster = UserDetailsMaster.builder()
+						.userId(StringUtils.isBlank(req.getUserId())?"SUPER_"+userId:req.getUserId())
+						.aadharNo(req.getAadharNo())
+						.createdBy(req.getCreatedBy())
+						.dateOfBirth(sdf.parse(req.getDateOfBirth()))
+						.email(req.getEmail())
+						.entryDate(new Date())
+						.mobileNo(req.getMobileNo())
+						.firstName(req.getFirstname())
+						.lastName(req.getLastName())
+						.stateCode(Integer.valueOf(req.getStateCode()))
+						.districtCode(Integer.valueOf(req.getDistrictCode()))
+						.city(req.getCity())
+						.address(req.getAddress())
+						.status(req.getStatus())
+						.userType(Integer.valueOf(req.getUserType()))
+						.loginId(req.getUserName())
+						.build();
+				UserDetailsMaster savedData =repository.save(detailsMaster);
 				
-				LoginMaster loginMaster =loginrepo.findById(req.getUserName()).orElse(null);
-				loginMaster.setStatus(savedData.getStatus());
-				loginMaster.setUpdateDate(new Date());
-				loginrepo.save(loginMaster);
-
+				if(savedData!=null && "N".equalsIgnoreCase(req.getEditYn())) {
+					passwordEnc passwordEnc = new passwordEnc();
+					LoginMaster loginMaster =LoginMaster.builder().build();
+					loginMaster.setLoginId(savedData.getLoginId());
+					loginMaster.setPassword(passwordEnc.encrypt(req.getPassword()));
+					loginMaster.setUsertype(savedData.getStatus());
+					loginMaster.setEntryDate(new Date());
+					loginMaster.setCreatedBy(savedData.getCreatedBy());
+					loginMaster.setStatus(savedData.getStatus());
+					loginrepo.save(loginMaster);
+				}else {
+					
+					LoginMaster loginMaster =loginrepo.findById(req.getUserName()).orElse(null);
+					loginMaster.setStatus(savedData.getStatus());
+					loginMaster.setUpdateDate(new Date());
+					loginrepo.save(loginMaster);
+	
+				}
+				
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse("Data saved Successfully");
+			}else {
+				response.setError(error);
+				response.setMessage("Error");
+				response.setResponse(null);
 			}
-			
-			response.setError(null);
-			response.setMessage("Success");
-			response.setResponse("Data saved Successfully");
-			
 			
 		}catch (Exception e) {
 			e.printStackTrace();

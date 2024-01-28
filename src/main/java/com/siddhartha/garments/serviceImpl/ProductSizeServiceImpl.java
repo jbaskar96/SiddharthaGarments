@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.siddhartha.garments.entity.ProductSizeMaster;
 import com.siddhartha.garments.repository.ProductSizeMasterRepository;
+import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.SizeMasterRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.ProductSizeService;
@@ -21,22 +22,35 @@ public class ProductSizeServiceImpl implements ProductSizeService{
 	
 	@Autowired
 	private ProductSizeMasterRepository repository; 
+	
+	@Autowired
+	private InputValidationServiceImpl validation;
 
 	@Override
 	public CommonResponse saveSize(SizeMasterRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			Long sizeId =repository.count()+1;
-			ProductSizeMaster productSizeMaster =ProductSizeMaster.builder()
-					.productSize(Integer.valueOf(req.getSize()))
-					.productSizeId(StringUtils.isBlank(req.getSizeId())?sizeId.intValue():Integer.valueOf(req.getSizeId()))
-					.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
-					.entryDate(new Date())
-					.build();
-			repository.save(productSizeMaster);
-			response.setError(null);
-			response.setMessage("Success");
-			response.setResponse("Data saved Successfully");
+			
+			List<ErrorList> error =validation.validateMasterInfo(req, "SIZE");
+			
+			if(error.isEmpty()) {
+				Long sizeId =repository.count()+1;
+				ProductSizeMaster productSizeMaster =ProductSizeMaster.builder()
+						.productSize(Integer.valueOf(req.getSize()))
+						.productSizeId(StringUtils.isBlank(req.getSizeId())?sizeId.intValue():Integer.valueOf(req.getSizeId()))
+						.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
+						.entryDate(new Date())
+						.build();
+				repository.save(productSizeMaster);
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse("Data saved Successfully");
+			}else {
+				response.setError(error);
+				response.setMessage("Error");
+				response.setResponse(null);
+			}
+				
 		}catch (Exception e) {
 			e.printStackTrace();
 			response.setError(null);

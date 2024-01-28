@@ -4,13 +4,11 @@
  */
 package com.siddhartha.garments.entity;
 
-import lombok.*;
-import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
-
-
 import java.math.BigDecimal;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Composite primary key for entity "LoginMaster" ( stored in table "LOGIN_MASTER" )

@@ -25,7 +25,6 @@ public class OperatorMasterController {
 		return service.saveOperator(req);
 	}
 	
-	
 	@GetMapping("/getAll")
 	public CommonResponse getAllOperator() {
 		return service.getAllOperator();
@@ -40,5 +39,7 @@ public class OperatorMasterController {
 	public CommonResponse deleteOperator(@PathVariable("operatorId") String operatorId) {
 		return service.deleteOperator(operatorId);
 	}
+	
+	
 	
 }

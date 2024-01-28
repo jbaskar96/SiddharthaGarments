@@ -11,9 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.siddhartha.garments.entity.ProductMaster;
 import com.siddhartha.garments.entity.SectionMaster;
 import com.siddhartha.garments.repository.SectionMasterRepository;
+import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.SectionSaveRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.SectionMasterService;
@@ -26,23 +26,34 @@ public class SectionMasterServiceImpl implements SectionMasterService {
 	
 	@Autowired
 	private SimpleDateFormat sdf;
+	
+	@Autowired
+	private InputValidationServiceImpl validation;
 
 	@Override
 	public CommonResponse saveSection(SectionSaveRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			Long sectionId =repository.count()+1;
-			SectionMaster sectionMaster =SectionMaster.builder()
-					.sectionId(StringUtils.isBlank(req.getSectionId())?sectionId.intValue():Integer.valueOf(req.getSectionId()))
-					.sectionName(req.getSectionName())
-					.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
-					.entryDate(new Date())
-					.build();
-			repository.save(sectionMaster);
+			List<ErrorList> error =validation.validateMasterInfo(req, "SECTION");
 			
-			response.setError(null);
-			response.setMessage("Success");
-			response.setResponse("Data saved Successfully");
+			if(error.isEmpty()) {
+				Long sectionId =repository.count()+1;
+				SectionMaster sectionMaster =SectionMaster.builder()
+						.sectionId(StringUtils.isBlank(req.getSectionId())?sectionId.intValue():Integer.valueOf(req.getSectionId()))
+						.sectionName(req.getSectionName())
+						.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
+						.entryDate(new Date())
+						.build();
+				repository.save(sectionMaster);
+				
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse("Data saved Successfully");
+			}else {
+				response.setError(error);
+				response.setMessage("Error");
+				response.setResponse(null);
+			}	
 		}catch (Exception e) {
 			e.printStackTrace();
 			response.setError(null);
@@ -65,6 +76,7 @@ public class SectionMasterServiceImpl implements SectionMasterService {
 					map.put("SectionName", p.getSectionName());
 					map.put("Status", p.getStatus());
 					map.put("CreatedDate", sdf.format(p.getEntryDate()));
+					res.add(map);
 				});
 				response.setError(null);
 				response.setMessage("Success");

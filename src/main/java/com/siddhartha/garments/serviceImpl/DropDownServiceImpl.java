@@ -60,7 +60,7 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse section() {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<SectionMaster> list =sectionRepo.findByStatusIgnorecase("Y");
+			List<SectionMaster> list =sectionRepo.findByStatusIgnoreCase("Y");
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
@@ -87,7 +87,7 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse product() {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<ProductMaster> list =productRepo.findByStatusIgnorecase("Y");
+			List<ProductMaster> list =productRepo.findByStatusIgnoreCase("Y");
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
@@ -114,7 +114,7 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse usertype() {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<UserTypeMaster> list =userTypeRepo.findByStatusIgnorecase("Y");
+			List<UserTypeMaster> list =userTypeRepo.findByStatusIgnoreCase("Y");
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
@@ -141,7 +141,7 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse color() {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<ProductColorMaster> list =colorRepo.findByStatusIgnorecase("Y");
+			List<ProductColorMaster> list =colorRepo.findByStatusIgnoreCase("Y");
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
@@ -168,7 +168,7 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse state() {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<StateMaster> list =stateRepo.findByStatusIgnorecase("Y");
+			List<StateMaster> list =stateRepo.findByStatusIgnoreCase("Y");
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
@@ -195,7 +195,7 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse district(String stateCode) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<DistrictMaster> list =districtRepo.findByStateCodeStatusIgnorecase("Y");
+			List<DistrictMaster> list =districtRepo.findByDistIdStateCodeAndStatusIgnoreCase(Integer.valueOf(1),"Y");
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
@@ -222,7 +222,7 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse operator() {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<OperatorMaster> list =operatorRepo.findByStatusIgnorecase("Y");
+			List<OperatorMaster> list =operatorRepo.findByStatusIgnoreCase("Y");
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
@@ -250,7 +250,7 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse size() {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<ProductSizeMaster> list =sizeRepo.findByStatusIgnorecase("Y");
+			List<ProductSizeMaster> list =sizeRepo.findByStatusIgnoreCase("Y");
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{

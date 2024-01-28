@@ -23,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Order(1000)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+
 	@Autowired
     private UserDetailsService userDetailsService;
     
@@ -67,9 +68,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/login/CheckChangePassword","/login/LoginChangePassword","/login/getForgotPassword","/JasperFiles/*","/JasperFiles/**","/login/getBranchDetail","/login/verify/policy").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().loginPage("/authentication/login").permitAll()
+                .formLogin().loginPage("/admin/region/list").loginPage("/authentication/login").permitAll()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                /*.sessionManagement().maximumSessions(1).sessionRegistry(sessionRegistry());*/
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http
                 .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
@@ -84,3 +86,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 }
+

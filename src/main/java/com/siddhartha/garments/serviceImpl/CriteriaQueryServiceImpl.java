@@ -9,6 +9,7 @@ import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import javax.transaction.Transactional;
@@ -17,10 +18,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import com.siddhartha.garments.entity.ChallanDetails;
 import com.siddhartha.garments.entity.DistrictMaster;
 import com.siddhartha.garments.entity.LoginMaster;
+import com.siddhartha.garments.entity.LotDeatils;
 import com.siddhartha.garments.entity.UserDetailsMaster;
-import com.siddhartha.garments.entity.UserTypeMaster;
 
 @Component
 @Transactional
@@ -69,6 +71,39 @@ public class CriteriaQueryServiceImpl {
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
+		return list;
+	}
+	
+	public List<Tuple> getAllOrderDetails(String status){
+		List<Tuple> list = null;
+		try {
+			CriteriaBuilder cb =em.getCriteriaBuilder();
+			CriteriaQuery<Tuple> query =cb.createTupleQuery();
+			Root<LotDeatils> lotRoot =query.from(LotDeatils.class);
+			
+			Subquery<Integer> subQuery=query.subquery(Integer.class);
+			Root<ChallanDetails> root =subQuery.from(ChallanDetails.class);
+			subQuery.select(cb.count(root).as(Integer.class)).where(cb.equal(lotRoot.get("orderId"), lotRoot.get("orderId"))
+					,cb.equal(cb.upper(root.get("status")), "Y"));
+
+			Expression<String> statusDesc =cb.selectCase()
+					.when(cb.equal(lotRoot.get("status"), "Y"), "INWARD")
+					.when(cb.equal(lotRoot.get("status"), "P"), "PRODUCTION")
+					.otherwise("DELIVERED")
+					.as(String.class);
+			
+			query.multiselect(lotRoot.get("orderId").alias("orderId"),lotRoot.get("lotNo").alias("lotNo"),lotRoot.get("companyName").alias("companyName"),
+					lotRoot.get("inwardDate").alias("inwardDate"),lotRoot.get("gstNo").alias("gstNo"),lotRoot.get("phoneNo").alias("phoneNo"),
+					subQuery.alias("totalSize"),statusDesc.alias("status"),lotRoot.get("deliveryDate").alias("deliveryDate"),lotRoot.get("productionDate").alias("productionDate"))
+			.where(cb.equal(cb.upper(lotRoot.get("status")), status))
+			.orderBy(cb.desc(lotRoot.get("entryDate")));
+			
+			TypedQuery<Tuple> typedQuery =em.createQuery(query);
+			list=typedQuery.getResultList();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		return list;
 	}
 

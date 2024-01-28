@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.siddhartha.garments.entity.UserTypeMaster;
 import com.siddhartha.garments.repository.UserTypeMasterRepository;
+import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.UserTypeRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.UserTypeService;
@@ -25,23 +26,35 @@ public class UserTypeServiceImpl implements UserTypeService {
 	
 	@Autowired
 	private SimpleDateFormat sdf;
+	
+	@Autowired
+	private InputValidationServiceImpl validation;
 
 	@Override
 	public CommonResponse saveUserType(UserTypeRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			Long userTypeId =repository.count()+1;
-			UserTypeMaster userTypeMaster =UserTypeMaster.builder()
-					.userTypeId(StringUtils.isBlank(req.getUserTypeId())?userTypeId.intValue():Integer.valueOf(req.getUserTypeId()))
-					.userType(req.getUserTypeName())
-					.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
-					.entryDate(new Date())
-					.build();
 			
-			repository.save(userTypeMaster);
-			response.setError(null);
-			response.setMessage("Success");
-			response.setResponse("Data saved Successfully");
+			List<ErrorList> error =validation.validateMasterInfo(req, "USERTYPE");
+			
+			if(error.isEmpty()) {
+				Long userTypeId =repository.count()+1;
+				UserTypeMaster userTypeMaster =UserTypeMaster.builder()
+						.userTypeId(StringUtils.isBlank(req.getUserTypeId())?userTypeId.intValue():Integer.valueOf(req.getUserTypeId()))
+						.userType(req.getUserTypeName())
+						.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
+						.entryDate(new Date())
+						.build();
+				
+				repository.save(userTypeMaster);
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse("Data saved Successfully");
+			}else {
+				response.setError(error);
+				response.setMessage("Error");
+				response.setResponse(null);
+			}
 		}catch (Exception e) {
 			e.printStackTrace();
 			response.setError(null);

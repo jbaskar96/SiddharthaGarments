@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.siddhartha.garments.entity.OperatorMaster;
 import com.siddhartha.garments.repository.OperatorMasterRepository;
+import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.OperatorSaveRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.OperatorMasterService;
@@ -23,35 +24,49 @@ public class OperatorMasterServiceImpl implements OperatorMasterService {
 	@Autowired
 	private OperatorMasterRepository repository;
 	
-	static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+	public static SimpleDateFormat sdf =new SimpleDateFormat("dd/MM/yyyy");
+	
+
+	@Autowired
+	private InputValidationServiceImpl validation;
 
 	@Override
 	public CommonResponse saveOperator(OperatorSaveRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			Long optId =repository.count()+1;
-			OperatorMaster operatorMaster =OperatorMaster.builder()
-					.aadharNo(req.getAadharNo())
-					.createdBy(req.getCreatedBy())
-					.dateOfBirth(sdf.parse(req.getDateOfBirth()))
-					.email(req.getEmail())
-					.entryDate(new Date())
-					.mobileNo(req.getMobileNo())
-					.firstName(req.getFirstname())
-					.lastName(req.getLastName())
-					.stateCode(Integer.valueOf(req.getStateCode()))
-					.districtCode(Integer.valueOf(req.getDistrictCode()))
-					.city(req.getCity())
-					.address(req.getAdress())
-					.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
-					.operatorId(StringUtils.isBlank(req.getOperatorId())?"OPT_"+optId:req.getOperatorId())
-					.build();
 			
-			repository.save(operatorMaster);
-			
-			response.setError(null);
-			response.setMessage("Success");
-			response.setResponse("Data saved Successfully");
+			List<ErrorList> error =validation.validateOperator(req);
+
+			if(error.isEmpty()) {
+				
+				Long optId =repository.count()+1;
+				OperatorMaster operatorMaster =OperatorMaster.builder()
+						.aadharNo(req.getAadharNo())
+						.createdBy(req.getCreatedBy())
+						.dateOfBirth(sdf.parse(req.getDateOfBirth()))
+						.email(req.getEmail())
+						.entryDate(new Date())
+						.mobileNo(req.getMobileNo())
+						.firstName(req.getFirstname())
+						.lastName(req.getLastName())
+						.stateCode(Integer.valueOf(req.getStateCode()))
+						.districtCode(Integer.valueOf(req.getDistrictCode()))
+						.city(req.getCity())
+						.address(req.getAdress())
+						.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
+						.operatorId(StringUtils.isBlank(req.getOperatorId())?"OPT_"+optId:req.getOperatorId())
+						.build();
+				
+				repository.save(operatorMaster);
+				
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse("Data saved Successfully");
+			}else {
+				response.setError(error);
+				response.setMessage("Error");
+				response.setResponse(null);
+			}
 		}catch (Exception e) {
 			e.printStackTrace();
 			response.setError(e.getMessage());
@@ -66,7 +81,7 @@ public class OperatorMasterServiceImpl implements OperatorMasterService {
 		CommonResponse response = new CommonResponse();
 		try {
 			List<OperatorMaster> list =repository.findByStatusIgnoreCase("Y");
-			if(list.isEmpty()) {
+			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
 					HashMap<String, String> map = new HashMap<String, String>();

@@ -4,10 +4,17 @@
  */
 package com.siddhartha.garments.entity;
 
-import lombok.*;
-import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Id;
+
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 
@@ -21,16 +28,21 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
-@EqualsAndHashCode
 @AllArgsConstructor
+@Embeddable
 public class SessionDetailsId implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    
+    //--- ENTITY PRIMARY KEY 
 
-    //--- ENTITY KEY ATTRIBUTES 
+    @Column(name="LOGIN_ID", nullable=false, length=100)
     private String     loginId ;
-    
+
+
+    @Column(name="TOKEN_ID", nullable=false, length=500)
     private String     tokenId ;
-    
+
      
 }

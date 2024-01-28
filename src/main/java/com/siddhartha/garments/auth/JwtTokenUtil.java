@@ -28,11 +28,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtTokenUtil implements Serializable {
-	@Autowired
-	private SessionDetailsRepository sessionRep;
 	
-	@Autowired
-	private JwtTokenUtil jwtTokenUtil;
+	
 	private static final long serialVersionUID = 1L;
 
 	public String getUsernameFromToken(String token) {

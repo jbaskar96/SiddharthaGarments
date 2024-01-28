@@ -26,6 +26,7 @@ import com.siddhartha.garments.auth.JwtTokenUtil;
 import com.siddhartha.garments.auth.passwordEnc;
 import com.siddhartha.garments.entity.LoginMaster;
 import com.siddhartha.garments.entity.SessionDetails;
+import com.siddhartha.garments.entity.SessionDetailsId;
 import com.siddhartha.garments.repository.LoginMasterRepository;
 import com.siddhartha.garments.repository.SessionDetailsRepository;
 import com.siddhartha.garments.request.LoginRequest;
@@ -65,13 +66,15 @@ public class LoginServiceImpl implements LoginService,UserDetailsService {
 				String token = jwtTokenUtil.doGenerateToken(request.getUserName());
 				servletRequest.getSession().removeAttribute(request.getUserName());
 				SessionDetails session = new SessionDetails();
-				session.setLoginId(request.getUserName());
-				session.setTokenId(token);
+				SessionDetailsId details = new SessionDetailsId();
+				details.setLoginId(request.getUserName());
+				details.setTokenId(token);
 				session.setStatus("Y");
 				session.setUserType(login.getUsertype());
 				String temptoken = bCryptPasswordEncoder.encode("CommercialClaim");
 				session.setTempTokenid(temptoken);
 				session.setEntryDate(new Date());
+				session.setSessionPk(details);
 				session =sessionDetailsRepository.save(session);
 				response= setTokenResponse(session,login);
 			}
@@ -89,7 +92,7 @@ public class LoginServiceImpl implements LoginService,UserDetailsService {
 		try {
 			String userType =session.getUserType();
 			response.put("Token", session.getTempTokenid());
-			response.put("UserName", session.getLoginId());
+			response.put("UserName", session.getSessionPk().getLoginId());
 			response.put("UserType", userType);
 		}catch (Exception e) {
 			e.printStackTrace();

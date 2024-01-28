@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.siddhartha.garments.entity.ProductColorMaster;
 import com.siddhartha.garments.repository.ProductColorMasterRepository;
 import com.siddhartha.garments.request.ColorSaveRequest;
+import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.ProductColorService;
 
@@ -23,24 +24,34 @@ public class ProductColorServiceImpl implements ProductColorService {
 	@Autowired
 	private ProductColorMasterRepository repository;
 	
-	
+	@Autowired
+	private InputValidationServiceImpl validation;
 
 	@Override
 	public CommonResponse saveColor(ColorSaveRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			Long colorId =repository.count()+1;
-			ProductColorMaster colorMaster =ProductColorMaster.builder()
-					.colorId(StringUtils.isBlank(req.getColorId())?colorId.intValue():Integer.valueOf(req.getColorId()))
-					.colorName(req.getColorName())
-					.entryDate(new Date())
-					.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
-					.build();
 			
-			repository.save(colorMaster);
-			response.setError(null);
-			response.setMessage("Success");
-			response.setResponse("Data saved Successfully");
+			List<ErrorList> error =validation.validateMasterInfo(req, "COLOR");
+			
+			if(error.isEmpty()) {
+				Long colorId =repository.count()+1;
+				ProductColorMaster colorMaster =ProductColorMaster.builder()
+						.colorId(StringUtils.isBlank(req.getColorId())?colorId.intValue():Integer.valueOf(req.getColorId()))
+						.colorName(req.getColorName())
+						.entryDate(new Date())
+						.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
+						.build();
+				
+				repository.save(colorMaster);
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse("Data saved Successfully");
+			}else {
+				response.setError(error);
+				response.setMessage("Error");
+				response.setResponse(null);
+			}
 		}catch (Exception e) {
 			e.printStackTrace();
 			response.setError(null);
@@ -55,7 +66,7 @@ public class ProductColorServiceImpl implements ProductColorService {
 		CommonResponse response = new CommonResponse();
 		try {
 			List<ProductColorMaster> list =repository.findAll();
-			if(list.isEmpty()) {
+			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
 					HashMap<String, String> map = new HashMap<String, String>();

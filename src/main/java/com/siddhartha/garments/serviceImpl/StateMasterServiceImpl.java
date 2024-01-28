@@ -11,11 +11,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.siddhartha.garments.entity.DistrictMaster;
-import com.siddhartha.garments.entity.DistrictMasterID;
 import com.siddhartha.garments.entity.StateMaster;
 import com.siddhartha.garments.repository.DistrictMasterRepository;
 import com.siddhartha.garments.repository.StateMasterRepository;
+import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.StateSaveRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.StateMasterService;
@@ -31,22 +30,33 @@ public class StateMasterServiceImpl implements StateMasterService{
 	
 	@Autowired
 	private SimpleDateFormat sdf;
+	
+	@Autowired
+	private InputValidationServiceImpl validation;
 
 	@Override
 	public CommonResponse saveState(StateSaveRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			Long stateCode =repository.count()+1;
-			StateMaster stateMaster =StateMaster.builder()
-					.stateCode(StringUtils.isBlank(req.getStateCode()) ?stateCode.toString():req.getStateCode())
-					.stateName(req.getStateName())
-					.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
-					.entryDate(new Date())
-					.build();
-			repository.save(stateMaster);
-			response.setError(null);
-			response.setMessage("Success");
-			response.setResponse("Data saved Successfully");
+			List<ErrorList> error =validation.validateMasterInfo(req, "STATE");
+			
+			if(error.isEmpty()) {
+				Long stateCode =repository.count()+1;
+				StateMaster stateMaster =StateMaster.builder()
+						.stateCode(StringUtils.isBlank(req.getStateCode()) ?stateCode.toString():req.getStateCode())
+						.stateName(req.getStateName())
+						.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
+						.entryDate(new Date())
+						.build();
+				repository.save(stateMaster);
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse("Data saved Successfully");
+			}else {
+				response.setError(error);
+				response.setMessage("Error");
+				response.setResponse(null);
+			}
 		}catch (Exception e) {
 			e.printStackTrace();
 			response.setError(null);
@@ -114,7 +124,7 @@ public class StateMasterServiceImpl implements StateMasterService{
 		CommonResponse response = new CommonResponse();
 		try {
 			repository.deleteById(stateCode.toString());
-			districtRepo.deleteByStateCode(stateCode);
+			districtRepo.deleteByDistIdStateCode(stateCode);
 			response.setError(null);
 			response.setMessage("Success");
 			response.setResponse("Data deleted Successfully");

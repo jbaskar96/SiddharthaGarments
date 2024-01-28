@@ -10,6 +10,6 @@ import com.siddhartha.garments.entity.StateMaster;
 @Repository
 public interface StateMasterRepository extends JpaRepository<StateMaster, String>{
 
-	List<StateMaster> findByStatusIgnorecase(String status);
+	List<StateMaster> findByStatusIgnoreCase(String status);
 
 }

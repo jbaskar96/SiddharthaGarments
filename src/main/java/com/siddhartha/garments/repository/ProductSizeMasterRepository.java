@@ -10,6 +10,6 @@ import com.siddhartha.garments.entity.ProductSizeMaster;
 @Repository
 public interface ProductSizeMasterRepository extends JpaRepository<ProductSizeMaster, Integer>{
 
-	List<ProductSizeMaster> findByStatusIgnorecase(String status);
+	List<ProductSizeMaster> findByStatusIgnoreCase(String status);
 
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.siddhartha.garments.entity.ProductMaster;
 import com.siddhartha.garments.repository.ProductMasterRepository;
+import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.ProductSaveRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.ProductMasterService;
@@ -27,24 +28,37 @@ public class ProductMasterServiceImpl implements ProductMasterService {
 	
 	@Autowired
 	private SimpleDateFormat sdf;
+	
+
+	@Autowired
+	private InputValidationServiceImpl validation;
 
 	@Override
 	public CommonResponse saveProduct(ProductSaveRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			Long productId =repository.count()+1;
-			ProductMaster productMaster =ProductMaster.builder()
-					.productId(StringUtils.isBlank(req.getProductId())?productId.intValue():Integer.valueOf(req.getProductId()))
-					.productName(req.getProductName())
-					.status(req.getStatus())
-					.entryDate(new Date())
-					.build();
 			
-			repository.save(productMaster);
+			List<ErrorList> error =validation.validateMasterInfo(req, "PRODUCT");
 			
-			response.setError(null);
-			response.setMessage("Success");
-			response.setResponse("Data saved Successfully");
+			if(error.isEmpty()) {
+				Long productId =repository.count()+1;
+				ProductMaster productMaster =ProductMaster.builder()
+						.productId(StringUtils.isBlank(req.getProductId())?productId.intValue():Integer.valueOf(req.getProductId()))
+						.productName(req.getProductName())
+						.status(req.getStatus())
+						.entryDate(new Date())
+						.build();
+				
+				repository.save(productMaster);
+				
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse("Data saved Successfully");
+			}else {
+				response.setError(error);
+				response.setMessage("Error");
+				response.setResponse(null);
+			}
 			
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -68,6 +82,7 @@ public class ProductMasterServiceImpl implements ProductMasterService {
 					map.put("ProductName", p.getProductName());
 					map.put("Status", p.getStatus());
 					map.put("CreatedDate", sdf.format(p.getEntryDate()));
+					res.add(map);
 				});
 				response.setError(null);
 				response.setMessage("Success");

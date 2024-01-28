@@ -13,16 +13,24 @@
 package com.siddhartha.garments.entity;
 
 
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
+
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import lombok.*;
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.List;
-
-import java.util.Date;
-import javax.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 
 
@@ -38,7 +46,6 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@IdClass(SessionDetailsId.class)
 @Entity
 @DynamicInsert
 @DynamicUpdate
@@ -47,20 +54,14 @@ import javax.persistence.*;
 public class SessionDetails {
  
  
-    //--- ENTITY PRIMARY KEY 
-    @Id
-    @Column(name="LOGIN_ID", nullable=false, length=100)
-    private String     loginId ;
-
-    @Id
-    @Column(name="TOKEN_ID", nullable=false, length=500)
-    private String     tokenId ;
-
+	@EmbeddedId
+	private SessionDetailsId sessionPk;
+   
     //--- ENTITY DATA FIELDS 
-    @Column(name="STATUS", length=50)
+    @Column(name="STATUS")
     private String    status ;
 
-    @Column(name="TEMP_TOKENID", length=50)
+    @Column(name="TEMP_TOKENID")
     private String     tempTokenid ;
 
     @Column(name="ENTRY_DATE")

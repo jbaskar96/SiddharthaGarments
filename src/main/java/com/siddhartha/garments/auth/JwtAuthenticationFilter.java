@@ -1,6 +1,5 @@
 package com.siddhartha.garments.auth;
 
-import com.siddhartha.garments.auth.Constants.*;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -46,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		if (header != null && header.startsWith(Constants.TOKEN_PREFIX)) {
 			authToken = header.replace(Constants.TOKEN_PREFIX, "");
 			table = sessionRep.findByTempTokenid(authToken);
-			authToken = table.getTokenId();
+			authToken = table.getSessionPk().getTokenId();
 	        requestWrapper.addHeader(Constants.HEADER_STRING, authToken);
 			try {
 				username = jwtTokenUtil.getUsernameFromToken(authToken);
@@ -54,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				logger.error("an error occured during getting username from token", e);
 			} catch (Exception e) {
 				logger.warn("the token is expired and not valid anymore");
-				username = table.getLoginId();
+				username = table.getSessionPk().getLoginId();
 			} 
 		} else {
 			//req.getSession().invalidate();
@@ -68,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				logger.info("new refresh token generated ======> "+refreshtoken);
 				int deletecount = sessionRep.deleteByTempTokenid(table.getTempTokenid());
 				logger.info("delete session table and insert new token ======> "+deletecount);
-				table.setTokenId(refreshtoken);  
+				table.getSessionPk().setTokenId(refreshtoken);  
 				sessionRep.save(table);
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 						userDetails, null, Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")));

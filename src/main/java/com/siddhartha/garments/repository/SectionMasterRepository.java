@@ -10,6 +10,6 @@ import com.siddhartha.garments.entity.SectionMaster;
 @Repository
 public interface SectionMasterRepository extends JpaRepository<SectionMaster, Integer>{
 
-	List<SectionMaster> findByStatusIgnorecase(String status);
+	List<SectionMaster> findByStatusIgnoreCase(String status);
 
 }

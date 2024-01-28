@@ -3,7 +3,6 @@ package com.siddhartha.garments.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
-import lombok.Setter;
 
 @Data
 public class UserDetailsRequest {

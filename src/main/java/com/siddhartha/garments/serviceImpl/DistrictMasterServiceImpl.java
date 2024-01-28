@@ -16,6 +16,7 @@ import com.siddhartha.garments.entity.DistrictMaster;
 import com.siddhartha.garments.entity.DistrictMasterID;
 import com.siddhartha.garments.repository.DistrictMasterRepository;
 import com.siddhartha.garments.request.DisrictRequest;
+import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.DistrictMasterService;
 
@@ -31,31 +32,43 @@ public class DistrictMasterServiceImpl implements DistrictMasterService {
 	private CriteriaQueryServiceImpl criteriaQuery;
 	
 	public static SimpleDateFormat sdf =new SimpleDateFormat("dd/MM/yyyy");
+	
+	@Autowired
+	private InputValidationServiceImpl validation;
 
 	@Override
 	public CommonResponse saveDistrict(DisrictRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			Integer districtCode =StringUtils.isBlank(req.getDistrictCode())?criteriaQuery.getMaxOfCodeByStateCode(req.getStateCode())
-					:Integer.valueOf(req.getDistrictCode());
 			
+			List<ErrorList> error =validation.validateMasterInfo(req, "DISTRICT");
 			
-			DistrictMasterID districtMasterID =DistrictMasterID.builder()
-					.stateCode(Integer.valueOf(req.getStateCode()))
-					.districtCode(districtCode)
-					.build();
+			if(error.isEmpty()) {
 			
-			DistrictMaster districtMaster =DistrictMaster.builder()
-					.distId(districtMasterID)
-					.districtName(req.getDistrictName())
-					.entryDate(new Date())
-					.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
-					.build();
-			repository.save(districtMaster);
-			
-			response.setError(null);
-			response.setMessage("Success");
-			response.setResponse("data saved successfully");
+				Integer districtCode =StringUtils.isBlank(req.getDistrictCode())?criteriaQuery.getMaxOfCodeByStateCode(req.getStateCode())
+						:Integer.valueOf(req.getDistrictCode());
+				
+				DistrictMasterID districtMasterID =DistrictMasterID.builder()
+						.stateCode(Integer.valueOf(req.getStateCode()))
+						.districtCode(districtCode)
+						.build();
+				
+				DistrictMaster districtMaster =DistrictMaster.builder()
+						.distId(districtMasterID)
+						.districtName(req.getDistrictName())
+						.entryDate(new Date())
+						.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
+						.build();
+				repository.save(districtMaster);
+				
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse("data saved successfully");
+			}else {
+				response.setError(error);
+				response.setMessage("Error");
+				response.setResponse(null);
+			}
 		}catch (Exception e) {
 			log.error(e);
 		}

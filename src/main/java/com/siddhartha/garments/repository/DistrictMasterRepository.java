@@ -14,8 +14,9 @@ public interface DistrictMasterRepository extends JpaRepository<DistrictMaster, 
 
 	List<DistrictMaster> findByDistIdStateCode(Integer statecode);
 
-	void deleteByStateCode(Integer stateCode);
+	void deleteByDistIdStateCode(Integer stateCode);
 
-	List<DistrictMaster> findByStateCodeStatusIgnorecase(String status);
+
+	List<DistrictMaster> findByDistIdStateCodeAndStatusIgnoreCase(Integer stateCode, String status);
 
 }
