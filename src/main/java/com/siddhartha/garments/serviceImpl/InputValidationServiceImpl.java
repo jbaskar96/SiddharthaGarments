@@ -1,6 +1,8 @@
 package com.siddhartha.garments.serviceImpl;
 
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Base64.Encoder;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -9,7 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.siddhartha.garments.auth.EncryDecryService;
-import com.siddhartha.garments.auth.passwordEnc;
 import com.siddhartha.garments.entity.LoginMaster;
 import com.siddhartha.garments.repository.LoginMasterRepository;
 import com.siddhartha.garments.request.ChallanInfoRequest;
@@ -29,6 +30,7 @@ import com.siddhartha.garments.request.SizeMasterRequest;
 import com.siddhartha.garments.request.StateSaveRequest;
 import com.siddhartha.garments.request.UserDetailsRequest;
 import com.siddhartha.garments.request.UserTypeRequest;
+import com.siddhartha.garments.request.WorkerEntryDetailsReq;
 
 @Component
 public class InputValidationServiceImpl {
@@ -54,10 +56,11 @@ public class InputValidationServiceImpl {
 			}
 			if(StringUtils.isNotBlank(req.getUserName()) && StringUtils.isNotBlank(req.getPassword())) {
 				
-				passwordEnc passEnc = new passwordEnc();
-				String paswd = passEnc.crypt(req.getPassword().trim());
+				Encoder encoder =Base64.getEncoder();
 				
-				LoginMaster loginMaster =loginMasterRepository.findByLoginIdAndPassword(req.getUserName(), paswd);
+				String paswd =encoder.encodeToString(req.getPassword().getBytes());
+				
+				LoginMaster loginMaster =loginMasterRepository.findByLoginIdIgnoreCaseAndPassword(req.getUserName(), paswd);
 				
 				if(loginMaster==null) {
 					errorList.add(new ErrorList("User","401","Please enter valid username/password"));
@@ -429,6 +432,45 @@ public class InputValidationServiceImpl {
 					errorLists.add(new ErrorList("UserTypeName","450","Please enter UserTypeName"));
 				}
 				
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return errorLists;
+	}
+
+	public List<ErrorList> validateWorkerEntry(WorkerEntryDetailsReq d) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		try {
+			if(StringUtils.isBlank(d.getChallanId())) {
+				errorLists.add(new ErrorList("Size","450","Please choose size"));
+			}
+			if(StringUtils.isBlank(d.getColorId())) {
+				errorLists.add(new ErrorList("Color","450","Please choose color"));
+			}
+			if(StringUtils.isBlank(d.getGoodPieces())) {
+				errorLists.add(new ErrorList("GoodPieces","450","Please enter GoodPieces"));
+			}
+			if(StringUtils.isBlank(d.getDamagedPieces())) {
+				errorLists.add(new ErrorList("DamagedPieces","450","Please enter DamagedPieces"));
+			}
+			if(StringUtils.isBlank(d.getOperatorId())) {
+				errorLists.add(new ErrorList("Operator","450","Please choose operator"));
+			}
+			if(StringUtils.isBlank(d.getSectionId())) {
+				errorLists.add(new ErrorList("SectionId","450","Please choose section"));
+			}
+			if(StringUtils.isBlank(d.getUpdatedBy())) {
+				errorLists.add(new ErrorList("UpdatedBy","450","Please enter UpdatedBy"));
+			}
+			if(StringUtils.isBlank(d.getWorkedPieces())) {
+				errorLists.add(new ErrorList("WorkedPieces","450","Please enter WorkedPieces"));
+			}
+			if(StringUtils.isBlank(d.getWorkedPieces())) {
+				errorLists.add(new ErrorList("WorkedPieces","450","Please enter WorkedPieces"));
+			}
+			if(StringUtils.isBlank(d.getOrderId())) {
+				errorLists.add(new ErrorList("Order","450","Please choose LotNumber"));
 			}
 		}catch (Exception e) {
 			e.printStackTrace();

@@ -3,6 +3,8 @@ package com.siddhartha.garments.serviceImpl;
 
 
 import java.util.Arrays;
+import java.util.Base64;
+import java.util.Base64.Encoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +31,7 @@ import com.siddhartha.garments.entity.SessionDetails;
 import com.siddhartha.garments.entity.SessionDetailsId;
 import com.siddhartha.garments.repository.LoginMasterRepository;
 import com.siddhartha.garments.repository.SessionDetailsRepository;
+import com.siddhartha.garments.repository.UserTypeMasterRepository;
 import com.siddhartha.garments.request.LoginRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.LoginService;
@@ -52,6 +55,9 @@ public class LoginServiceImpl implements LoginService,UserDetailsService {
 	
 	@Autowired
 	private EncryDecryService endecryService;
+	
+	@Autowired
+	private UserTypeMasterRepository userTypeRepo;
 
 
 	@Override
@@ -59,9 +65,9 @@ public class LoginServiceImpl implements LoginService,UserDetailsService {
 		Map<String,String> response =new HashMap<String,String>();
 		CommonResponse commonResponse = new CommonResponse();
 		try {
-			passwordEnc passEnc = new passwordEnc();
-			String epass = passEnc.crypt(request.getPassword().trim());
-			LoginMaster login =loginMasterRepository.findByLoginIdAndPassword(request.getUserName(),epass);
+			Encoder encoder = Base64.getEncoder();
+			String epass = encoder.encodeToString(request.getPassword().trim().getBytes());
+			LoginMaster login =loginMasterRepository.findByLoginIdIgnoreCaseAndPassword(request.getUserName(),epass);
 			if (login!=null) {
 				String token = jwtTokenUtil.doGenerateToken(request.getUserName());
 				servletRequest.getSession().removeAttribute(request.getUserName());
@@ -92,8 +98,8 @@ public class LoginServiceImpl implements LoginService,UserDetailsService {
 		try {
 			String userType =session.getUserType();
 			response.put("Token", session.getTempTokenid());
-			response.put("UserName", session.getSessionPk().getLoginId());
-			response.put("UserType", userType);
+			response.put("UserName", login.getLoginId());
+			response.put("UserType", userTypeRepo.findById(Integer.valueOf(userType)).get().getUserType());
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -105,7 +111,7 @@ public class LoginServiceImpl implements LoginService,UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		LoginMaster userList = new LoginMaster();
 		try {
-			 userList =  loginMasterRepository.findByLoginId(username);
+			 userList =  loginMasterRepository.findByLoginIdIgnoreCase(username);
 			if (userList!=null) {
 				String pass =bCryptPasswordEncoder.encode(endecryService.decrypt("zQYgCo7GMZeX1tBQyzAi8Q=="));
 				userList.setPassword(pass);

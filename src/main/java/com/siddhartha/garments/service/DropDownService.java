@@ -20,4 +20,10 @@ public interface DropDownService {
 
 	CommonResponse district(String stateCode);
 
+	CommonResponse getOrderDetails();
+
+	CommonResponse getSizeDetails(String orderId);
+
+	CommonResponse colorDeatilsByOrderId(String orderId, String sizeId);
+
 }

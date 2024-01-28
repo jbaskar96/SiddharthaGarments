@@ -1,5 +1,7 @@
 package com.siddhartha.garments.serviceImpl;
 
+import java.util.Base64;
+import java.util.Base64.Encoder;
 import java.util.Date;
 
 import javax.annotation.PostConstruct;
@@ -66,6 +68,7 @@ public class InsertDataServiceImpl {
 	@PostConstruct
 	public void insertdata() {
 		try {
+			Encoder encoder =Base64.getEncoder();
 			UserDetailsMaster details = UserDetailsMaster.builder()
 					.aadharNo("9777 3093 2515")
 					.address("Chennai")
@@ -87,12 +90,11 @@ public class InsertDataServiceImpl {
 			
 			userRepo.save(details);
 			
-			passwordEnc pe = new passwordEnc();
 			LoginMaster loginMaster = LoginMaster.builder()
 					.createdBy("admin")
 					.entryDate(new Date())
 					.loginId("admin")
-					.password(pe.encrypt("Admin@01"))
+					.password(encoder.encodeToString("Admin@01".getBytes()))
 					.usertype("1")
 					.status("Y")
 					.build();
@@ -124,7 +126,7 @@ public class InsertDataServiceImpl {
 					.createdBy("admin")
 					.entryDate(new Date())
 					.loginId("Supervisor")
-					.password(pe.encrypt("Admin@01"))
+					.password(encoder.encodeToString("Admin@01".getBytes()))
 					.usertype("2")
 					.status("Y")
 					.build();

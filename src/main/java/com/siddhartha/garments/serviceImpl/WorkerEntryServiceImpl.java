@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.siddhartha.garments.entity.WorkerEntryDetails;
 import com.siddhartha.garments.repository.WorkerEntryRepository;
+import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.WorkerEntryDetailsReq;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.WorkerEntryService;
@@ -25,32 +26,44 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 	private WorkerEntryRepository workerEntryRepository;
 	
 	@Autowired
+	private InputValidationServiceImpl validation;
+	
+	@Autowired
 	private SimpleDateFormat sdf;
 
 	@Override
 	public CommonResponse workerEntrySave(WorkerEntryDetailsReq req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			WorkerEntryDetails workerEntryDetails =WorkerEntryDetails.builder()
-					.serialNo(StringUtils.isBlank(req.getSerialNo())?null:Long.valueOf(req.getSerialNo()))
-					.challanId(req.getChallanId())
-					.colorId(Integer.valueOf(req.getColorId()))
-					.damagedPieces(Integer.valueOf(req.getDamagedPieces()))
-					.entryDate(new Date())
-					.goodPieces(Integer.valueOf(req.getGoodPieces()))
-					.operatorId(req.getOperatorId())
-					.orderId(req.getOrderId())
-					.sectionId(Integer.valueOf(req.getSectionId()))
-					.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
-					.updatedBy(req.getUpdatedBy())
-					.goodPieces(Integer.valueOf(req.getGoodPieces()))
-					.workedPieces(Integer.valueOf(req.getWorkedPieces()))
-					.build();
-			workerEntryRepository.save(workerEntryDetails);
 			
-			response.setError(null);
-			response.setMessage("Success");
-			response.setResponse(response);
+			List<ErrorList> error =validation.validateWorkerEntry(req);
+			
+			if(!error.isEmpty()) {
+				WorkerEntryDetails workerEntryDetails =WorkerEntryDetails.builder()
+						.serialNo(StringUtils.isBlank(req.getSerialNo())?null:Long.valueOf(req.getSerialNo()))
+						.challanId(req.getChallanId())
+						.colorId(Integer.valueOf(req.getColorId()))
+						.damagedPieces(Integer.valueOf(req.getDamagedPieces()))
+						.entryDate(new Date())
+						.goodPieces(Integer.valueOf(req.getGoodPieces()))
+						.operatorId(req.getOperatorId())
+						.orderId(req.getOrderId())
+						.sectionId(Integer.valueOf(req.getSectionId()))
+						.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
+						.updatedBy(req.getUpdatedBy())
+						.goodPieces(Integer.valueOf(req.getGoodPieces()))
+						.workedPieces(Integer.valueOf(req.getWorkedPieces()))
+						.build();
+				workerEntryRepository.save(workerEntryDetails);
+				
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse("Data Saved Successfully");
+			}else {
+				response.setError(null);
+				response.setMessage("Error");
+				response.setResponse(error);
+			}
 		}catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -2,6 +2,9 @@ package com.siddhartha.garments.serviceImpl;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Base64.Decoder;
+import java.util.Base64.Encoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,9 +34,6 @@ public class UserDetailsMasterServiceImpl implements UserDetailsMasterService{
 	private UserDetailsMasterRepository repository ;
 	
 	@Autowired
-	private UserTypeMasterRepository userTypeRepo;
-	
-	@Autowired
 	private LoginMasterRepository loginrepo;
 	
 	@Autowired
@@ -49,6 +49,8 @@ public class UserDetailsMasterServiceImpl implements UserDetailsMasterService{
 	public CommonResponse saveUserDetails(UserDetailsRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
+			
+			Encoder encoder = Base64.getEncoder();
 			
 			List<ErrorList> error =validation.validateUserRequest(req);
 			
@@ -75,10 +77,9 @@ public class UserDetailsMasterServiceImpl implements UserDetailsMasterService{
 				UserDetailsMaster savedData =repository.save(detailsMaster);
 				
 				if(savedData!=null && "N".equalsIgnoreCase(req.getEditYn())) {
-					passwordEnc passwordEnc = new passwordEnc();
 					LoginMaster loginMaster =LoginMaster.builder().build();
 					loginMaster.setLoginId(savedData.getLoginId());
-					loginMaster.setPassword(passwordEnc.encrypt(req.getPassword()));
+					loginMaster.setPassword(encoder.encodeToString(req.getPassword().getBytes()));
 					loginMaster.setUsertype(savedData.getStatus());
 					loginMaster.setEntryDate(new Date());
 					loginMaster.setCreatedBy(savedData.getCreatedBy());
@@ -148,6 +149,7 @@ public class UserDetailsMasterServiceImpl implements UserDetailsMasterService{
 	@Override
 	public CommonResponse editUseDetails(String userId) {
 		CommonResponse response = new CommonResponse();
+		Decoder decoder = Base64.getDecoder();
 		try {
 			passwordEnc passwordEnc = new passwordEnc();
 			List<Tuple> userList =criteriaQueryImpl.getUserList(userId);
@@ -165,8 +167,8 @@ public class UserDetailsMasterServiceImpl implements UserDetailsMasterService{
 				map.put("City", tuple.get("city")==null?"":tuple.get("city").toString());
 				map.put("Address", tuple.get("address")==null?"":tuple.get("address").toString());
 				map.put("UserName", tuple.get("loginId")==null?"":tuple.get("loginId").toString());
-				map.put("Password", tuple.get("password")==null?"":passwordEnc.crypt(tuple.get("password").toString()));
-				map.put("DateOfBirth", tuple.get("dateOfBirth")==null?"":tuple.get("dateOfBirth").toString());
+				map.put("Password", tuple.get("password")==null?"":new String(decoder.decode(tuple.get("password").toString())));
+				map.put("DateOfBirth", tuple.get("dateOfBirth")==null?"":sdf.format(tuple.get("dateOfBirth")));
 				map.put("Status", tuple.get("status")==null?"":tuple.get("status").toString());
 				map.put("CreatedBy", tuple.get("createdBy")==null?"":tuple.get("createdBy").toString());
 				map.put("UserType", tuple.get("userType")==null?"":tuple.get("userType").toString());

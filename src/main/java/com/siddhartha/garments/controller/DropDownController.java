@@ -58,4 +58,19 @@ public class DropDownController {
 		return service.size();
 	}
 	
+	@GetMapping("/get/orderDetails")
+	public CommonResponse getOrderDetails() {
+		return service.getOrderDetails();
+	}
+	
+	@GetMapping("/get/sizeDetails/{orderId}")
+	public CommonResponse getSizeDetails(@PathVariable("orderId") String orderId) {
+		return service.getSizeDetails(orderId);
+	}
+	
+	@GetMapping("/get/colorDeatilsByOrderId/{orderId}/{sizeId}")
+	public CommonResponse colorDeatilsByOrderId(@PathVariable("orderId") String orderId,@PathVariable("sizeId") String sizeId) {
+		return service.colorDeatilsByOrderId(orderId,sizeId);
+	}
+	
 }

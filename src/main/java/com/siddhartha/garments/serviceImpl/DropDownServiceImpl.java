@@ -5,11 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Tuple;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.siddhartha.garments.entity.ChallanDetails;
 import com.siddhartha.garments.entity.DistrictMaster;
+import com.siddhartha.garments.entity.LotDeatils;
 import com.siddhartha.garments.entity.OperatorMaster;
 import com.siddhartha.garments.entity.ProductColorMaster;
 import com.siddhartha.garments.entity.ProductMaster;
@@ -17,7 +21,9 @@ import com.siddhartha.garments.entity.ProductSizeMaster;
 import com.siddhartha.garments.entity.SectionMaster;
 import com.siddhartha.garments.entity.StateMaster;
 import com.siddhartha.garments.entity.UserTypeMaster;
+import com.siddhartha.garments.repository.ChallanRepository;
 import com.siddhartha.garments.repository.DistrictMasterRepository;
+import com.siddhartha.garments.repository.LotCreationRepository;
 import com.siddhartha.garments.repository.OperatorMasterRepository;
 import com.siddhartha.garments.repository.ProductColorMasterRepository;
 import com.siddhartha.garments.repository.ProductMasterRepository;
@@ -54,6 +60,15 @@ public class DropDownServiceImpl implements DropDownService{
 	
 	@Autowired
 	private DistrictMasterRepository districtRepo;
+
+	@Autowired
+	private LotCreationRepository lotRepo;
+	
+	@Autowired
+	private ChallanRepository challanRepository;
+	
+	@Autowired
+	private CriteriaQueryServiceImpl query;
 
 
 	@Override
@@ -257,6 +272,88 @@ public class DropDownServiceImpl implements DropDownService{
 					HashMap<String, String> map = new HashMap<String, String>();
 					map.put("Code", p.getProductSizeId().toString());
 					map.put("CodeDesc", p.getProductSize().toString());
+					res.add(map);
+				});
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(res);
+			}else {
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse("No data found");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse getOrderDetails() {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<LotDeatils> list =lotRepo.findByStatusIgnoreCase("Y");
+			if(!list.isEmpty()) {
+				List<Map<String,String>> res = new ArrayList<>();
+				list.forEach(p ->{
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("Code", p.getOrderId());
+					map.put("CodeDesc", p.getLotNo());
+					res.add(map);
+				});
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(res);
+			}else {
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse("No data found");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse getSizeDetails(String orderId) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ChallanDetails> list =challanRepository.findByChaIdOrderId(orderId);
+			if(!list.isEmpty()) {
+				List<Map<String,String>> res = new ArrayList<>();
+				list.forEach(p ->{
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("Code", p.getChaId().getChallanId());
+					map.put("CodeDesc", p.getSize().toString());
+					res.add(map);
+				});
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(res);
+			}else {
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse("No data found");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse colorDeatilsByOrderId(String orderId, String sizeId) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<Tuple> list =query.getColorDeatilsByChallanId(orderId, sizeId);
+			if(!list.isEmpty()) {
+				List<Map<String,String>> res = new ArrayList<>();
+				list.forEach(p ->{
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("Code", p.get("colorId")==null?"":p.get("colorId").toString());
+					map.put("CodeDesc", p.get("colorName")==null?"":p.get("colorName").toString());
+					map.put("TotalPieces", p.get("piecesCount")==null?"":p.get("piecesCount").toString());
 					res.add(map);
 				});
 				response.setError(null);

@@ -1,6 +1,7 @@
 package com.siddhartha.garments;
 
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,5 +23,6 @@ public class GarmentsApiApplication {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		return sdf;
 	}
+	
 
 }

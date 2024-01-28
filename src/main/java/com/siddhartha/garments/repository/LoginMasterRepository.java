@@ -12,4 +12,8 @@ public interface LoginMasterRepository extends JpaRepository<LoginMaster, String
 
 	LoginMaster findByLoginId(String username);
 
+	LoginMaster findByLoginIdIgnoreCaseAndPassword(String userName, String paswd);
+
+	LoginMaster findByLoginIdIgnoreCase(String username);
+
 }
