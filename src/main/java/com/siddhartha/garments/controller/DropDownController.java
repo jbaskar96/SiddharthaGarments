@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.DropDownService;
 
+import io.swagger.annotations.Api;
+
 @RestController
 @RequestMapping("/dropdown")
+@Api(tags = "DROPDOWN CONTROLLER" ,description = "API'S")
 public class DropDownController {
 	
 	
@@ -71,6 +74,11 @@ public class DropDownController {
 	@GetMapping("/get/colorDeatilsByOrderId/{orderId}/{sizeId}")
 	public CommonResponse colorDeatilsByOrderId(@PathVariable("orderId") String orderId,@PathVariable("sizeId") String sizeId) {
 		return service.colorDeatilsByOrderId(orderId,sizeId);
+	}
+	
+	@GetMapping("/metalType")
+	public CommonResponse metalType() {
+		return service.metalType();
 	}
 	
 }

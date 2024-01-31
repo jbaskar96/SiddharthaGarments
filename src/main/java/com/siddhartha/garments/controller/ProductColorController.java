@@ -12,8 +12,11 @@ import com.siddhartha.garments.request.ColorSaveRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.ProductColorService;
 
+import io.swagger.annotations.Api;
+
 @RestController
 @RequestMapping("/color")
+@Api(tags = "MASTER : COLOR CONTROLLER",description = "API'S")
 public class ProductColorController {
 	
 	@Autowired

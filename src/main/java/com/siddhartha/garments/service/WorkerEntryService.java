@@ -9,4 +9,6 @@ public interface WorkerEntryService {
 
 	CommonResponse getWorkerEntryByOrderId(String orderId);
 
+	CommonResponse getAllWorkerEntryDetail();
+
 }

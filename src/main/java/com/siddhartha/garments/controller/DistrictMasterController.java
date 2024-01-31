@@ -12,8 +12,11 @@ import com.siddhartha.garments.request.DisrictRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.DistrictMasterService;
 
+import io.swagger.annotations.Api;
+
 @RestController
 @RequestMapping("/district")
+@Api(tags="MASTER : DISTRICT CONTROLLER", description="API's")
 public class DistrictMasterController {
 	
 	@Autowired

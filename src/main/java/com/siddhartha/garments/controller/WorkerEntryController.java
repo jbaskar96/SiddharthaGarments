@@ -12,8 +12,11 @@ import com.siddhartha.garments.request.WorkerEntryDetailsReq;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.WorkerEntryService;
 
+import io.swagger.annotations.Api;
+
 @RestController	
 @RequestMapping("/worker")
+@Api(tags = "WORKER DATA ENTRY CONTROLLER",description = "API'S")
 public class WorkerEntryController {
 	
 	@Autowired
@@ -27,6 +30,11 @@ public class WorkerEntryController {
 	@GetMapping("/getWorkerEntryByOrderId/{orderId}")
 	public CommonResponse getWorkerEntryByOrderId(@PathVariable("OrderId") String orderId) {
 		return service.getWorkerEntryByOrderId(orderId);
+	}
+	
+	@GetMapping("/getAllWorkerEntryDetail")
+	public CommonResponse getAllWorkerEntryDetail() {
+		return service.getAllWorkerEntryDetail();
 	}
 	
 

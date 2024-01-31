@@ -20,8 +20,11 @@ import com.siddhartha.garments.request.ProductionMoveReq;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.LotCreationService;
 
+import io.swagger.annotations.Api;
+
 @RestController
 @RequestMapping("/order")
+@Api(tags = "LOT CREATION CONTROLLER",description = "API'S")
 public class LotCreationController {
 	
 	

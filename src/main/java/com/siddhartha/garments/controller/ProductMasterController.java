@@ -12,8 +12,11 @@ import com.siddhartha.garments.request.ProductSaveRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.ProductMasterService;
 
+import io.swagger.annotations.Api;
+
 @RestController
 @RequestMapping("/product")
+@Api(tags = "MASTER : PRODUCT CONTROLLER",description = "API'S")
 public class ProductMasterController {
 	
 	@Autowired

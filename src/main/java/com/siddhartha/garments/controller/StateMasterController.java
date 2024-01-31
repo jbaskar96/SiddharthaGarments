@@ -12,8 +12,11 @@ import com.siddhartha.garments.request.StateSaveRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.StateMasterService;
 
+import io.swagger.annotations.Api;
+
 @RestController
 @RequestMapping("/state")
+@Api(tags = "MASTER : STATE CONTROLLER",description = "API'S")
 public class StateMasterController {
 	
 	@Autowired

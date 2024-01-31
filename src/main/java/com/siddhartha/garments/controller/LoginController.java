@@ -16,8 +16,11 @@ import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.LoginService;
 import com.siddhartha.garments.serviceImpl.InputValidationServiceImpl;
 
+import io.swagger.annotations.Api;
+
 @RestController
 @RequestMapping("/authentication")
+@Api(tags = "LOGIN CONTROLLER",description = "API'S")
 public class LoginController {
 	
 	

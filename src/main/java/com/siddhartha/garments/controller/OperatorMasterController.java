@@ -12,8 +12,11 @@ import com.siddhartha.garments.request.OperatorSaveRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.OperatorMasterService;
 
+import io.swagger.annotations.Api;
+
 @RestController
 @RequestMapping("/operator")
+@Api(tags = "MASTER : OPERATOR CONTROLLER",description = "API'S")
 public class OperatorMasterController {
 	
 	@Autowired

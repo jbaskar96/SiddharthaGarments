@@ -10,9 +10,12 @@ import com.siddhartha.garments.request.WorkerEntryDetailsReq;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.ReportService;
 
+import io.swagger.annotations.Api;
+
 
 @RestController
 @RequestMapping("/report")
+@Api(tags = "OPERATOR WORK REPORT CONTROLLER",description = "API'S")
 public class ReportController {
 	
 	@Autowired
@@ -24,4 +27,9 @@ public class ReportController {
 		return service.getWorkerReport(req);
 	}
 
+	@PostMapping("/export/excel")
+	public CommonResponse exportExcel(@RequestBody WorkerEntryDetailsReq req) {
+		return service.exportExcel(req);
+	}
+	
 }

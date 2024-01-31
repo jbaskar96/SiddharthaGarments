@@ -109,4 +109,42 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 		return response;
 	}
 
+	@Override
+	public CommonResponse getAllWorkerEntryDetail() {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<WorkerEntryDetails> workerDetails =workerEntryRepository.findAll();
+			if(workerDetails.isEmpty()) {
+				List<Map<String,String>> mapList =new ArrayList<>();
+				workerDetails.forEach(p ->{
+					HashMap<String, String> map =new HashMap<String, String>();
+					map.put("SerialNo", p.getSerialNo().toString());
+					map.put("OperatorId", p.getOperatorId());
+					map.put("SectionId", p.getSectionId().toString());
+					map.put("OrderId", p.getOrderId());
+					map.put("ChallanId", p.getChallanId());
+					map.put("ColorId", p.getColorId().toString());
+					map.put("WokedDate", sdf.format(p.getEntryDate()));
+					map.put("Wokedpieces", p.getWorkedPieces().toString());
+					map.put("GoodPieces", p.getGoodPieces().toString());
+					map.put("DamagePieces", p.getDamagedPieces().toString());
+					map.put("UpdatedBy", p.getUpdatedBy());
+					mapList.add(map);
+					
+				});
+				
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(mapList);
+			}else {
+				response.setError(null);
+				response.setMessage("Failed");
+				response.setResponse("No data Found");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
 }

@@ -151,7 +151,6 @@ public class UserDetailsMasterServiceImpl implements UserDetailsMasterService{
 		CommonResponse response = new CommonResponse();
 		Decoder decoder = Base64.getDecoder();
 		try {
-			passwordEnc passwordEnc = new passwordEnc();
 			List<Tuple> userList =criteriaQueryImpl.getUserList(userId);
 			if(!userList.isEmpty()) {
 				Tuple tuple =userList.get(0);

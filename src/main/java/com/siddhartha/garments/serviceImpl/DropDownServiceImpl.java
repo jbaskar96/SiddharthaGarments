@@ -292,7 +292,7 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse getOrderDetails() {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<LotDeatils> list =lotRepo.findByStatusIgnoreCase("Y");
+			List<LotDeatils> list =lotRepo.findByStatusIgnoreCase("P");
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
@@ -370,4 +370,29 @@ public class DropDownServiceImpl implements DropDownService{
 		return response;
 	}
 
+	@Override
+	public CommonResponse metalType() {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<Map<String,String>> res = new ArrayList<>();
+			
+			HashMap<String, String> map1 = new HashMap<String, String>();
+			map1.put("Code","Required");
+			map1.put("CodeDesc","Required");
+			
+			HashMap<String, String> map2 = new HashMap<String, String>();
+			map2.put("Code","Received");
+			map2.put("CodeDesc","Received");
+			
+			res.add(map2);
+			res.add(map1);
+			response.setError(null);
+			response.setMessage("Success");
+			response.setResponse(res);
+
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
 }

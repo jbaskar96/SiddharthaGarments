@@ -12,8 +12,11 @@ import com.siddhartha.garments.request.UserDetailsRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.UserDetailsMasterService;
 
+import io.swagger.annotations.Api;
+
 @RestController
 @RequestMapping("/userdetail")
+@Api(tags = "MASTER : USER DETAILS CONTROLLER",description = "API'S")
 public class UserDetailMasterController {
 	
 	@Autowired
@@ -25,7 +28,6 @@ public class UserDetailMasterController {
 		return service.saveUserDetails(req);
 	}
 	
-
 	@GetMapping("/getAll")
 	public CommonResponse getAllUserDetails() {
 		return service.getAllUserDetails();

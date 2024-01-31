@@ -12,8 +12,11 @@ import com.siddhartha.garments.request.SizeMasterRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.ProductSizeService;
 
+import io.swagger.annotations.Api;
+
 @RestController
 @RequestMapping("/size")
+@Api(tags = "MASTER : SIZE CONTROLLER",description = "API'S")
 public class ProductSizeController {
 	
 	

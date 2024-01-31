@@ -12,8 +12,11 @@ import com.siddhartha.garments.request.UserTypeRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.UserTypeService;
 
+import io.swagger.annotations.Api;
+
 @RestController
 @RequestMapping("/usertype")
+@Api(tags = "MASTER : USERTYPE CONTROLLER",description = "API'S")
 public class UserTypeController {
 	
 	@Autowired

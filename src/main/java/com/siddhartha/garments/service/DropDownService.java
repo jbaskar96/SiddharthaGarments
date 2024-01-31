@@ -26,4 +26,6 @@ public interface DropDownService {
 
 	CommonResponse colorDeatilsByOrderId(String orderId, String sizeId);
 
+	CommonResponse metalType();
+
 }

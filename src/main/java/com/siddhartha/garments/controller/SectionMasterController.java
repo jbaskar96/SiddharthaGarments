@@ -12,8 +12,11 @@ import com.siddhartha.garments.request.SectionSaveRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.SectionMasterService;
 
+import io.swagger.annotations.Api;
+
 @RestController
 @RequestMapping("/section")
+@Api(tags = "MASTER : SECTION CONTROLLER",description = "API'S")
 public class SectionMasterController {
 	
 	@Autowired

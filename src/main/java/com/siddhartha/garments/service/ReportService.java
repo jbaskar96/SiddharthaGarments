@@ -7,4 +7,6 @@ public interface ReportService {
 
 	CommonResponse getWorkerReport(WorkerEntryDetailsReq req);
 
+	CommonResponse exportExcel(WorkerEntryDetailsReq req);
+
 }

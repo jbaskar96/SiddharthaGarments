@@ -29,11 +29,11 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo(){
         return new ApiInfo(
-                "Spring Boot Blog REST APIs",
-                "Spring Boot Blog REST API Documentation",
+                "SIDDHARTHA GARMENTS",
+                "Below rest api are created  for siddhartha garments by futureforce solutions private imited",
                 "1",
                 "Terms of service",
-                new Contact("Ramesh Fadatare", "www.javaguides.net", "ramesh@gmail.com"),
+                new Contact("Kalaivanan", "www.siddhartha.in", "kalai@gmail.com"),
                 "License of API",
                 "API license URL",
                 Collections.emptyList()
