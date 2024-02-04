@@ -28,7 +28,7 @@ public class WorkerEntryController {
 	}
 	
 	@GetMapping("/getWorkerEntryByOrderId/{orderId}")
-	public CommonResponse getWorkerEntryByOrderId(@PathVariable("OrderId") String orderId) {
+	public CommonResponse getWorkerEntryByOrderId(@PathVariable("orderId") String orderId) {
 		return service.getWorkerEntryByOrderId(orderId);
 	}
 	

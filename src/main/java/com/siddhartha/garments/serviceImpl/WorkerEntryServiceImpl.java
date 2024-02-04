@@ -38,11 +38,11 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 			
 			List<ErrorList> error =validation.validateWorkerEntry(req);
 			
-			if(!error.isEmpty()) {
+			if(error.isEmpty()) {
 				WorkerEntryDetails workerEntryDetails =WorkerEntryDetails.builder()
-						.serialNo(StringUtils.isBlank(req.getSerialNo())?null:Long.valueOf(req.getSerialNo()))
+						.serialNo(StringUtils.isBlank(req.getSerialNo())?workerEntryRepository.count()							:Long.valueOf(req.getSerialNo()))
 						.challanId(req.getChallanId())
-						.colorId(Integer.valueOf(req.getColorId()))
+						.colorId(req.getColorId())
 						.damagedPieces(Integer.valueOf(req.getDamagedPieces()))
 						.entryDate(new Date())
 						.goodPieces(Integer.valueOf(req.getGoodPieces()))

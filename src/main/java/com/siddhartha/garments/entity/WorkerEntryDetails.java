@@ -39,7 +39,7 @@ public class WorkerEntryDetails {
 	private String challanId;
 	
 	@Column(name="COLOR_ID")
-	private Integer colorId;
+	private String colorId;
 	
 	@Column(name="WORKED_PIECES")
 	private Integer workedPieces;
