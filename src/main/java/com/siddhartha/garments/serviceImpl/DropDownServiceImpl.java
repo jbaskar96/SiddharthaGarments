@@ -395,4 +395,105 @@ public class DropDownServiceImpl implements DropDownService{
 		}
 		return response;
 	}
+
+	@Override
+	public CommonResponse getCompanyBrand(String companyId) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<Map<String,String>> res = new ArrayList<>();
+			HashMap<String, String> map1 = new HashMap<String, String>();
+			HashMap<String, String> map2 = new HashMap<String, String>();
+
+			if("1".equals(companyId)) {
+				map1.put("Code","1");
+				map1.put("CodeDesc","HondaCity");
+				map2.put("Code","2");
+				map2.put("CodeDesc","Hyundai");
+			}else if("2".equals(companyId)) {
+				map1.put("Code","1");
+				map1.put("CodeDesc","A1");
+				map2.put("Code","2");
+				map2.put("CodeDesc","A3");
+			}
+			
+			res.add(map2);
+			res.add(map1);
+			response.setError(null);
+			response.setMessage("Success");
+			response.setResponse(res);
+
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse getBrandCategory(String companyId, String itemId) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<Map<String,String>> res = new ArrayList<>();
+			HashMap<String, String> map1 = new HashMap<String, String>();
+			HashMap<String, String> map2 = new HashMap<String, String>();
+
+			if("1".equals(companyId) && "1".equals(itemId)) {
+				map1.put("Code","1");
+				map1.put("CodeDesc","Salloon");
+				map2.put("Code","2");
+				map2.put("CodeDesc","Taxi");
+			}else if("1".equals(companyId)&& "2".equals(itemId)) {
+				map1.put("Code","1");
+				map1.put("CodeDesc","Salloon");
+				map2.put("Code","2");
+				map2.put("CodeDesc","Taxi");
+			}else if("2".equals(companyId)&& "1".equals(itemId)) {
+				map1.put("Code","1");
+				map1.put("CodeDesc","Salloon");
+				map2.put("Code","2");
+				map2.put("CodeDesc","Taxi");
+			}else if("2".equals(companyId)&& "2".equals(itemId)) {
+				map1.put("Code","1");
+				map1.put("CodeDesc","Salloon");
+				map2.put("Code","2");
+				map2.put("CodeDesc","Taxi");
+			}
+			
+			res.add(map2);
+			res.add(map1);
+			response.setError(null);
+			response.setMessage("Success");
+			response.setResponse(res);
+
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+	@Override
+	public CommonResponse getCompany() {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<Map<String,String>> res = new ArrayList<>();
+			
+			HashMap<String, String> map1 = new HashMap<String, String>();
+			map1.put("Code","1");
+			map1.put("CodeDesc","Honda");
+			
+			HashMap<String, String> map2 = new HashMap<String, String>();
+			map2.put("Code","2");
+			map2.put("CodeDesc","Audi");
+			
+			res.add(map2);
+			res.add(map1);
+			response.setError(null);
+			response.setMessage("Success");
+			response.setResponse(res);
+
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	
 }

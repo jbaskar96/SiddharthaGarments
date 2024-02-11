@@ -24,6 +24,7 @@ import com.siddhartha.garments.request.LoginRequest;
 import com.siddhartha.garments.request.LotDetailsRequest;
 import com.siddhartha.garments.request.MeterialDetailsRequest;
 import com.siddhartha.garments.request.MeterialInfoReq;
+import com.siddhartha.garments.request.MeterialSetupRequest;
 import com.siddhartha.garments.request.OperatorSaveRequest;
 import com.siddhartha.garments.request.ProductSaveRequest;
 import com.siddhartha.garments.request.SectionSaveRequest;
@@ -105,8 +106,14 @@ public class InputValidationServiceImpl {
 			if(StringUtils.isBlank(req.getPhoneNo())) {
 				errorLists.add(new ErrorList("PhoneNo","108","Please enter Phone Number"));
 			}
-			if(StringUtils.isBlank(req.getProductCode())) {
-				errorLists.add(new ErrorList("ProductCode","109","Please choose your Product"));
+			if(StringUtils.isBlank(req.getCompanyId())) {
+				errorLists.add(new ErrorList("CompanyId","109","Please choose your CompanyId"));
+			}
+			if(StringUtils.isBlank(req.getItemId())) {
+				errorLists.add(new ErrorList("ItemId","109","Please choose your ItemId"));
+			}
+			if(StringUtils.isBlank(req.getCategoryId())) {
+				errorLists.add(new ErrorList("CategoryId","109","Please choose your CategoryId"));
 			}
 			if(StringUtils.isBlank(req.getStateCode())) {
 				errorLists.add(new ErrorList("StateCode","110","Please choose your State"));
@@ -494,6 +501,48 @@ public class InputValidationServiceImpl {
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
+		return errorLists;
+	}
+
+	public List<ErrorList>  validateMeterialSetup(MeterialSetupRequest req) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		
+		if(StringUtils.isBlank(req.getProductId())) {
+			errorLists.add(new ErrorList("Product","450","Please choose product"));
+		}
+		if(StringUtils.isBlank(req.getTableColumn())) {
+			errorLists.add(new ErrorList("TableColumn","450","Please choose TableColumn"));
+		}
+		if(StringUtils.isBlank(req.getQuantityType())) {
+			errorLists.add(new ErrorList("QuantityType","450","Please choose QuantityType"));
+		}
+		if(StringUtils.isBlank(req.getDisplayOrder())) {
+			errorLists.add(new ErrorList("DisplayOrder","450","Please choose DisplayOrder"));
+		}
+		if(StringUtils.isBlank(req.getDisplayColumn())) {
+			errorLists.add(new ErrorList("DisplayColumn","450","Please choose DisplayColumn"));
+		}
+		if(req.getQuantityType().equals("P")) {
+			
+			if("P".equals(req.getCalcType())) {
+				
+				if(StringUtils.isBlank(req.getCalcPercentage())) {
+					errorLists.add(new ErrorList("CalcPercentage","450","Please enter CalcPercentage"));
+				}
+	
+			}else if("A".equals(req.getCalcAmount())) {
+				
+				if(StringUtils.isBlank(req.getCalcAmount())) {
+					errorLists.add(new ErrorList("No Of Pieces","450","Please enter Number Of Pieces"));
+				}
+			}
+		}else if("B".equalsIgnoreCase(req.getQuantityType())){
+			
+			if(StringUtils.isBlank(req.getBoxPieceCount())) {
+				errorLists.add(new ErrorList("BoxPiecesCount","450","Please choose BoxPiecesCount"));
+			}
+		}
+		
 		return errorLists;
 	}
 

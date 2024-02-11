@@ -25,6 +25,7 @@ import com.siddhartha.garments.repository.ChallanRepository;
 import com.siddhartha.garments.repository.ColorDetailsRepository;
 import com.siddhartha.garments.repository.LotCreationRepository;
 import com.siddhartha.garments.repository.MeterialDetailsRepository;
+import com.siddhartha.garments.repository.MeterialSetupMasterRepository;
 import com.siddhartha.garments.request.ChallanInfoRequest;
 import com.siddhartha.garments.request.ColorDetailsRequest;
 import com.siddhartha.garments.request.ColorInfoReq;
@@ -64,6 +65,9 @@ public class LotCreationServiceImpl implements LotCreationService{
 	
 	@Autowired
 	private InputValidationServiceImpl validation;
+	
+	@Autowired
+	private MeterialSetupMasterRepository meterialSetupRepo;
 
 
 	@Override
@@ -91,7 +95,9 @@ public class LotCreationServiceImpl implements LotCreationService{
 						.inwardDate(sdf.parse(req.getInwardDate()))
 						.lotNo(req.getLotNo())
 						.phoneNo(req.getPhoneNo())
-						.productCode(Integer.valueOf(req.getProductCode()))
+						.companyId(Integer.valueOf(req.getCompanyId())) 
+						.itemId(Integer.valueOf(req.getCategoryId()))
+						.categoryId(Integer.valueOf(req.getCategoryId()))
 						.orderId(StringUtils.isBlank(req.getOrderId())?"ORDER_0"+getOrderId():req.getOrderId())
 						.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
 						.build();
@@ -167,7 +173,9 @@ public class LotCreationServiceImpl implements LotCreationService{
 				map.put("OrderCreationDate",sdf.format(lo.getEntryDate()));
 				map.put("UpdatedBy", lo.getUpdatedBy());
 				map.put("UpdatedDate",sdf.format(lo.getUpdatedDate()));
-				map.put("ProductCode", lo.getProductCode().toString());
+				map.put("CompanyId", lo.getCompanyId());
+				map.put("ItemId", lo.getItemId());
+				map.put("CategoryId", lo.getCategoryId());
 				
 				List<ChallanDetails> challanDetails =challanRepository.findByChaIdOrderId(orderId);
 				List<Map<String,String>> list = new ArrayList<>();
@@ -356,7 +364,7 @@ public class LotCreationServiceImpl implements LotCreationService{
 	public CommonResponse getMeterialDetails(MeterialDetailsReq req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<Meterialdetails> list =meterialDetailsRepo.findByMetIdOrderIdAndMetIdChallanId(req.getOrderId(),req.getChallanNo());
+			List<Meterialdetails> list =null;//meterialDetailsRepo.findByMetIdOrderIdAndMetIdChallanId(req.getOrderId(),req.getChallanNo());
 			if(!list.isEmpty()) {
 				List<Map<String,String>> mapList =new ArrayList<>();
 				list.forEach(p ->{
@@ -582,6 +590,6 @@ public class LotCreationServiceImpl implements LotCreationService{
 	}
 	
 	private Long getMeterialId(String orderId,String challanId) {
-		return (long)meterialDetailsRepo.findByMetIdOrderIdAndMetIdChallanId(orderId, challanId).size()+1;
+		return 0L;//meterialDetailsRepo.findByMetIdOrderIdAndMetIdChallanId(orderId, challanId).size()+1;
 	}
 }

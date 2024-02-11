@@ -81,4 +81,19 @@ public class DropDownController {
 		return service.metalType();
 	}
 	
+	@GetMapping("/company")
+	public CommonResponse getCompany() {
+		return service.getCompany();
+	}
+	
+	@GetMapping("/company/items/{companyId}")
+	public CommonResponse getCompanyBrand(@PathVariable("companyId") String companyId) {
+		return service.getCompanyBrand(companyId);
+	}
+	
+	@GetMapping("/item/category/{companyId}/{itemId}")
+	public CommonResponse getBrandCategory(@PathVariable("companyId") String companyId,@PathVariable("itemId") String itemId) {
+		return service.getBrandCategory(companyId,itemId);
+	}
+	
 }

@@ -78,6 +78,22 @@ public class LotDeatils {
 	@Column(name = "UPDATEDBY")
 	private String updatedBy;
 	
+	@Column(name = "FOLDINGYN")
+	private String foldingYn;
+	
+	@Column(name = "TOTAL_SIZE")
+	private Integer totalSize;
+	
+	@Column(name = "COMPANY_ID")
+	private Integer companyId;
+	
+	@Column(name = "ITEM_ID")
+	private Integer itemId;
+	
+	@Column(name = "CATEGORY_ID")
+	private Integer categoryId;
+	
+	
 	@Column(name = "UPDATED_DATE")
 	private Date updatedDate;
 	

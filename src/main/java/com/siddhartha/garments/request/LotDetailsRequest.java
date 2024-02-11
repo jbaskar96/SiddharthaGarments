@@ -16,8 +16,14 @@ public class LotDetailsRequest {
 	@JsonProperty("LotNo")
 	private String lotNo;
 	
-	@JsonProperty("ProductCode")
-	private String productCode;
+	@JsonProperty("CompanyId")
+	private String companyId;
+	
+	@JsonProperty("ItemId")
+	private String itemId;
+	
+	@JsonProperty("CategoryId")
+	private String categoryId;
 	
 	@JsonProperty("CompanyName")
 	private String companyName;

@@ -7,10 +7,6 @@ import com.siddhartha.garments.entity.Meterialdetails;
 import com.siddhartha.garments.entity.MeterialdetailsId;
 
 @Repository
-public interface MeterialDetailsRepository extends JpaRepository<Meterialdetails, MeterialdetailsId> {
-
-	//List<Meterialdetails> findByMetIdOrderIdAndMetIdChallanId(String orderId, String challanNo);
-
-	//Long countByProductId(Integer productId);
+public interface MeterialSetupMasterRepository extends JpaRepository<Meterialdetails, MeterialdetailsId>{
 
 }

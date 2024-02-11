@@ -28,4 +28,10 @@ public interface DropDownService {
 
 	CommonResponse metalType();
 
+	CommonResponse getCompanyBrand(String companyId);
+
+	CommonResponse getBrandCategory(String companyId, String itemId);
+
+	CommonResponse getCompany();
+
 }
