@@ -29,8 +29,9 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo(){
         return new ApiInfo(
-                "SIDDHARTHA GARMENTS",
-                "Below rest api are created  for siddhartha garments by futureforce solutions private imited",
+                "REST API",
+                //"Below rest api are created  for siddhartha garments by futureforce solutions private imited",
+                "tst",
                 "1",
                 "Terms of service",
                 new Contact("Kalaivanan", "www.siddhartha.in", "kalai@gmail.com"),

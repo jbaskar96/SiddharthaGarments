@@ -1,18 +1,18 @@
 package com.siddhartha.garments.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.siddhartha.garments.request.ExpensiveRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.ExpensiveService;
 
-@Repository
+@RestController
 @RequestMapping("/expensive")
 public class ExpensiveController {
 	
@@ -25,9 +25,9 @@ public class ExpensiveController {
 		return service.saveExpensive(req);
 	}
 
-	@GetMapping("/getAll/{pageNo}/{pageSize}")
-	public CommonResponse getAllExpensive(@PathVariable("pageNo") Integer pageNo,@PathVariable("pageSize") Integer pageSize) {
-		return service.getAllExpensive(pageNo,pageSize);
+	@GetMapping("/getAll")
+	public CommonResponse getAllExpensive() {
+		return service.getAllExpensive();
 	}
 	
 	@GetMapping("/edit/{SerialNo}")

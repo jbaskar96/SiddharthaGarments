@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.siddhartha.garments.entity.PurchaseMaster;
 import com.siddhartha.garments.repository.PurchaseRepository;
+import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.PurchaseRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.PurchaseService;
@@ -28,49 +29,62 @@ public class PurchaseServiceImpl implements PurchaseService{
 	private SimpleDateFormat sdf;
 	
 	@Autowired
+	private InputValidationServiceImpl validation;
+	
+	
+	@Autowired
 	private PurchaseRepository purchaseRepo;
 
 	@Override
 	public CommonResponse savePurchase(PurchaseRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			Double cgstAmt=0D;
-			Double sgstAmt=0D;
-			Double totalAmount=0D;
-			Double cgstTax =0D;
-			Double scgsttax =0D;
-			if(req.getCategoryId().equals("1")) {
-				 cgstTax =Double.valueOf(req.getCGSTTax());
-				 scgsttax =Double.valueOf(req.getSgstTax());
-				 cgstAmt =Double.valueOf(req.getAmountBeforeTax()) * cgstTax/100;
-				 sgstAmt =Double.valueOf(req.getAmountBeforeTax()) * scgsttax/100;
-				 totalAmount =Double.valueOf(req.getAmountBeforeTax()) + cgstAmt +sgstAmt;
-			}else if(req.getCategoryId().equals("2")){
-				totalAmount=Double.valueOf(req.getAmountBeforeTax());
-			}
-			
-			
 
-			PurchaseMaster purchaseMaster =PurchaseMaster.builder()
-					.amountBeforetax(StringUtils.isBlank(req.getAmountBeforeTax())?null:Double.valueOf(req.getAmountBeforeTax()))
-					.billDate(sdf.parse(req.getBillDate()))
-					.categoryId(Long.valueOf(req.getCategoryId()))
-					.cgstTax(cgstTax)
-					.sgstTax(cgstTax)
-					.cgst(cgstAmt)
-					.sgst(scgsttax)
-					.entryDate(new Date())
-					.billRefNo(req.getBillRefNo())
-					.status(StringUtils.isBlank(req.getStatus())?"Y":"N")
-					.supplierName(req.getSupplierName())
-					.totalAmount(totalAmount)
-					.product(req.getProductDesc())
-					.serialNo(StringUtils.isBlank(req.getSerialNo())?purchaseRepo.count()+1:Long.valueOf(req.getSerialNo()))
-					.build();
-			purchaseRepo.save(purchaseMaster);
-			response.setResponse("Data Saved Successfully");
-			response.setMessage("Success");
-			response.setError(null);
+			List<ErrorList> errorLists =validation.validatePurchase(req);
+			if(errorLists.isEmpty()) {
+			
+				Double cgstAmt=0D;
+				Double sgstAmt=0D;
+				Double totalAmount=0D;
+				Double cgstTax =0D;
+				Double scgsttax =0D;
+				if(req.getCategoryId().equals("1")) {
+					 cgstTax =Double.valueOf(req.getCGSTTax());
+					 scgsttax =Double.valueOf(req.getSgstTax());
+					 cgstAmt =Double.valueOf(req.getAmountBeforeTax()) * cgstTax/100;
+					 sgstAmt =Double.valueOf(req.getAmountBeforeTax()) * scgsttax/100;
+					 totalAmount =Double.valueOf(req.getAmountBeforeTax()) + cgstAmt +sgstAmt;
+				}else if(req.getCategoryId().equals("2")){
+					totalAmount=Double.valueOf(req.getAmountBeforeTax());
+				}
+				
+				
+	
+				PurchaseMaster purchaseMaster =PurchaseMaster.builder()
+						.amountBeforetax(StringUtils.isBlank(req.getAmountBeforeTax())?null:Double.valueOf(req.getAmountBeforeTax()))
+						.billDate(sdf.parse(req.getBillDate()))
+						.categoryId(Long.valueOf(req.getCategoryId()))
+						.cgstTax(cgstTax)
+						.sgstTax(cgstTax)
+						.cgst(cgstAmt)
+						.sgst(scgsttax)
+						.entryDate(new Date())
+						.billRefNo(req.getBillRefNo())
+						.status(StringUtils.isBlank(req.getStatus())?"Y":"N")
+						.supplierName(req.getSupplierName())
+						.totalAmount(totalAmount)
+						.product(req.getProductDesc())
+						.serialNo(StringUtils.isBlank(req.getSerialNo())?purchaseRepo.count()+1:Long.valueOf(req.getSerialNo()))
+						.build();
+				purchaseRepo.save(purchaseMaster);
+				response.setResponse("Data Saved Successfully");
+				response.setMessage("Success");
+				response.setError(null);
+			}else{
+				response.setError(errorLists);
+				response.setMessage("Failed");
+				response.setResponse("Data saved failed");
+			}
 		}catch (Exception e) {
 			e.printStackTrace();
 			response.setResponse("Data Saved Failed");
@@ -81,11 +95,11 @@ public class PurchaseServiceImpl implements PurchaseService{
 	}
 
 	@Override
-	public CommonResponse getAll(Integer pageNo, Integer pageSize) {
+	public CommonResponse getAll() {
 		CommonResponse response = new CommonResponse();
 		try {
-			Pageable pageable =PageRequest.of(pageNo, pageSize,Sort.by("serialNo").ascending());
-			List<PurchaseMaster> list =purchaseRepo.findAll(pageable).getContent();
+		//Pageable pageable =PageRequest.of(pageNo, pageSize,Sort.by("serialNo").ascending());
+			List<PurchaseMaster> list =purchaseRepo.findAll();
 			if(!list.isEmpty()) {
 				List<Map<String,String>> mapList= new ArrayList<>();
 				list.forEach(p ->{

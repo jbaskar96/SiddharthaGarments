@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.siddhartha.garments.entity.ExpensiveDetails;
 import com.siddhartha.garments.entity.PurchaseMaster;
 import com.siddhartha.garments.repository.ExpensiveRepository;
+import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.ExpensiveRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.ExpensiveService;
@@ -29,25 +30,38 @@ public class ExpensiveServiceImpl implements ExpensiveService{
 	
 	@Autowired
 	private SimpleDateFormat sdf;
+	
+	@Autowired
+	private InputValidationServiceImpl validation;
+	
 
 	@Override
 	public CommonResponse saveExpensive(ExpensiveRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			ExpensiveDetails expensiveDetails = ExpensiveDetails.builder()
-					.acountType(req.getAccountType())
-					.amount(Double.valueOf(req.getAmount()))
-					.categoryType(req.getCategoryType())
-					.entryDate(new Date())
-					.notes(StringUtils.isBlank(req.getNotes())?null:req.getNotes())
-					.serialNo(StringUtils.isBlank(req.getSerialNo())?expensiveRepo.count()+1:Long.valueOf(req.getSerialNo()))
-					.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
-					.build();
-			expensiveRepo.save(expensiveDetails);
 			
-			response.setError(null);
-			response.setMessage("Success");
-			response.setResponse("Data Saved Successfully");
+			List<ErrorList> errorLists =validation.validateExpensive(req);
+			if(errorLists.isEmpty()) {
+				ExpensiveDetails expensiveDetails = ExpensiveDetails.builder()
+						.acountType(req.getAccountType())
+						.amount(Double.valueOf(req.getAmount()))
+						.categoryType(req.getCategoryType())
+						.entryDate(new Date())
+						.notes(StringUtils.isBlank(req.getNotes())?null:req.getNotes())
+						.serialNo(StringUtils.isBlank(req.getSerialNo())?expensiveRepo.count()+1:Long.valueOf(req.getSerialNo()))
+						.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
+						.expeniveDate(sdf.parse(req.getExpensiveDate()))
+						.build();
+				expensiveRepo.save(expensiveDetails);
+				
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse("Data Saved Successfully");
+			}else {
+				response.setError(errorLists);
+				response.setMessage("Failed");
+				response.setResponse("Data saved failed");
+			}
 		}catch (Exception e) {
 			e.printStackTrace();
 			response.setError(null);
@@ -58,11 +72,11 @@ public class ExpensiveServiceImpl implements ExpensiveService{
 	}
 
 	@Override
-	public CommonResponse getAllExpensive(Integer pageNo, Integer pageSize) {
+	public CommonResponse getAllExpensive() {
 		CommonResponse response = new CommonResponse();
 		try {
-			Pageable pageable =PageRequest.of(pageNo, pageSize,Sort.by("serialNo").ascending());
-			List<ExpensiveDetails> list =expensiveRepo.findAll(pageable).getContent();
+			//Pageable pageable =PageRequest.of(pageNo, pageSize,Sort.by("serialNo").ascending());
+			List<ExpensiveDetails> list =expensiveRepo.findAll();
 			if(!list.isEmpty()) {
 				List<Map<String,String>> mapList= new ArrayList<>();
 				list.forEach(p ->{

@@ -27,9 +27,9 @@ public class PurchaseController {
 		return service.savePurchase(req);
 	}
 	
-	@GetMapping("/getAll/{pageNo}/{pageSize}")
-	private CommonResponse getAll(@PathVariable("pageNo") Integer pageNo,@PathVariable("pageSize") Integer pageSize) {
-		return service.getAll(pageNo,pageSize);
+	@GetMapping("/getAll")
+	private CommonResponse getAll() {
+		return service.getAll();
 	}
 	
 	@GetMapping("/edit/{serialNo}")

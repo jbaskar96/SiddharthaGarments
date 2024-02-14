@@ -24,6 +24,9 @@ public class ExpensiveRequest {
 
 	@JsonProperty("Status")
 	private String status;
+	
+	@JsonProperty("ExpensiveDate")
+	private String expensiveDate;
 
 	
 	

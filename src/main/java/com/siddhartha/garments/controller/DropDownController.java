@@ -1,5 +1,10 @@
 package com.siddhartha.garments.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -95,5 +100,54 @@ public class DropDownController {
 	public CommonResponse getBrandCategory(@PathVariable("companyId") String companyId,@PathVariable("itemId") String itemId) {
 		return service.getBrandCategory(companyId,itemId);
 	}
+	
+	@GetMapping("/purchase/category")
+	public CommonResponse getPurChaseCategory() {
+		CommonResponse response = new CommonResponse();
+		Map<String,Object> map1 =new HashMap<String,Object>();
+		Map<String,Object> map2 =new HashMap<String,Object>();
+		map1.put("1", "GST");
+		map2.put("2", "NON-GST");
+		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		list.add(map1);
+		list.add(map1);
+		response.setError(null);
+		response.setMessage("Success");
+		response.setResponse(list);
+		return response;
+	}
+	
+	@GetMapping("/expensive/category")
+	public CommonResponse getExpensiveCatgeory() {
+		CommonResponse response = new CommonResponse();
+		Map<String,Object> map1 =new HashMap<String,Object>();
+		Map<String,Object> map2 =new HashMap<String,Object>();
+		map1.put("1", "Thread");
+		map2.put("2", "Button");
+		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		list.add(map1);
+		list.add(map1);
+		response.setError(null);
+		response.setMessage("Success");
+		response.setResponse(list);
+		return response;
+	}
+	
+	@GetMapping("/expensive/accountType")
+	public CommonResponse getExpensiveAccountCatgeory() {
+		CommonResponse response = new CommonResponse();
+		Map<String,Object> map1 =new HashMap<String,Object>();
+		Map<String,Object> map2 =new HashMap<String,Object>();
+		map1.put("1", "CASH");
+		map2.put("2", "GPAY");
+		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		list.add(map1);
+		list.add(map1);
+		response.setError(null);
+		response.setMessage("Success");
+		response.setResponse(list);
+		return response;
+	}
+	
 	
 }

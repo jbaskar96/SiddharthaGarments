@@ -20,6 +20,7 @@ import com.siddhartha.garments.request.ColorInfoReq;
 import com.siddhartha.garments.request.ColorSaveRequest;
 import com.siddhartha.garments.request.DisrictRequest;
 import com.siddhartha.garments.request.ErrorList;
+import com.siddhartha.garments.request.ExpensiveRequest;
 import com.siddhartha.garments.request.LoginRequest;
 import com.siddhartha.garments.request.LotDetailsRequest;
 import com.siddhartha.garments.request.MeterialDetailsRequest;
@@ -27,6 +28,7 @@ import com.siddhartha.garments.request.MeterialInfoReq;
 import com.siddhartha.garments.request.MeterialSetupRequest;
 import com.siddhartha.garments.request.OperatorSaveRequest;
 import com.siddhartha.garments.request.ProductSaveRequest;
+import com.siddhartha.garments.request.PurchaseRequest;
 import com.siddhartha.garments.request.SectionSaveRequest;
 import com.siddhartha.garments.request.SizeMasterRequest;
 import com.siddhartha.garments.request.StateSaveRequest;
@@ -545,5 +547,69 @@ public class InputValidationServiceImpl {
 		
 		return errorLists;
 	}
-
+	
+	public List<ErrorList> validateExpensive(ExpensiveRequest req){
+		List<ErrorList> errorLists = new ArrayList<>();
+		try {
+			if(StringUtils.isBlank(req.getExpensiveDate())) {
+				errorLists.add(new ErrorList("ExpensiveDate","101","Please enter ExpensiveDate"));
+			}
+			if(StringUtils.isBlank(req.getAccountType())) {
+				errorLists.add(new ErrorList("AccountType","102","Please enter AccountType"));
+			}
+			if(StringUtils.isBlank(req.getAmount())) {
+				errorLists.add(new ErrorList("Amount","103","Please enter Amount"));
+			}
+			if(StringUtils.isBlank(req.getNotes())) {
+				errorLists.add(new ErrorList("Notes","104","Please choose your Notes"));
+			}
+			if(StringUtils.isBlank(req.getStatus())) {
+				errorLists.add(new ErrorList("Status","105","Please enter Gst Status"));
+			}
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return errorLists;
+	}
+	
+	public List<ErrorList> validatePurchase(PurchaseRequest req){
+		List<ErrorList> errorLists = new ArrayList<>();
+		try {
+			if(StringUtils.isBlank(req.getAmountBeforeTax())) {
+				errorLists.add(new ErrorList("AmountBeforeTax","101","Please enter AmountBeforeTax"));
+			}
+			if(StringUtils.isBlank(req.getBillDate())) {
+				errorLists.add(new ErrorList("BillDate","102","Please enter BillDate"));
+			}
+			if(StringUtils.isBlank(req.getBillRefNo())) {
+				errorLists.add(new ErrorList("BillRefNo","103","Please enter BillRefNo"));
+			}
+			if(StringUtils.isBlank(req.getCategoryId())) {
+				errorLists.add(new ErrorList("CategoryId","104","Please choose your CategoryId"));
+			}
+			if(StringUtils.isBlank(req.getCGSTTax())) {
+				errorLists.add(new ErrorList("CGSTTax","105","Please enter Gst CGSTTax"));
+			}
+			if(StringUtils.isBlank(req.getProductDesc())) {
+				errorLists.add(new ErrorList("ProductDesc","106","Please enter ProductDesc"));
+			}
+			if(StringUtils.isBlank(req.getSgstTax())) {
+				errorLists.add(new ErrorList("SgstTax","107","Please enter Lot SgstTax"));
+			}
+			if(StringUtils.isBlank(req.getSupplierName())) {
+				errorLists.add(new ErrorList("SupplierName","108","Please enterSupplierNamer"));
+			}
+			if(StringUtils.isBlank(req.getStatus())) {
+				errorLists.add(new ErrorList("Status","108","Please Status"));
+			}
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return errorLists;
+	}
+		
 }

@@ -7,7 +7,7 @@ public interface PurchaseService {
 
 	CommonResponse savePurchase(PurchaseRequest req);
 
-	CommonResponse getAll(Integer pageNo, Integer pageSize);
+	CommonResponse getAll();
 
 	CommonResponse getAll(Long serialNo);
 

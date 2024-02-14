@@ -7,7 +7,7 @@ public interface ExpensiveService {
 
 	CommonResponse saveExpensive(ExpensiveRequest req);
 
-	CommonResponse getAllExpensive(Integer pageNo, Integer pageSize);
+	CommonResponse getAllExpensive();
 
 	CommonResponse editExpensive(Integer serialNo);
 
