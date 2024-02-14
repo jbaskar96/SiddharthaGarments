@@ -75,7 +75,7 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 		CommonResponse response = new CommonResponse();
 		try {
 			List<WorkerEntryDetails> workerDetails =workerEntryRepository.findByOrderId(orderId);
-			if(workerDetails.isEmpty()) {
+			if(!workerDetails.isEmpty()) {
 				List<Map<String,String>> mapList =new ArrayList<>();
 				workerDetails.forEach(p ->{
 					HashMap<String, String> map =new HashMap<String, String>();
@@ -114,7 +114,7 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 		CommonResponse response = new CommonResponse();
 		try {
 			List<WorkerEntryDetails> workerDetails =workerEntryRepository.findAll();
-			if(workerDetails.isEmpty()) {
+			if(!workerDetails.isEmpty()) {
 				List<Map<String,String>> mapList =new ArrayList<>();
 				workerDetails.forEach(p ->{
 					HashMap<String, String> map =new HashMap<String, String>();
