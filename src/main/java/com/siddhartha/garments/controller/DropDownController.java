@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import io.swagger.annotations.Api;
 @RestController
 @RequestMapping("/dropdown")
 @Api(tags = "DROPDOWN CONTROLLER" ,description = "API'S")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class DropDownController {
 	
 	
@@ -110,7 +112,7 @@ public class DropDownController {
 		map2.put("2", "NON-GST");
 		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
 		list.add(map1);
-		list.add(map1);
+		list.add(map2);
 		response.setError(null);
 		response.setMessage("Success");
 		response.setResponse(list);
@@ -126,7 +128,7 @@ public class DropDownController {
 		map2.put("2", "Button");
 		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
 		list.add(map1);
-		list.add(map1);
+		list.add(map2);
 		response.setError(null);
 		response.setMessage("Success");
 		response.setResponse(list);
@@ -142,7 +144,7 @@ public class DropDownController {
 		map2.put("2", "GPAY");
 		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
 		list.add(map1);
-		list.add(map1);
+		list.add(map2);
 		response.setError(null);
 		response.setMessage("Success");
 		response.setResponse(list);

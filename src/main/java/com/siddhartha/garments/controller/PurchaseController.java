@@ -1,6 +1,7 @@
 package com.siddhartha.garments.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import com.siddhartha.garments.service.PurchaseService;
 
 @RestController
 @RequestMapping("/purchase")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class PurchaseController {
 	
 	
