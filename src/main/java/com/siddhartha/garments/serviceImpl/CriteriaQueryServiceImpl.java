@@ -1,6 +1,8 @@
 package com.siddhartha.garments.serviceImpl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -18,6 +20,7 @@ import javax.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.siddhartha.garments.entity.ChallanDetails;
@@ -26,8 +29,10 @@ import com.siddhartha.garments.entity.DistrictMaster;
 import com.siddhartha.garments.entity.LoginMaster;
 import com.siddhartha.garments.entity.LotDeatils;
 import com.siddhartha.garments.entity.ProductColorMaster;
+import com.siddhartha.garments.entity.PurchaseMaster;
 import com.siddhartha.garments.entity.UserDetailsMaster;
 import com.siddhartha.garments.entity.WorkerEntryDetails;
+import com.siddhartha.garments.request.PurchaseReportReq;
 import com.siddhartha.garments.request.WorkerEntryDetailsReq;
 
 @Component
@@ -38,6 +43,9 @@ public class CriteriaQueryServiceImpl {
 	
 	@PersistenceContext
 	private EntityManager em;
+	
+	@Autowired
+	private SimpleDateFormat sdf;
 	
 	
 	public Integer getMaxOfCodeByStateCode(String stateCode) {
@@ -195,6 +203,37 @@ public class CriteriaQueryServiceImpl {
 			e.printStackTrace();
 		}
 		
+		return null;
+	}
+
+
+	public List<PurchaseMaster> getPurchaseReport(PurchaseReportReq req) {
+		try {
+			CriteriaBuilder cb =em.getCriteriaBuilder();
+			CriteriaQuery<PurchaseMaster> query =cb.createQuery(PurchaseMaster.class);
+			Root<PurchaseMaster> root = query.from(PurchaseMaster.class);
+			List<Predicate> predicates = new ArrayList<>();
+			
+			Date startDate =sdf.parse(req.getStartDate());
+			Date endDate =sdf.parse(req.getEndDate());
+			if("1".equals(req.getReportType())) {
+				predicates.add(cb.between(root.get("billDate"),startDate,endDate));
+				predicates.add(cb.equal(root.get("categoryId"), 1));
+			}else if ("2".equals(req.getReportType())) {
+				predicates.add(cb.between(root.get("billDate"),startDate,endDate));
+				predicates.add(cb.equal(root.get("categoryId"), 2));
+			}else {
+				predicates.add(cb.between(root.get("billDate"),startDate,endDate));
+			}
+			
+			TypedQuery<PurchaseMaster> list =em.createQuery(query);
+			
+			return list.getResultList();
+			
+
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 }

@@ -18,8 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
 
+import com.siddhartha.garments.entity.PurchaseMaster;
 import com.siddhartha.garments.entity.WorkerEntryDetails;
 import com.siddhartha.garments.repository.WorkerEntryRepository;
+import com.siddhartha.garments.request.PurchaseReportReq;
 import com.siddhartha.garments.request.WorkerEntryDetailsReq;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.ReportService;
@@ -176,6 +178,17 @@ public class ReportServiceImpl implements ReportService{
 				response.setError(null);
 			}
 			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse getPurchaseReport(PurchaseReportReq req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<PurchaseMaster> list =query.getPurchaseReport(req);
 		}catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.siddhartha.garments.request.PurchaseReportReq;
 import com.siddhartha.garments.request.WorkerEntryDetailsReq;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.ReportService;
@@ -32,6 +33,11 @@ public class ReportController {
 	@PostMapping("/export/excel")
 	public CommonResponse exportExcel(@RequestBody WorkerEntryDetailsReq req) {
 		return service.exportExcel(req);
+	}
+	
+	@PostMapping("/purchase")
+	public CommonResponse getPurchaseReport(@RequestBody PurchaseReportReq req) {
+		return service.getPurchaseReport(req);
 	}
 	
 }
