@@ -238,34 +238,5 @@ public class CriteriaQueryServiceImpl {
 	}
 	
 	
-	public List<PurchaseMaster> getPurchaseReport(PurchaseReportReq req) {
-		try {
-			CriteriaBuilder cb =em.getCriteriaBuilder();
-			CriteriaQuery<PurchaseMaster> query =cb.createQuery(PurchaseMaster.class);
-			Root<PurchaseMaster> root = query.from(PurchaseMaster.class);
-			List<Predicate> predicates = new ArrayList<>();
-			
-			Date startDate =sdf.parse(req.getStartDate());
-			Date endDate =sdf.parse(req.getEndDate());
-			if("1".equals(req.getReportType())) {
-				predicates.add(cb.between(root.get("billDate"),startDate,endDate));
-				predicates.add(cb.equal(root.get("categoryId"), 1));
-			}else if ("2".equals(req.getReportType())) {
-				predicates.add(cb.between(root.get("billDate"),startDate,endDate));
-				predicates.add(cb.equal(root.get("categoryId"), 2));
-			}else {
-				predicates.add(cb.between(root.get("billDate"),startDate,endDate));
-			}
-			
-			TypedQuery<PurchaseMaster> list =em.createQuery(query);
-			
-			return list.getResultList();
-			
-
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 	
 }
