@@ -99,7 +99,7 @@ public class LoginServiceImpl implements LoginService,UserDetailsService {
 			String userType =session.getUserType();
 			response.put("Token", session.getTempTokenid());
 			response.put("UserName", login.getLoginId());
-			response.put("UserType", userTypeRepo.findById(Integer.valueOf(userType)).get().getUserType());
+			response.put("UserType", "admin");
 		}catch (Exception e) {
 			e.printStackTrace();
 		}

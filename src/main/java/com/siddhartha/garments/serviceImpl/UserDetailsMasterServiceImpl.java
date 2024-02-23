@@ -80,7 +80,7 @@ public class UserDetailsMasterServiceImpl implements UserDetailsMasterService{
 					LoginMaster loginMaster =LoginMaster.builder().build();
 					loginMaster.setLoginId(savedData.getLoginId());
 					loginMaster.setPassword(encoder.encodeToString(req.getPassword().getBytes()));
-					loginMaster.setUsertype(savedData.getStatus());
+					loginMaster.setUsertype("admin");
 					loginMaster.setEntryDate(new Date());
 					loginMaster.setCreatedBy(savedData.getCreatedBy());
 					loginMaster.setStatus(savedData.getStatus());

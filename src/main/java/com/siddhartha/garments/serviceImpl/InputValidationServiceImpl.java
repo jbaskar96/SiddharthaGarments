@@ -9,10 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.siddhartha.garments.entity.ColorDeatils;
-import com.siddhartha.garments.entity.ColorDeatilsId;
 import com.siddhartha.garments.entity.LoginMaster;
-import com.siddhartha.garments.repository.ColorDetailsRepository;
 import com.siddhartha.garments.repository.LoginMasterRepository;
 import com.siddhartha.garments.request.ChallanInfoRequest;
 import com.siddhartha.garments.request.ColorDetailsRequest;
@@ -46,8 +43,6 @@ public class InputValidationServiceImpl {
 	@Autowired
 	private LoginMasterRepository loginMasterRepository;
 	
-	@Autowired
-	private ColorDetailsRepository colorDetailsRepository;
 	
 	public List<ErrorList> validateLoginRequest(LoginRequest req){
 		List<ErrorList> errorList = new ArrayList<ErrorList>();
@@ -483,26 +478,7 @@ public class InputValidationServiceImpl {
 				errorLists.add(new ErrorList("Order","450","Please choose LotNumber"));
 			}
 			
-			if(StringUtils.isBlank(d.getOrderId()) && StringUtils.isBlank(d.getChallanId()) && StringUtils.isBlank(d.getColorId())) {
-				
-				ColorDeatilsId  colorDeatilsId =ColorDeatilsId.builder()
-						.challanId(d.getChallanId())
-						.orderId(d.getOrderId())
-						.colorId(d.getColorId())
-						.build();
-					
-				ColorDeatils  cd =colorDetailsRepository.findById(colorDeatilsId).get();
-				
-				Integer workerData =Integer.valueOf(d.getGoodPieces()) + Integer.valueOf(d.getDamagedPieces());
-				
-				Integer masterData =cd.getPiecesCount();
-				
-				if(workerData>masterData) {
-					
-					errorLists.add(new ErrorList("Error","500","Your have entered data should not greaterthan master data "
-							+ "Master data is "+masterData+" || your enter data is "+workerData+""));
-				}
-			}
+			
 		}catch (Exception e) {
 			e.printStackTrace();
 		}

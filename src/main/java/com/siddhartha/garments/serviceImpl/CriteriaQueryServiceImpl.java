@@ -11,10 +11,8 @@ import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,12 +21,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.siddhartha.garments.entity.ChallanDetails;
-import com.siddhartha.garments.entity.ColorDeatils;
 import com.siddhartha.garments.entity.DistrictMaster;
 import com.siddhartha.garments.entity.LoginMaster;
-import com.siddhartha.garments.entity.LotDeatils;
-import com.siddhartha.garments.entity.ProductColorMaster;
 import com.siddhartha.garments.entity.PurchaseMaster;
 import com.siddhartha.garments.entity.UserDetailsMaster;
 import com.siddhartha.garments.entity.WorkerEntryDetails;
@@ -82,61 +76,6 @@ public class CriteriaQueryServiceImpl {
 	
 			TypedQuery<Tuple> typedQuery = em.createQuery(query);
 			list=typedQuery.getResultList();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
-		return list;
-	}
-	
-	public List<Tuple> getAllOrderDetails(String status){
-		List<Tuple> list = null;
-		try {
-			CriteriaBuilder cb =em.getCriteriaBuilder();
-			CriteriaQuery<Tuple> query =cb.createTupleQuery();
-			Root<LotDeatils> lotRoot =query.from(LotDeatils.class);
-			
-			Subquery<Integer> subQuery=query.subquery(Integer.class);
-			Root<ChallanDetails> root =subQuery.from(ChallanDetails.class);
-			subQuery.select(cb.count(root).as(Integer.class)).where(cb.equal(lotRoot.get("orderId"), lotRoot.get("orderId"))
-					,cb.equal(cb.upper(root.get("status")), "Y"));
-
-			Expression<String> statusDesc =cb.selectCase()
-					.when(cb.equal(lotRoot.get("status"), "Y"), "INWARD")
-					.when(cb.equal(lotRoot.get("status"), "P"), "PRODUCTION")
-					.otherwise("DELIVERED")
-					.as(String.class);
-			
-			query.multiselect(lotRoot.get("orderId").alias("orderId"),lotRoot.get("lotNo").alias("lotNo"),lotRoot.get("companyName").alias("companyName"),
-					lotRoot.get("inwardDate").alias("inwardDate"),lotRoot.get("gstNo").alias("gstNo"),lotRoot.get("phoneNo").alias("phoneNo"),
-					subQuery.alias("totalSize"),statusDesc.alias("status"),lotRoot.get("deliveryDate").alias("deliveryDate"),lotRoot.get("productionDate").alias("productionDate"))
-			.where(cb.equal(cb.upper(lotRoot.get("status")), status))
-			.orderBy(cb.desc(lotRoot.get("entryDate")));
-			
-			TypedQuery<Tuple> typedQuery =em.createQuery(query);
-			list=typedQuery.getResultList();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return list;
-	}
-
-	public List<Tuple> getColorDeatilsByChallanId(String orderId,String challanId){
-		List<Tuple> list = null;
-		try {
-			CriteriaBuilder cb =em.getCriteriaBuilder();
-			CriteriaQuery<Tuple> query =cb.createTupleQuery();
-			Root<ColorDeatils> color =query.from(ColorDeatils.class);
-			Root<ProductColorMaster> polCol =query.from(ProductColorMaster.class);
-			query.multiselect(color.get("colId").get("colorId").alias("colorId"),polCol.get("colorName").alias("colorName"),
-					color.get("piecesCount").alias("piecesCount"))
-			.where(cb.equal(color.get("colId").get("orderId"), orderId),
-					cb.equal(color.get("colId").get("challanId"), challanId),
-					cb.equal(color.get("colorCode"), polCol.get("colorId")),cb.equal(polCol.get("status"),"Y"))
-			.orderBy(cb.asc(polCol.get("colorName")));
-			
-			TypedQuery<Tuple> typedQuery =em.createQuery(query);
-			list =typedQuery.getResultList();
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
