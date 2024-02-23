@@ -7,6 +7,8 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,6 +31,24 @@ public class CompanyProductMaster {
 	@Column(name="PRODUCT_NAME")
 	private String productName;
 	
+	@Column(name="FOLDING_YN")
+	private String foldingYn;
+	
+	@Column(name="ELASTIC_YN")
+	private String elasticYn;
+	
+	@Column(name="FOLDING_MESUREMENT_TYPE")
+	private String foldingMesurementType;
+	
+	@Column(name="FOLDING_MESUREMENT_VALUE")
+	private Integer foldingMesurementValue;
+	
+	@Column(name="ELASTIC_MESUREMENT_TYPE")
+	private String elasticMesurementType;
+	
+	@Column(name="ELASTIC_MESUREMENT_VALUE")
+	private Integer elastciMesurementValue;
+
 	@Column(name="REMARKS")
 	private String remarks;
 	
@@ -40,6 +60,8 @@ public class CompanyProductMaster {
 	
 	@Column(name="CREATED_BY")
 	private String createdBy;
+	
+	
 	
 
 }

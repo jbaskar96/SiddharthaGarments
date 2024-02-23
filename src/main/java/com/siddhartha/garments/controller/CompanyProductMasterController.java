@@ -36,7 +36,18 @@ public class CompanyProductMasterController {
 	public CommonResponse styleSave(@RequestBody ProductStyleMasterRequest req) {
 		return service.styleSave(req);
 	}
-
+	
+	@GetMapping("/getAll/style/{companyId}/{productId}")
+	public CommonResponse getAllStyle(@PathVariable("companyId") Integer companyId,@PathVariable("productId") Integer productId) {
+		return service.getAllStyle(companyId,productId);
+	}
+	
+	@GetMapping("/edit/style/{companyId}/{productId}/{styleId}")
+	public CommonResponse getAllStyle(@PathVariable("companyId") Integer companyId,@PathVariable("productId") Integer productId,
+			@PathVariable("styleId") Integer styleId) {
+		return service.getAllStyle(companyId,productId,styleId);
+	}
+	
 	@GetMapping("/getAllCompany")
 	public CommonResponse getAllCompany() {
 		return service.getAllCompany();

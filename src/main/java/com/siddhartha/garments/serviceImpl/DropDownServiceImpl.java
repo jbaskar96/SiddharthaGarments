@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.siddhartha.garments.entity.ChallanDetails;
+import com.siddhartha.garments.entity.CompanyMaster;
+import com.siddhartha.garments.entity.CompanyProductMaster;
 import com.siddhartha.garments.entity.DistrictMaster;
 import com.siddhartha.garments.entity.LotDeatils;
 import com.siddhartha.garments.entity.OperatorMaster;
@@ -22,6 +24,8 @@ import com.siddhartha.garments.entity.SectionMaster;
 import com.siddhartha.garments.entity.StateMaster;
 import com.siddhartha.garments.entity.UserTypeMaster;
 import com.siddhartha.garments.repository.ChallanRepository;
+import com.siddhartha.garments.repository.CompanyProductMasterRepository;
+import com.siddhartha.garments.repository.CompanyProductRepository;
 import com.siddhartha.garments.repository.DistrictMasterRepository;
 import com.siddhartha.garments.repository.LotCreationRepository;
 import com.siddhartha.garments.repository.OperatorMasterRepository;
@@ -69,6 +73,13 @@ public class DropDownServiceImpl implements DropDownService{
 	
 	@Autowired
 	private CriteriaQueryServiceImpl query;
+	
+	@Autowired
+	private CompanyProductMasterRepository companyRepo;
+	
+	@Autowired
+	private CompanyProductRepository companyProductRepo;
+
 
 
 	@Override
@@ -473,22 +484,50 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse getCompany() {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<Map<String,String>> res = new ArrayList<>();
-			
-			HashMap<String, String> map1 = new HashMap<String, String>();
-			map1.put("Code","1");
-			map1.put("CodeDesc","Honda");
-			
-			HashMap<String, String> map2 = new HashMap<String, String>();
-			map2.put("Code","2");
-			map2.put("CodeDesc","Audi");
-			
-			res.add(map2);
-			res.add(map1);
-			response.setError(null);
-			response.setMessage("Success");
-			response.setResponse(res);
+			List<CompanyMaster> list =companyRepo.findByStatusIgnoreCase("Y");
+			if(!list.isEmpty()) {
+				List<Map<String,String>> res = new ArrayList<>();
+				list.forEach(p ->{
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("Code", p.getCompanyId().toString());
+					map.put("CodeDesc", p.getCompanyName());
+					res.add(map);
+				});
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(res);
+			}else {
+				response.setError(null);
+				response.setMessage("Failed");
+				response.setResponse("No data found");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
 
+	@Override
+	public CommonResponse getProduct(Integer companyId) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<CompanyProductMaster> list =companyProductRepo.findByIdCompanyIdAndStatusIgnoreCase(companyId,"Y");
+			if(!list.isEmpty()) {
+				List<Map<String,String>> res = new ArrayList<>();
+				list.forEach(p ->{
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("Code", p.getId().getProductId().toString());
+					map.put("CodeDesc", p.getProductName());
+					res.add(map);
+				});
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(res);
+			}else {
+				response.setError(null);
+				response.setMessage("Failed");
+				response.setResponse("No data found");
+			}
 		}catch (Exception e) {
 			e.printStackTrace();
 		}

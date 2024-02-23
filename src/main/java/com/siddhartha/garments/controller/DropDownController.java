@@ -93,6 +93,11 @@ public class DropDownController {
 		return service.getCompany();
 	}
 	
+	@GetMapping("/company/product/{companyId}")
+	public CommonResponse getProduct(@PathVariable("companyId") Integer companyId) {
+		return service.getProduct(companyId);
+	}
+	
 	@GetMapping("/company/items/{companyId}")
 	public CommonResponse getCompanyBrand(@PathVariable("companyId") String companyId) {
 		return service.getCompanyBrand(companyId);

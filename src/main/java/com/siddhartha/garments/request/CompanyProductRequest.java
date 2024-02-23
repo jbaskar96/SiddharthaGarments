@@ -1,7 +1,5 @@
 package com.siddhartha.garments.request;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -18,7 +16,36 @@ public class CompanyProductRequest {
 	@JsonProperty("CreatedBy")
 	private String createdBy;
 	
-	@JsonProperty("CompanyProductList")
-	private List<CompanyProductList> companyProductList;
+	@JsonProperty("ProductId")
+	private String productId;
+	
+	@JsonProperty("ProductName")
+	private String productName;
+	
+	@JsonProperty("Remarks")
+	private String remarks;
+	
+	@JsonProperty("FoldingYn")
+	private String foldingYn;
+	
+	@JsonProperty("FoldingMesurementType")
+	private String foldingMesurementType;
+	
+	@JsonProperty("FoldingMesurementValue")
+	private String foldingMesurementValue;
+	
+	@JsonProperty("ElasticYn")
+	private String elasticYn;
+	
+	@JsonProperty("ElasticMesurementType")
+	private String elasticMesurementType;
+	
+	@JsonProperty("ElasticMesurementValue")
+	private String elasticMesurementValue;
+	
+	@JsonProperty("Status")
+	private String status;
+	
+
 
 }

@@ -34,4 +34,6 @@ public interface DropDownService {
 
 	CommonResponse getCompany();
 
+	CommonResponse getProduct(Integer companyId);
+
 }

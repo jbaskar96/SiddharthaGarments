@@ -11,6 +11,10 @@ import com.siddhartha.garments.entity.CompanyProductMasterId;
 @Repository
 public interface CompanyProductRepository  extends JpaRepository<CompanyProductMaster,CompanyProductMasterId>{
 
-	List<CompanyProductMaster> findByCompanyId(Integer companyId);
+	List<CompanyProductMaster> findByIdCompanyId(Integer companyId);
+
+	List<CompanyProductMaster> findByStatusIgnoreCase(String status);
+
+	List<CompanyProductMaster> findByIdCompanyIdAndStatusIgnoreCase(Integer companyId,String status);
 
 }

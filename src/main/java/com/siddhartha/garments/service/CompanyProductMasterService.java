@@ -21,4 +21,8 @@ public interface CompanyProductMasterService {
 
 	CommonResponse editProductByCompanyIdAndProductId(Integer companyId, Integer productId);
 
+	CommonResponse getAllStyle(Integer companyId, Integer productId);
+
+	CommonResponse getAllStyle(Integer companyId, Integer productId, Integer styleId);
+
 }

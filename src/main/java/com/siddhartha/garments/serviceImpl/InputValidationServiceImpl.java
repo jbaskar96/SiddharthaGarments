@@ -18,6 +18,8 @@ import com.siddhartha.garments.request.ChallanInfoRequest;
 import com.siddhartha.garments.request.ColorDetailsRequest;
 import com.siddhartha.garments.request.ColorInfoReq;
 import com.siddhartha.garments.request.ColorSaveRequest;
+import com.siddhartha.garments.request.CompanyMasterRequest;
+import com.siddhartha.garments.request.CompanyProductRequest;
 import com.siddhartha.garments.request.DisrictRequest;
 import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.ExpensiveRequest;
@@ -28,6 +30,7 @@ import com.siddhartha.garments.request.MeterialInfoReq;
 import com.siddhartha.garments.request.MeterialSetupRequest;
 import com.siddhartha.garments.request.OperatorSaveRequest;
 import com.siddhartha.garments.request.ProductSaveRequest;
+import com.siddhartha.garments.request.ProductStyleMasterRequest;
 import com.siddhartha.garments.request.PurchaseRequest;
 import com.siddhartha.garments.request.SectionSaveRequest;
 import com.siddhartha.garments.request.SizeMasterRequest;
@@ -611,5 +614,115 @@ public class InputValidationServiceImpl {
 		
 		return errorLists;
 	}
+
+	public List<ErrorList> company(CompanyMasterRequest req) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		
+		if(StringUtils.isBlank(req.getAddress())) {
+			errorLists.add(new ErrorList("Address","101","Please enter Address"));
+		}
+		if(StringUtils.isBlank(req.getCompanyName())) {
+			errorLists.add(new ErrorList("CompanyName","103","Please enter CompanyName"));
+		}
+		if(StringUtils.isBlank(req.getDistrict())) {
+			errorLists.add(new ErrorList("District","104","Please choose your District"));
+		}
+		if(StringUtils.isBlank(req.getGstNumber())) {
+			errorLists.add(new ErrorList("GstNo","105","Please enter Gst Number"));
+		}
+		if(StringUtils.isBlank(req.getMobileNo())) {
+			errorLists.add(new ErrorList("MobileNo","108","Please enter Mobile Number"));
+		}
+		if(StringUtils.isBlank(req.getState())) {
+			errorLists.add(new ErrorList("StateCode","110","Please choose your State"));
+		}
+		if(StringUtils.isBlank(req.getStatus())) {
+			errorLists.add(new ErrorList("Status","110","Please choose your Status"));
+		}
+		
+		return errorLists;
+	}
+
+	public List<ErrorList> product(CompanyProductRequest req) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		
+		if(StringUtils.isBlank(req.getCompanyId())) {
+			errorLists.add(new ErrorList("CompanyId","101","Please enter CompanyId"));
+		}
+		if(StringUtils.isBlank(req.getCreatedBy())) {
+			errorLists.add(new ErrorList("CreatedBy","103","Please enter CreatedBy"));
+		}
+		if(StringUtils.isBlank(req.getFoldingYn())) {
+			errorLists.add(new ErrorList("FoldingYn","104","Please choose your FoldingYn"));
+			
+		}else if(StringUtils.isNotBlank(req.getFoldingYn()) && "Y".equals(req.getFoldingYn())) {
+			
+			if(StringUtils.isBlank(req.getFoldingMesurementType())) {
+				errorLists.add(new ErrorList("FoldingMesurementType","103","Please enter FoldingMesurementType"));
+			}
+			if(StringUtils.isBlank(req.getFoldingMesurementValue())) {
+				errorLists.add(new ErrorList("FoldingMesurementValue","104","Please enter FoldingMesurementValue"));
+			}else if(StringUtils.isNotBlank(req.getFoldingMesurementValue())) {
+	
+				if(!req.getFoldingMesurementValue().matches("[0-9]*")) {
+					
+					errorLists.add(new ErrorList("FoldingMesurementValue","104","Number only allows"));
+				}
+			}
+			
+		}
+		if(StringUtils.isBlank(req.getElasticYn())) {
+			errorLists.add(new ErrorList("ElasticYn","105","Please choose your ElasticYn"));
+		}else if(StringUtils.isNotBlank(req.getElasticYn()) && "Y".equals(req.getFoldingYn())) {
+			
+			if(StringUtils.isBlank(req.getElasticMesurementType())) {
+				errorLists.add(new ErrorList("ElasticMesurementType","103","Please enter ElasticMesurementType"));
+			}
+			if(StringUtils.isBlank(req.getElasticMesurementValue())) {
+				errorLists.add(new ErrorList("ElasticMesurementValue","104","Please enter ElasticMesurementValue"));
+			}else if(StringUtils.isNotBlank(req.getElasticMesurementValue())) {
+	
+				if(!req.getElasticMesurementValue().matches("[0-9]*")) {
+					
+					errorLists.add(new ErrorList("ElasticMesurementValue","104","Number only allows"));
+				}
+			}
+			
+		}
+
+		if(StringUtils.isBlank(req.getProductName())) {
+			errorLists.add(new ErrorList("ProductName","110","Please enter your ProductName"));
+		}
+		if(StringUtils.isBlank(req.getStatus())) {
+			errorLists.add(new ErrorList("Status","110","Please choose your Status"));
+		}
+		
+		
+		
+		return errorLists;
+	}
+
+	public List<ErrorList> style(ProductStyleMasterRequest req) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		
+		if(StringUtils.isBlank(req.getCompanyId())) {
+			errorLists.add(new ErrorList("CompanyId","101","Please enter CompanyId"));
+		}
+		if(StringUtils.isBlank(req.getCreatedBy())) {
+			errorLists.add(new ErrorList("CreatedBy","103","Please enter CreatedBy"));
+		}
+		if(StringUtils.isBlank(req.getProductId())) {
+			errorLists.add(new ErrorList("ProductId","110","Please enter your ProductId"));
+		}
+		if(StringUtils.isBlank(req.getStatus())) {
+			errorLists.add(new ErrorList("Status","110","Please choose your Status"));
+		}
+		if(StringUtils.isBlank(req.getStyleName())) {
+			errorLists.add(new ErrorList("StyleName","110","Please enter your StyleName"));
+		}
+		
+		return errorLists;
+	}
+
 		
 }

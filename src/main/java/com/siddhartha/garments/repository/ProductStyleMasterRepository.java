@@ -11,6 +11,8 @@ import com.siddhartha.garments.entity.ProductStyleMasterId;
 @Repository
 public interface ProductStyleMasterRepository extends JpaRepository<ProductStyleMaster, ProductStyleMasterId>{
 
-	List<ProductStyleMaster> findByCompanyIdAndProductId(Integer valueOf, Integer valueOf2);
+
+
+	List<ProductStyleMaster> findByIdCompanyIdAndIdProductId(Integer companyId, Integer productId);
 
 }

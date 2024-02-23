@@ -1,7 +1,5 @@
 package com.siddhartha.garments.request;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -17,10 +15,21 @@ public class ProductStyleMasterRequest {
 	@JsonProperty("ProductId")
 	private String productId;
 	
+	@JsonProperty("StyleId")
+	private String styleId;
+	
+	@JsonProperty("StyleName")
+	private String styleName;
+	
+	@JsonProperty("Status")
+	private String Status;
+	
+	@JsonProperty("Remarks")
+	private String remarks;
+	
 	@JsonProperty("CreatedBy")
 	private String createdBy;
 	
-	@JsonProperty("ProductStyleList")
-	private List<ProductStyleList> productStyleList;
+	
 
 }

@@ -22,10 +22,8 @@ import com.siddhartha.garments.repository.CompanyProductMasterRepository;
 import com.siddhartha.garments.repository.CompanyProductRepository;
 import com.siddhartha.garments.repository.ProductStyleMasterRepository;
 import com.siddhartha.garments.request.CompanyMasterRequest;
-import com.siddhartha.garments.request.CompanyProductList;
 import com.siddhartha.garments.request.CompanyProductRequest;
 import com.siddhartha.garments.request.ErrorList;
-import com.siddhartha.garments.request.ProductStyleList;
 import com.siddhartha.garments.request.ProductStyleMasterRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.CompanyProductMasterService;
@@ -44,6 +42,9 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	private ProductStyleMasterRepository styleMasterRepo;
 	
 	@Autowired
+	private InputValidationServiceImpl validation;
+	
+	@Autowired
 	private SimpleDateFormat sdf;
 	
 	private static Integer companyId =1000;
@@ -52,7 +53,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	public CommonResponse companySave(CompanyMasterRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<ErrorList> list = new ArrayList<>();
+			List<ErrorList> list =validation.company(req);
 			if(list.isEmpty()) {
 				CompanyMaster companyMaster =CompanyMaster.builder()
 						.address(req.getAddress())
@@ -66,16 +67,13 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 						.mobileNo(req.getMobileNo())
 						.remarks(StringUtils.isBlank(req.getRemarks())?"":req.getRemarks())
 						.state(Integer.valueOf(req.getState()))
-						.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
+						.status(req.getStatus())
 						.build();
 				
-				CompanyMaster savedData=companyRepo.save(companyMaster);
+				companyRepo.save(companyMaster);
 				
-				Map<String,String> res = new HashMap<>();
-				res.put("CompanyId", savedData.getCompanyId().toString());
-				
-				response.setMessage("Sucess");
-				response.setResponse(res);
+				response.setMessage("Success");
+				response.setResponse("Data Saved Successfully");
 				response.setError(null);
 			}else {
 				response.setMessage("Error");
@@ -92,37 +90,33 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	public CommonResponse productSave(CompanyProductRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<ErrorList> list = new ArrayList<>();
+			List<ErrorList> list = validation.product(req);
 			if(list.isEmpty()) {
-				List<CompanyProductMaster> masterList = new ArrayList<>();
-				
-				for(CompanyProductList data :req.getCompanyProductList()) {
-					
 					CompanyProductMasterId id = CompanyProductMasterId.builder()
 							.companyId(Integer.valueOf(req.getCompanyId()))
-							.productId(StringUtils.isBlank(data.getProductId())?getProductIdByCompanyId(req.getCompanyId())
-									:Integer.valueOf(data.getProductId()))
+							.productId(StringUtils.isBlank(req.getProductId())?getProductIdByCompanyId(req.getCompanyId())
+									:Integer.valueOf(req.getProductId()))
 							.build();
 					
 					CompanyProductMaster productMaster = CompanyProductMaster.builder()
 							.createdBy(req.getCreatedBy())
 							.entryDate(new Date())
 							.id(id)
-							.productName(data.getProductName())
-							.remarks(StringUtils.isBlank(data.getRemarks())?"":data.getRemarks())
-							.status(data.getStatus())
+							.productName(req.getProductName())
+							.remarks(StringUtils.isBlank(req.getRemarks())?"":req.getRemarks())
+							.status(req.getStatus())
+							.foldingYn(req.getFoldingYn())
+							.foldingMesurementType(StringUtils.isBlank(req.getFoldingMesurementType())?null:req.getFoldingMesurementType())
+							.foldingMesurementValue(StringUtils.isBlank(req.getFoldingMesurementValue())?0:Integer.valueOf(req.getFoldingMesurementValue()))
+							.elasticYn(req.getElasticYn())
+							.elasticMesurementType(StringUtils.isBlank(req.getElasticMesurementType())?null:req.getElasticMesurementType())
+							.elastciMesurementValue(StringUtils.isBlank(req.getElasticMesurementValue())?0:Integer.valueOf(req.getElasticMesurementValue()))
 							.build();
 					
-					masterList.add(productMaster);
-				}
-				
-				List<CompanyProductMaster> savedData =productRepo.saveAll(masterList);
-				Map<String,String> res = new HashMap<>();
-				res.put("CompanyId", savedData.get(0).getId().getCompanyId().toString());
-				
-			
-				response.setMessage("Sucess");
-				response.setResponse(savedData);
+				productRepo.save(productMaster);
+					
+				response.setMessage("Success");
+				response.setResponse("Data Saved Successfully");
 				response.setError(null);
 			}else {
 				response.setMessage("Error");
@@ -137,7 +131,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 
 	
 	private Integer getProductIdByCompanyId(String companyId) {
-		List<CompanyProductMaster> list =productRepo.findByCompanyId(Integer.valueOf(companyId));
+		List<CompanyProductMaster> list =productRepo.findByIdCompanyId(Integer.valueOf(companyId));
 		return list.size()+1;
 	}
 
@@ -145,35 +139,30 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	public CommonResponse styleSave(ProductStyleMasterRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<ErrorList> list = new ArrayList<>();
+			List<ErrorList> list = validation.style(req);
 			if(list.isEmpty()) {
-				List<ProductStyleMaster> masterList = new ArrayList<>();
-				
-				for(ProductStyleList data :req.getProductStyleList()) {
-					
-					ProductStyleMasterId styleMasterId = ProductStyleMasterId.builder()
+			
+				ProductStyleMasterId styleMasterId = ProductStyleMasterId.builder()
 							.companyId(Integer.valueOf(req.getCompanyId()))
 							.productId(Integer.valueOf(req.getProductId()))
-							.styleId(StringUtils.isBlank(data.getStyleId())?getStyleId(req.getCompanyId(),req.getProductId())
-									:Integer.valueOf(data.getStyleId()))
+							.styleId(StringUtils.isBlank(req.getStyleId())?getStyleId(req.getCompanyId(),req.getProductId())
+									:Integer.valueOf(req.getStyleId()))
 							.build();
 					
 					ProductStyleMaster styleMaster = ProductStyleMaster.builder()
 							.createdBy(req.getCreatedBy())
 							.entryDate(new Date())
 							.id(styleMasterId)
-							.styleName(data.getStyleName())
-							.remarks(StringUtils.isBlank(data.getRemarks())?"":data.getRemarks())
-							.status(data.getStatus())
+							.styleName(req.getStyleName())
+							.remarks(StringUtils.isBlank(req.getRemarks())?"":req.getRemarks())
+							.status(req.getStatus())
 							.build();
 					
-					masterList.add(styleMaster);
-				}
 				
-				styleMasterRepo.saveAll(masterList);
+				styleMasterRepo.save(styleMaster);
 				
-				response.setMessage("Sucess");
-				response.setResponse("");
+				response.setMessage("Success");
+				response.setResponse("Data Saved Successfully");
 				response.setError(null);
 			}else {
 				response.setMessage("Error");
@@ -187,7 +176,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	}
 
 	private Integer getStyleId(String companyId, String productId) {
-		List<ProductStyleMaster> list =styleMasterRepo.findByCompanyIdAndProductId(Integer.valueOf(companyId),Integer.valueOf(productId));
+		List<ProductStyleMaster> list =styleMasterRepo.findByIdCompanyIdAndIdProductId(Integer.valueOf(companyId),Integer.valueOf(productId));
 		return list.size()+1;
 	}
 
@@ -215,7 +204,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 					
 				});
 				
-				response.setMessage("Sucess");
+				response.setMessage("Success");
 				response.setResponse(mapList);
 				response.setError(null);
 			}else {
@@ -250,7 +239,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 				map.put("Remarks", StringUtils.isBlank(p.getRemarks())?"":p.getRemarks());
 				map.put("CreatedDate", sdf.format(p.getEntryDate()));
 				
-				response.setMessage("Sucess");
+				response.setMessage("Success");
 				response.setResponse(map);
 				response.setError(null);
 			}else {
@@ -268,7 +257,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	public CommonResponse getAllProductByCompanyId(Integer companyId) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<CompanyProductMaster> product =productRepo.findByCompanyId(companyId);
+			List<CompanyProductMaster> product =productRepo.findByIdCompanyId(companyId);
 			if(!product.isEmpty()) {
 				List<Map<String,String>> mapList = new ArrayList<>();
 				product.forEach(p ->{
@@ -281,10 +270,16 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 					map.put("CreatedBy", p.getCreatedBy());
 					map.put("Remarks", StringUtils.isBlank(p.getRemarks())?"":p.getRemarks());
 					map.put("CreatedDate", sdf.format(p.getEntryDate()));
+					map.put("FoldingYn", p.getFoldingYn());
+					map.put("ElasticYn", p.getElasticYn());
+					map.put("FoldingMesurementType",StringUtils.isBlank(p.getFoldingMesurementType())?"":p.getFoldingMesurementType());
+					map.put("FoldingMesurementValue",p.getFoldingMesurementValue().toString());
+					map.put("ElasticMesurementType",StringUtils.isBlank(p.getElasticMesurementType())?"":p.getElasticMesurementType());
+					map.put("ElasticMesurementValue",p.getElastciMesurementValue().toString());
 					mapList.add(map);
 				});
 				
-				response.setMessage("Sucess");
+				response.setMessage("Success");
 				response.setResponse(mapList);
 				response.setError(null);
 			}else {
@@ -321,8 +316,89 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 				map.put("CreatedBy", p.getCreatedBy());
 				map.put("Remarks", StringUtils.isBlank(p.getRemarks())?"":p.getRemarks());
 				map.put("CreatedDate", sdf.format(p.getEntryDate()));
+				map.put("FoldingYn", p.getFoldingYn());
+				map.put("ElasticYn", p.getElasticYn());
+				map.put("FoldingMesurementType",StringUtils.isBlank(p.getFoldingMesurementType())?"":p.getFoldingMesurementType());
+				map.put("FoldingMesurementValue",p.getFoldingMesurementValue().toString());
+				map.put("ElasticMesurementType",StringUtils.isBlank(p.getElasticMesurementType())?"":p.getElasticMesurementType());
+				map.put("ElasticMesurementValue",p.getElastciMesurementValue().toString());
+
+				response.setMessage("Success");
+				response.setResponse(map);
+				response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Record found");
+				response.setError(null);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse getAllStyle(Integer companyId, Integer productId) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ProductStyleMaster> product =styleMasterRepo.findByIdCompanyIdAndIdProductId(companyId,productId);
+			if(!product.isEmpty()) {
+				List<Map<String,String>> mapList = new ArrayList<>();
+				product.forEach(p ->{
+					HashMap<String,String> map = new HashMap<>();
+					map.put("CompanyId", p.getId().getCompanyId().toString());
+					map.put("ProductId", p.getId().getProductId().toString());
+					map.put("StyleId",p.getId().getStyleId().toString());
+					map.put("StyleName",p.getStyleName());
+					map.put("CreatedBy", p.getCreatedBy());
+					map.put("Status", p.getStatus());
+					map.put("CreatedBy", p.getCreatedBy());
+					map.put("Remarks", StringUtils.isBlank(p.getRemarks())?"":p.getRemarks());
+					map.put("CreatedDate", sdf.format(p.getEntryDate()));
+					mapList.add(map);
+				});
 				
-				response.setMessage("Sucess");
+				response.setMessage("Success");
+				response.setResponse(mapList);
+				response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Record Found");
+				response.setError(null);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse getAllStyle(Integer companyId, Integer productId, Integer styleId) {
+		CommonResponse response = new CommonResponse();
+		try {
+			ProductStyleMasterId styleMasterId =ProductStyleMasterId.builder()
+					.companyId(companyId)
+					.productId(productId)
+					.styleId(styleId)
+					.build();
+			
+			Optional<ProductStyleMaster> data =styleMasterRepo.findById(styleMasterId);
+			
+			if(data.isPresent()) {
+				
+				ProductStyleMaster p =data.get();
+				HashMap<String,String> map = new HashMap<>();
+				map.put("CompanyId", p.getId().getCompanyId().toString());
+				map.put("ProductId", p.getId().getProductId().toString());
+				map.put("StyleId",p.getId().getStyleId().toString());
+				map.put("StyleName",p.getStyleName());
+				map.put("CreatedBy", p.getCreatedBy());
+				map.put("Status", p.getStatus());
+				map.put("CreatedBy", p.getCreatedBy());
+				map.put("Remarks", StringUtils.isBlank(p.getRemarks())?"":p.getRemarks());
+				map.put("CreatedDate", sdf.format(p.getEntryDate()));
+				
+				response.setMessage("Success");
 				response.setResponse(map);
 				response.setError(null);
 			}else {
