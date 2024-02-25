@@ -270,8 +270,8 @@ public class DropDownServiceImpl implements DropDownService{
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
 					HashMap<String, String> map = new HashMap<String, String>();
-					map.put("Code", p.getProductSizeId().toString());
-					map.put("CodeDesc", p.getProductSize().toString());
+				//	map.put("Code", p.getProductSizeId().toString());
+					//map.put("CodeDesc", p.getProductSize().toString());
 					res.add(map);
 				});
 				response.setError(null);

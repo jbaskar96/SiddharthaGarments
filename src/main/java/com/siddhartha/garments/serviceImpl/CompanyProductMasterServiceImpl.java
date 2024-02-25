@@ -13,13 +13,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.siddhartha.garments.dto.GetProductColorMetalReq;
+import com.siddhartha.garments.dto.GetProductSizeColorReq;
+import com.siddhartha.garments.dto.GetProductSizeMetalReq;
+import com.siddhartha.garments.dto.ProductSizeColorRequest;
+import com.siddhartha.garments.dto.ProductSizeMasterReq;
+import com.siddhartha.garments.dto.ProductSizeMetalReq;
+import com.siddhartha.garments.dto.SaveProductSizeColorMetalReq;
 import com.siddhartha.garments.entity.CompanyMaster;
 import com.siddhartha.garments.entity.CompanyProductMaster;
 import com.siddhartha.garments.entity.CompanyProductMasterId;
+import com.siddhartha.garments.entity.ProductSizeColorMaster;
+import com.siddhartha.garments.entity.ProductSizeColorMasterId;
+import com.siddhartha.garments.entity.ProductSizeMaster;
+import com.siddhartha.garments.entity.ProductSizeMasterId;
+import com.siddhartha.garments.entity.ProductSizeMetalMaster;
+import com.siddhartha.garments.entity.ProductSizeMetalMasterId;
 import com.siddhartha.garments.entity.ProductStyleMaster;
 import com.siddhartha.garments.entity.ProductStyleMasterId;
 import com.siddhartha.garments.repository.CompanyProductMasterRepository;
 import com.siddhartha.garments.repository.CompanyProductRepository;
+import com.siddhartha.garments.repository.ProductSizeColorMasterRepository;
+import com.siddhartha.garments.repository.ProductSizeMasterRepo;
+import com.siddhartha.garments.repository.ProductSizeMetalMasterRepository;
 import com.siddhartha.garments.repository.ProductStyleMasterRepository;
 import com.siddhartha.garments.request.CompanyMasterRequest;
 import com.siddhartha.garments.request.CompanyProductRequest;
@@ -43,6 +59,15 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	
 	@Autowired
 	private InputValidationServiceImpl validation;
+	
+	@Autowired
+	private ProductSizeMasterRepo productSizeMasterRepo;
+	
+	@Autowired
+	private ProductSizeMetalMasterRepository ProductSizeMetalMasterRepo;
+	
+	@Autowired
+	private ProductSizeColorMasterRepository productSizeColorMasterRepo;
 	
 	@Autowired
 	private SimpleDateFormat sdf;
@@ -105,12 +130,6 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 							.productName(req.getProductName())
 							.remarks(StringUtils.isBlank(req.getRemarks())?"":req.getRemarks())
 							.status(req.getStatus())
-							.foldingYn(req.getFoldingYn())
-							.foldingMesurementType(StringUtils.isBlank(req.getFoldingMesurementType())?null:req.getFoldingMesurementType())
-							.foldingMesurementValue(StringUtils.isBlank(req.getFoldingMesurementValue())?0:Integer.valueOf(req.getFoldingMesurementValue()))
-							.elasticYn(req.getElasticYn())
-							.elasticMesurementType(StringUtils.isBlank(req.getElasticMesurementType())?null:req.getElasticMesurementType())
-							.elastciMesurementValue(StringUtils.isBlank(req.getElasticMesurementValue())?0:Integer.valueOf(req.getElasticMesurementValue()))
 							.build();
 					
 				productRepo.save(productMaster);
@@ -270,12 +289,6 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 					map.put("CreatedBy", p.getCreatedBy());
 					map.put("Remarks", StringUtils.isBlank(p.getRemarks())?"":p.getRemarks());
 					map.put("CreatedDate", sdf.format(p.getEntryDate()));
-					map.put("FoldingYn", p.getFoldingYn());
-					map.put("ElasticYn", p.getElasticYn());
-					map.put("FoldingMesurementType",StringUtils.isBlank(p.getFoldingMesurementType())?"":p.getFoldingMesurementType());
-					map.put("FoldingMesurementValue",p.getFoldingMesurementValue().toString());
-					map.put("ElasticMesurementType",StringUtils.isBlank(p.getElasticMesurementType())?"":p.getElasticMesurementType());
-					map.put("ElasticMesurementValue",p.getElastciMesurementValue().toString());
 					mapList.add(map);
 				});
 				
@@ -316,13 +329,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 				map.put("CreatedBy", p.getCreatedBy());
 				map.put("Remarks", StringUtils.isBlank(p.getRemarks())?"":p.getRemarks());
 				map.put("CreatedDate", sdf.format(p.getEntryDate()));
-				map.put("FoldingYn", p.getFoldingYn());
-				map.put("ElasticYn", p.getElasticYn());
-				map.put("FoldingMesurementType",StringUtils.isBlank(p.getFoldingMesurementType())?"":p.getFoldingMesurementType());
-				map.put("FoldingMesurementValue",p.getFoldingMesurementValue().toString());
-				map.put("ElasticMesurementType",StringUtils.isBlank(p.getElasticMesurementType())?"":p.getElasticMesurementType());
-				map.put("ElasticMesurementValue",p.getElastciMesurementValue().toString());
-
+				
 				response.setMessage("Success");
 				response.setResponse(map);
 				response.setError(null);
@@ -411,5 +418,405 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 		}
 		return response;
 	}
-	
+
+	@Override
+	public CommonResponse saveSize(List<ProductSizeMasterReq> req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ErrorList> error = new ArrayList<ErrorList>();
+			if(error.isEmpty()) {
+				List<ProductSizeMaster> masterList = new ArrayList<>();
+				for(ProductSizeMasterReq r :req) {
+					
+					ProductSizeMasterId id = ProductSizeMasterId.builder()
+							.companyId(Integer.valueOf(r.getCompanyId()))
+							.productId(Integer.valueOf(r.getProductId()))
+							.sizeId(StringUtils.isBlank(r.getSizeId())?getSizedId(Integer.valueOf(r.getCompanyId()),Integer.valueOf(r.getProductId()))
+									:Integer.valueOf(r.getSizeId()))
+							.build();
+					
+					ProductSizeMaster master =ProductSizeMaster.builder()
+							.entryDate(new Date())
+							.id(id)
+							.remarks(StringUtils.isBlank(r.getRemarks())?null:r.getRemarks())
+							.size(Integer.valueOf(r.getSize()))
+							.sizeType(r.getSizeType())
+							.status(r.getStatus())
+							.build();
+					
+					masterList.add(master);
+				}
+				
+				productSizeMasterRepo.saveAll(masterList);
+				response.setMessage("Success");
+				response.setResponse("Data Saved Successfully");
+				response.setError(null);
+			}else {
+				
+				response.setMessage("Error");
+				response.setResponse(null);
+				response.setError(error);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	private Integer getSizedId(Integer companyId,Integer productId) {
+		Integer sizeId =productSizeMasterRepo.findByIdCompanyIdAndIdProductId(companyId, productId).size()+1;
+		return sizeId;
+	}
+
+	@Override
+	public CommonResponse getSizeDetailsByCompanyIdAndPrductId(Integer companyId, Integer productId) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ProductSizeMaster> list =productSizeMasterRepo.findByIdCompanyIdAndIdProductId(companyId,productId);
+			if(!list.isEmpty()) {
+				List<Map<String,String>> mapList = new ArrayList<>();
+				list.forEach(p ->{
+					Map<String,String> map = new HashMap<String, String>();
+					map.put("CompanyId", p.getId().getCompanyId().toString());
+					map.put("ProductId", p.getId().getProductId().toString());
+					map.put("SizeId", p.getId().getSizeId().toString());
+					map.put("Size", p.getSize().toString());
+					map.put("SizeType", p.getSizeType());
+					map.put("Status", p.getStatus());
+					map.put("Remarks", StringUtils.isBlank(p.getRemarks())?"":p.getRemarks());
+					map.put("CreatedDate", sdf.format(p.getEntryDate()));
+					mapList.add(map);
+				});
+				response.setMessage("Success");
+				response.setResponse(mapList);
+				response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Record found");
+				response.setError(null);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse getSizeDetailsByCompanyIdAndPrductId(Integer companyId, Integer productId, Integer sizeId) {
+		CommonResponse response = new CommonResponse();
+		try {
+			ProductSizeMasterId id = ProductSizeMasterId.builder()
+					.companyId(companyId)
+					.productId(productId)
+					.sizeId(sizeId)
+					.build();
+			
+			Optional<ProductSizeMaster>  master = productSizeMasterRepo.findById(id);
+			if(master.isPresent()) {
+				
+				ProductSizeMaster p =master.get();
+				HashMap<String,String> map = new HashMap<>();
+				map.put("CompanyId", p.getId().getCompanyId().toString());
+				map.put("ProductId", p.getId().getProductId().toString());
+				map.put("SizeId", p.getId().getSizeId().toString());
+				map.put("Size", p.getSize().toString());
+				map.put("SizeType", p.getSizeType());
+				map.put("Status", p.getStatus());
+				map.put("Remarks", StringUtils.isBlank(p.getRemarks())?"":p.getRemarks());
+				map.put("CreatedDate", sdf.format(p.getEntryDate()));
+				
+				response.setMessage("Success");
+				response.setResponse(map);
+				response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Record found");
+				response.setError(null);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse saveSizeMetal(List<ProductSizeMetalReq> req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ErrorList> error = new ArrayList<ErrorList>();
+			if(error.isEmpty()) {
+				List<ProductSizeMetalMaster> masterList = new ArrayList<>();
+				
+				int sno =1;
+				
+				for(ProductSizeMetalReq r :req) {
+					
+					ProductSizeMetalMasterId id = ProductSizeMetalMasterId.builder()
+							.companyId(Integer.valueOf(r.getCompanyId()))
+							.productId(Integer.valueOf(r.getProductId()))
+							.sizeId(Integer.valueOf(r.getSizeId()))
+							.metalId(StringUtils.isBlank(r.getMetalId())?getSizeMetalId(Integer.valueOf(r.getCompanyId()),Integer.valueOf(r.getProductId()),Integer.valueOf(r.getSizeId())) 
+									:Integer.valueOf(r.getMetalId()))		
+							.build();
+					
+					ProductSizeMetalMaster master =ProductSizeMetalMaster.builder()
+							.entryDate(new Date())
+							.id(id)
+							.displayOrder(Integer.valueOf(r.getDisplayOrder()))
+							.mesurementPieces(Integer.valueOf(r.getMesurementPieces()))
+							.mesurementType(r.getMesurementType())
+							.mesurementValue(Double.valueOf(r.getMesurementValue()))
+							.metalName(r.getMetalName())
+							.columnName(StringUtils.isBlank(r.getColumnName())?"PARAM_"+sno:r.getColumnName())
+							.status(r.getStatus())
+							.build();
+					
+					masterList.add(master);
+					
+					sno++;
+				}
+				
+				ProductSizeMetalMasterRepo.saveAll(masterList);
+				response.setMessage("Success");
+				response.setResponse("Data Saved Successfully");
+				response.setError(null);
+			}else {
+				
+				response.setMessage("Error");
+				response.setResponse(null);
+				response.setError(error);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	private Integer getSizeMetalId(Integer companyId, Integer productId, Integer sizeId) {
+		Integer metalid =ProductSizeMetalMasterRepo.findByIdCompanyIdAndIdProductIdAndIdMetalId(companyId,productId,sizeId).size()+1;
+		return metalid;
+	}
+
+	@Override
+	public CommonResponse getSizeMetalDetails(GetProductSizeMetalReq req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ProductSizeMetalMaster> list =ProductSizeMetalMasterRepo.findByIdCompanyIdAndIdProductIdAndIdSizeId(Integer.valueOf(req.getCompanyId()),Integer.valueOf(req.getProductId()),Integer.valueOf(req.getSizeId()));
+			if(!list.isEmpty()) {
+				List<Map<String,String>> mapList = new ArrayList<>();
+				list.forEach(p ->{
+					Map<String,String> map = new HashMap<String, String>();
+					map.put("CompanyId", p.getId().getCompanyId().toString());
+					map.put("ProductId", p.getId().getProductId().toString());
+					map.put("SizeId", p.getId().getSizeId().toString());
+					map.put("MetalId", p.getId().getMetalId().toString());
+					map.put("MetalName", p.getMetalName());
+					map.put("ColumnName", p.getColumnName());
+					map.put("MesurementType", p.getMesurementType());
+					map.put("MesurementValue", p.getMesurementValue().toString());
+					map.put("MesurementPieces", p.getMesurementPieces().toString());
+					map.put("Status", p.getStatus());
+					map.put("DisplayOrder", p.getDisplayOrder().toString());
+					map.put("CreatedDate", sdf.format(p.getEntryDate()));
+					mapList.add(map);
+				});
+				response.setMessage("Success");
+				response.setResponse(mapList);
+				response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Record found");
+				response.setError(null);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse editSizeMetalDetails(GetProductSizeMetalReq r) {
+		CommonResponse response = new CommonResponse();
+		try {
+
+			ProductSizeMetalMasterId id = ProductSizeMetalMasterId.builder()
+					.companyId(Integer.valueOf(r.getCompanyId()))
+					.productId(Integer.valueOf(r.getProductId()))
+					.sizeId(Integer.valueOf(r.getSizeId()))
+					.metalId(Integer.valueOf(r.getMetalId()))			
+					.build();
+			
+			Optional<ProductSizeMetalMaster> data =ProductSizeMetalMasterRepo.findById(id);
+			
+			if(data.isPresent()) {
+				
+				ProductSizeMetalMaster p =data.get();
+				
+				Map<String,String> map = new HashMap<String, String>();
+				map.put("CompanyId", p.getId().getCompanyId().toString());
+				map.put("ProductId", p.getId().getProductId().toString());
+				map.put("SizeId", p.getId().getSizeId().toString());
+				map.put("MetalId", p.getId().getMetalId().toString());
+				map.put("MetalName", p.getMetalName());
+				map.put("ColumnName", p.getColumnName());
+				map.put("MesurementType", p.getMesurementType());
+				map.put("MesurementValue", p.getMesurementValue().toString());
+				map.put("MesurementPieces", p.getMesurementPieces().toString());
+				map.put("Status", p.getStatus());
+				map.put("DisplayOrder", p.getDisplayOrder().toString());
+				map.put("CreatedDate", sdf.format(p.getEntryDate()));
+				
+				response.setMessage("Success");
+				response.setResponse(map);
+				response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Record found");
+				response.setError(null);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse saveSizeColor(List<ProductSizeColorRequest> req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ErrorList> error = new ArrayList<ErrorList>();
+			if(error.isEmpty()) {
+				List<ProductSizeColorMaster> masterList = new ArrayList<>();
+			
+				for(ProductSizeColorRequest r :req) {
+					
+					ProductSizeColorMasterId id = ProductSizeColorMasterId.builder()
+							.companyId(Integer.valueOf(r.getCompanyId()))
+							.productId(Integer.valueOf(r.getProductId()))
+							.sizeId(Integer.valueOf(r.getSizeId()))
+							.colourCode(StringUtils.isBlank(r.getColorCode())?getColorCode(Integer.valueOf(r.getCompanyId()),Integer.valueOf(r.getProductId()),Integer.valueOf(r.getSizeId()))
+									:Integer.valueOf(r.getColorCode()))	
+							.build();
+					
+					ProductSizeColorMaster master =ProductSizeColorMaster.builder()
+							.entryDate(new Date())
+							.id(id)
+							.colourName(r.getColorName())
+							.status(r.getStatus())
+							.build();
+					
+					masterList.add(master);
+					
+				}
+				
+				productSizeColorMasterRepo.saveAll(masterList);
+				response.setMessage("Success");
+				response.setResponse("Data Saved Successfully");
+				response.setError(null);
+			}else {
+				
+				response.setMessage("Error");
+				response.setResponse(null);
+				response.setError(error);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	private Integer getColorCode(Integer companyId, Integer productId, Integer sizeId) {
+		Integer colorId =productSizeColorMasterRepo.findByIdCompanyIdAndIdProductIdAndIdSizeId(companyId, productId, sizeId).size()+1;
+		return colorId;
+	}
+
+	@Override
+	public CommonResponse getSizeColorDetails(GetProductSizeColorReq req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ProductSizeColorMaster> list =productSizeColorMasterRepo.findByIdCompanyIdAndIdProductIdAndIdSizeId(Integer.valueOf(req.getCompanyId()),Integer.valueOf(req.getProductId()),Integer.valueOf(req.getSizeId()));
+			if(!list.isEmpty()) {
+				List<Map<String,String>> mapList = new ArrayList<>();
+				list.forEach(p ->{
+					Map<String,String> map = new HashMap<String, String>();
+					map.put("CompanyId", p.getId().getCompanyId().toString());
+					map.put("ProductId", p.getId().getProductId().toString());
+					map.put("SizeId", p.getId().getSizeId().toString());
+					map.put("ColorCode", p.getId().getColourCode().toString());
+					map.put("ColorName", p.getColourName());
+					map.put("Status", p.getStatus());
+					map.put("CreatedDate", sdf.format(p.getEntryDate()));
+					mapList.add(map);
+				});
+				response.setMessage("Success");
+				response.setResponse(mapList);
+				response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Record found");
+				response.setError(null);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+	@Override
+	public CommonResponse editSizeColorDetails(GetProductSizeColorReq r) {
+		CommonResponse response = new CommonResponse();
+		try {
+
+			ProductSizeColorMasterId id = ProductSizeColorMasterId.builder()
+					.companyId(Integer.valueOf(r.getCompanyId()))
+					.productId(Integer.valueOf(r.getProductId()))
+					.sizeId(Integer.valueOf(r.getSizeId()))
+					.colourCode(Integer.valueOf(r.getColorCode()))
+					.build();
+			
+			Optional<ProductSizeColorMaster> data =productSizeColorMasterRepo.findById(id);
+			
+			if(data.isPresent()) {
+				
+				ProductSizeColorMaster p =data.get();
+				Map<String,String> map = new HashMap<String, String>();
+				map.put("CompanyId", p.getId().getCompanyId().toString());
+				map.put("ProductId", p.getId().getProductId().toString());
+				map.put("SizeId", p.getId().getSizeId().toString());
+				map.put("ColorCode", p.getId().getColourCode().toString());
+				map.put("ColorName", p.getColourName());
+				map.put("Status", p.getStatus());
+				map.put("CreatedDate", sdf.format(p.getEntryDate()));
+				
+				response.setMessage("Success");
+				response.setResponse(map);
+				response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Record found");
+				response.setError(null);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse saveColorMetal(List<SaveProductSizeColorMetalReq> req) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CommonResponse getColorMetalDetails(GetProductColorMetalReq req) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CommonResponse editColorMetalDetails(GetProductColorMetalReq req) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -18,27 +17,22 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
-@Table(name="PRODUCT_SIZE_MASTER")
-public class ProductSizeMaster {
-
+@Table(name = "PRODUCT_SIZE_COLOR_MASTER")
+@Builder
+public class ProductSizeColorMaster {
 	
 	@EmbeddedId
-	private ProductSizeMasterId id;
+	private ProductSizeColorMasterId id;
 	
-	@Column(name="SIZE")
-	private Integer size;
-	
-	@Column(name="SIZE_TYPE")
-	private String sizeType;
-	
-	@Column(name="REMARKS")
-	private String remarks;
+	@Column(name="COLOUR_NAME")
+	private String colourName;
 	
 	@Column(name="STATUS")
 	private String status;
-	
+
 	@Column(name="ENTRY_DATE")
 	private Date entryDate;
+
+	
 }

@@ -628,43 +628,6 @@ public class InputValidationServiceImpl {
 		if(StringUtils.isBlank(req.getCreatedBy())) {
 			errorLists.add(new ErrorList("CreatedBy","103","Please enter CreatedBy"));
 		}
-		if(StringUtils.isBlank(req.getFoldingYn())) {
-			errorLists.add(new ErrorList("FoldingYn","104","Please choose your FoldingYn"));
-			
-		}else if(StringUtils.isNotBlank(req.getFoldingYn()) && "Y".equals(req.getFoldingYn())) {
-			
-			if(StringUtils.isBlank(req.getFoldingMesurementType())) {
-				errorLists.add(new ErrorList("FoldingMesurementType","103","Please enter FoldingMesurementType"));
-			}
-			if(StringUtils.isBlank(req.getFoldingMesurementValue())) {
-				errorLists.add(new ErrorList("FoldingMesurementValue","104","Please enter FoldingMesurementValue"));
-			}else if(StringUtils.isNotBlank(req.getFoldingMesurementValue())) {
-	
-				if(!req.getFoldingMesurementValue().matches("[0-9]*")) {
-					
-					errorLists.add(new ErrorList("FoldingMesurementValue","104","Number only allows"));
-				}
-			}
-			
-		}
-		if(StringUtils.isBlank(req.getElasticYn())) {
-			errorLists.add(new ErrorList("ElasticYn","105","Please choose your ElasticYn"));
-		}else if(StringUtils.isNotBlank(req.getElasticYn()) && "Y".equals(req.getFoldingYn())) {
-			
-			if(StringUtils.isBlank(req.getElasticMesurementType())) {
-				errorLists.add(new ErrorList("ElasticMesurementType","103","Please enter ElasticMesurementType"));
-			}
-			if(StringUtils.isBlank(req.getElasticMesurementValue())) {
-				errorLists.add(new ErrorList("ElasticMesurementValue","104","Please enter ElasticMesurementValue"));
-			}else if(StringUtils.isNotBlank(req.getElasticMesurementValue())) {
-	
-				if(!req.getElasticMesurementValue().matches("[0-9]*")) {
-					
-					errorLists.add(new ErrorList("ElasticMesurementValue","104","Number only allows"));
-				}
-			}
-			
-		}
 
 		if(StringUtils.isBlank(req.getProductName())) {
 			errorLists.add(new ErrorList("ProductName","110","Please enter your ProductName"));

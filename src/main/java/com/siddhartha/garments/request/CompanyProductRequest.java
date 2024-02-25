@@ -25,24 +25,6 @@ public class CompanyProductRequest {
 	@JsonProperty("Remarks")
 	private String remarks;
 	
-	@JsonProperty("FoldingYn")
-	private String foldingYn;
-	
-	@JsonProperty("FoldingMesurementType")
-	private String foldingMesurementType;
-	
-	@JsonProperty("FoldingMesurementValue")
-	private String foldingMesurementValue;
-	
-	@JsonProperty("ElasticYn")
-	private String elasticYn;
-	
-	@JsonProperty("ElasticMesurementType")
-	private String elasticMesurementType;
-	
-	@JsonProperty("ElasticMesurementValue")
-	private String elasticMesurementValue;
-	
 	@JsonProperty("Status")
 	private String status;
 	

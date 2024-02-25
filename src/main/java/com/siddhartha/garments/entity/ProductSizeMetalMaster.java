@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -18,27 +17,37 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
-@Table(name="PRODUCT_SIZE_MASTER")
-public class ProductSizeMaster {
-
+@Table(name = "PRODUCT_SIZE_METAL_MASTER")
+@Builder
+public class ProductSizeMetalMaster {
 	
 	@EmbeddedId
-	private ProductSizeMasterId id;
+	private ProductSizeMetalMasterId id;
 	
-	@Column(name="SIZE")
-	private Integer size;
+	@Column(name="METAL_NAME")
+	private String metalName;
 	
-	@Column(name="SIZE_TYPE")
-	private String sizeType;
+	@Column(name="COLUMN_NAME")
+	private String columnName;
 	
-	@Column(name="REMARKS")
-	private String remarks;
+	@Column(name="MESUREMENT_TYPE")
+	private String mesurementType;
+	
+	@Column(name="MESUREMENT_VALUE")
+	private Double mesurementValue;
+	
+	@Column(name="MESUREMENT_PIECES")
+	private Integer mesurementPieces;
+	
+	@Column(name="DISPLAY_ORDER")
+	private Integer displayOrder;
 	
 	@Column(name="STATUS")
 	private String status;
 	
 	@Column(name="ENTRY_DATE")
 	private Date entryDate;
+	
+
 }

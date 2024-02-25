@@ -36,8 +36,8 @@ public class ProductSizeServiceImpl implements ProductSizeService{
 			if(error.isEmpty()) {
 				Long sizeId =repository.count()+1;
 				ProductSizeMaster productSizeMaster =ProductSizeMaster.builder()
-						.productSize(Integer.valueOf(req.getSize()))
-						.productSizeId(StringUtils.isBlank(req.getSizeId())?sizeId.intValue():Integer.valueOf(req.getSizeId()))
+						//.productSize(Integer.valueOf(req.getSize()))
+						//.productSizeId(StringUtils.isBlank(req.getSizeId())?sizeId.intValue():Integer.valueOf(req.getSizeId()))
 						.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
 						.entryDate(new Date())
 						.build();
@@ -67,8 +67,8 @@ public class ProductSizeServiceImpl implements ProductSizeService{
 			ProductSizeMaster p = repository.findById(sizeId).orElse(null);
 			if(p !=null) {
 				HashMap<String, String> map = new HashMap<String, String>();
-				map.put("SizeId", p.getProductSizeId().toString());
-				map.put("Size",p.getProductSize().toString());
+			//	map.put("SizeId", p.getProductSizeId().toString());
+			//	map.put("Size",p.getProductSize().toString());
 				map.put("Status", p.getStatus());
 				map.put("CreatedDate",OperatorMasterServiceImpl.sdf.format(p.getEntryDate()));
 				response.setError(null);
@@ -108,8 +108,8 @@ public class ProductSizeServiceImpl implements ProductSizeService{
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
 					HashMap<String, String> map = new HashMap<String, String>();
-					map.put("SizeId", p.getProductSizeId().toString());
-					map.put("Size",p.getProductSize().toString());
+					//map.put("SizeId", p.getProductSizeId().toString());
+					//map.put("Size",p.getProductSize().toString());
 					map.put("Status", p.getStatus());
 					map.put("CreatedDate",OperatorMasterServiceImpl.sdf.format(p.getEntryDate()));
 					res.add(map);
