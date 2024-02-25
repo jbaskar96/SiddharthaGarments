@@ -431,7 +431,6 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 		try {
 			List<ErrorList> error = new ArrayList<ErrorList>();
 			if(error.isEmpty()) {
-				List<ProductSizeMaster> masterList = new ArrayList<>();
 				for(ProductSizeMasterReq r :req) {
 					
 					ProductSizeMasterId id = ProductSizeMasterId.builder()
@@ -450,10 +449,10 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 							.status(r.getStatus())
 							.build();
 					
-					masterList.add(master);
+					productSizeMasterRepo.save(master);
 				}
 				
-				productSizeMasterRepo.saveAll(masterList);
+				
 				response.setMessage("Success");
 				response.setResponse("Data Saved Successfully");
 				response.setError(null);
@@ -551,7 +550,6 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 		try {
 			List<ErrorList> error = new ArrayList<ErrorList>();
 			if(error.isEmpty()) {
-				List<ProductSizeMetalMaster> masterList = new ArrayList<>();
 				
 				int sno =1;
 				
@@ -577,12 +575,12 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 							.status(r.getStatus())
 							.build();
 					
-					masterList.add(master);
+					ProductSizeMetalMasterRepo.save(master);
 					
 					sno++;
 				}
 				
-				ProductSizeMetalMasterRepo.saveAll(masterList);
+				
 				response.setMessage("Success");
 				response.setResponse("Data Saved Successfully");
 				response.setError(null);
@@ -692,7 +690,6 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 		try {
 			List<ErrorList> error = new ArrayList<ErrorList>();
 			if(error.isEmpty()) {
-				List<ProductSizeColorMaster> masterList = new ArrayList<>();
 			
 				for(ProductSizeColorRequest r :req) {
 					
@@ -711,11 +708,11 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 							.status(r.getStatus())
 							.build();
 					
-					masterList.add(master);
+					productSizeColorMasterRepo.save(master);
 					
 				}
 				
-				productSizeColorMasterRepo.saveAll(masterList);
+				
 				response.setMessage("Success");
 				response.setResponse("Data Saved Successfully");
 				response.setError(null);
@@ -813,7 +810,6 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 		try {
 			List<ErrorList> error = new ArrayList<ErrorList>();
 			if(error.isEmpty()) {
-				List<ProductSizeColorMetalMaster> masterList = new ArrayList<>();
 			    int sno =1;
 				for(SaveProductSizeColorMetalReq r :req) {
 					
@@ -839,12 +835,11 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 							.status(r.getStatus())
 							.build();
 					
-					masterList.add(master);
+					productSizeColorMetalMasterRepo.save(master);
 					
 					sno++;
 				}
 				
-				productSizeColorMetalMasterRepo.saveAll(masterList);
 				response.setMessage("Success");
 				response.setResponse("Data Saved Successfully");
 				response.setError(null);

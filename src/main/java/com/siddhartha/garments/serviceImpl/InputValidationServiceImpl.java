@@ -9,6 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.siddhartha.garments.dto.OrderChallanColorReq;
+import com.siddhartha.garments.dto.OrderChallanInfoReq;
+import com.siddhartha.garments.dto.OrderDetailsRequest;
 import com.siddhartha.garments.entity.LoginMaster;
 import com.siddhartha.garments.repository.LoginMasterRepository;
 import com.siddhartha.garments.request.ChallanInfoRequest;
@@ -660,6 +663,89 @@ public class InputValidationServiceImpl {
 			errorLists.add(new ErrorList("StyleName","110","Please enter your StyleName"));
 		}
 		
+		return errorLists;
+	}
+
+	public List<ErrorList> validateOrder(OrderDetailsRequest req) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		
+		if(StringUtils.isBlank(req.getCompanyId())) {
+			errorLists.add(new ErrorList("CompanyId","101","Please enter CompanyId"));
+		}
+		
+		if(StringUtils.isBlank(req.getProductId())) {
+			errorLists.add(new ErrorList("ProductId","101","Please enter ProductId"));
+		}
+		
+		if(StringUtils.isBlank(req.getStyleId())) {
+			errorLists.add(new ErrorList("StyleId","101","Please enter StyleId"));
+		}
+		
+		if(StringUtils.isBlank(req.getInwardDate())) {
+			errorLists.add(new ErrorList("InwardDate","101","Please enter InwardDate"));
+		}
+		
+		if(StringUtils.isBlank(req.getLotNumber())) {
+			errorLists.add(new ErrorList("LotNumber","101","Please enter LotNumber"));
+		}
+		
+		if(StringUtils.isBlank(req.getStatus())) {
+			errorLists.add(new ErrorList("Status","101","Please enter Status"));
+		}
+		
+		if(req.getOrderChallanInfo().isEmpty()) {
+			errorLists.add(new ErrorList("ChallanInfo","101","Please enter ChallanInfo"));
+		}else {
+			
+			int rowno =1;
+			for(OrderChallanInfoReq r :req.getOrderChallanInfo()) {
+				
+				if(StringUtils.isBlank(r.getChallanDate())) {
+					errorLists.add(new ErrorList("ChallanDate","Row : "+rowno+"","Please enter ChallanDate"));
+				}
+				if(StringUtils.isBlank(r.getChallanNumber())) {
+					errorLists.add(new ErrorList("ChallanNumber","Row : "+rowno+"","Please enter ChallanNumber"));
+				}
+				if(StringUtils.isBlank(r.getSize())) {
+					errorLists.add(new ErrorList("Size","Row : "+rowno+"","Please enter Size"));
+				}
+				if(StringUtils.isBlank(r.getTotalPieces())) {
+					errorLists.add(new ErrorList("TotalPieces","Row : "+rowno+"","Please enter TotalPieces"));
+				}
+				rowno++;
+			}
+			
+		}
+		
+		
+		
+		return errorLists;
+	}
+
+	public List<ErrorList> orderColor(List<OrderChallanColorReq> req) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		if(req.isEmpty()) {
+			errorLists.add(new ErrorList("ColorInfo","101","Please enter ColorInfo"));
+		}else {
+			int rowno =1;
+			for(OrderChallanColorReq r : req) {
+				
+				if(StringUtils.isBlank(r.getColorCode())) {
+					errorLists.add(new ErrorList("ColorCode","Row : "+rowno+"","Please enter ColorCode"));
+				}
+				if(StringUtils.isBlank(r.getColorName())) {
+					errorLists.add(new ErrorList("ColorName","Row : "+rowno+"","Please enter ColorName"));
+				}
+				if(StringUtils.isBlank(r.getTotalPieces())) {
+					errorLists.add(new ErrorList("TotalPieces","Row : "+rowno+"","Please enter TotalPieces"));
+				}
+				if(StringUtils.isBlank(r.getTotalPieces())) {
+					errorLists.add(new ErrorList("TotalPieces","Row : "+rowno+"","Please enter TotalPieces"));
+				}
+				
+				rowno++;
+			}
+		}
 		return errorLists;
 	}
 

@@ -24,7 +24,7 @@ public class OrderDetails {
 	
 	@Id
 	@Column(name = "ORDER_ID")
-	private String inwardId;
+	private String orderId;
 	
 	@Column(name = "COMPANY_ID")
 	private Integer companyId;
@@ -36,7 +36,7 @@ public class OrderDetails {
 	private Integer styleId;
 	
 	@Column(name = "LOT_NUMBER")
-	private Integer lotNumber;
+	private String lotNumber;
 	
 	@Column(name = "INWARD_DATE")
 	private Date inwardDate;
