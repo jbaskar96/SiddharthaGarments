@@ -98,6 +98,18 @@ public class DropDownController {
 		return service.getProduct(companyId);
 	}
 	
+	@GetMapping("/company/product/size/{companyId}/{productId}")
+	public CommonResponse getProductSize(@PathVariable("companyId") Integer companyId,@PathVariable("productId") Integer productId) {
+		return service.getProductSize(companyId,productId);
+	}
+	
+	@GetMapping("/company/product/size/color/{companyId}/{productId}/{sizeId}")
+	public CommonResponse getProductSizeColor(@PathVariable("companyId") Integer companyId,@PathVariable("productId") Integer productId,
+			@PathVariable("sizeId") Integer sizeId) {
+		return service.getProductSizeColor(companyId,productId,sizeId);
+	}
+	
+	
 	@GetMapping("/company/items/{companyId}")
 	public CommonResponse getCompanyBrand(@PathVariable("companyId") String companyId) {
 		return service.getCompanyBrand(companyId);

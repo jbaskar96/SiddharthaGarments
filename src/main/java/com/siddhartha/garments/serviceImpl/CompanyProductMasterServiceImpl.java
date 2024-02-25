@@ -25,6 +25,8 @@ import com.siddhartha.garments.entity.CompanyProductMaster;
 import com.siddhartha.garments.entity.CompanyProductMasterId;
 import com.siddhartha.garments.entity.ProductSizeColorMaster;
 import com.siddhartha.garments.entity.ProductSizeColorMasterId;
+import com.siddhartha.garments.entity.ProductSizeColorMetalMaster;
+import com.siddhartha.garments.entity.ProductSizeColorMetalMasterId;
 import com.siddhartha.garments.entity.ProductSizeMaster;
 import com.siddhartha.garments.entity.ProductSizeMasterId;
 import com.siddhartha.garments.entity.ProductSizeMetalMaster;
@@ -34,6 +36,7 @@ import com.siddhartha.garments.entity.ProductStyleMasterId;
 import com.siddhartha.garments.repository.CompanyProductMasterRepository;
 import com.siddhartha.garments.repository.CompanyProductRepository;
 import com.siddhartha.garments.repository.ProductSizeColorMasterRepository;
+import com.siddhartha.garments.repository.ProductSizeColorMetalMasterRepository;
 import com.siddhartha.garments.repository.ProductSizeMasterRepo;
 import com.siddhartha.garments.repository.ProductSizeMetalMasterRepository;
 import com.siddhartha.garments.repository.ProductStyleMasterRepository;
@@ -68,6 +71,9 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	
 	@Autowired
 	private ProductSizeColorMasterRepository productSizeColorMasterRepo;
+	
+	@Autowired
+	private ProductSizeColorMetalMasterRepository productSizeColorMetalMasterRepo;
 	
 	@Autowired
 	private SimpleDateFormat sdf;
@@ -803,20 +809,150 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 
 	@Override
 	public CommonResponse saveColorMetal(List<SaveProductSizeColorMetalReq> req) {
-		// TODO Auto-generated method stub
-		return null;
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ErrorList> error = new ArrayList<ErrorList>();
+			if(error.isEmpty()) {
+				List<ProductSizeColorMetalMaster> masterList = new ArrayList<>();
+			    int sno =1;
+				for(SaveProductSizeColorMetalReq r :req) {
+					
+					ProductSizeColorMetalMasterId id = ProductSizeColorMetalMasterId.builder()
+							.companyId(Integer.valueOf(r.getCompanyId()))
+							.productId(Integer.valueOf(r.getProductId()))
+							.sizeId(Integer.valueOf(r.getSizeId()))
+							.colourCode(Integer.valueOf(r.getColorCode()))	
+							.metalId(StringUtils.isBlank(r.getMetalId())?getColorMetlaId(Integer.valueOf(r.getCompanyId()),Integer.valueOf(r.getProductId()),
+									Integer.valueOf(r.getSizeId()),Integer.valueOf(r.getColorCode()))
+									:Integer.valueOf(r.getColorCode()))
+							.build();
+					
+					ProductSizeColorMetalMaster master =ProductSizeColorMetalMaster.builder()
+							.entryDate(new Date())
+							.id(id)
+							.displayOrder(Integer.valueOf(r.getDisplayOrder()))
+							.mesurementPieces(Integer.valueOf(r.getMesurementPieces()))
+							.mesurementType(r.getMesurementType())
+							.mesurementValue(Double.valueOf(r.getMesurementValue()))
+							.metalName(r.getMetalName())
+							.columnName(StringUtils.isBlank(r.getColumnName())?"PARAM_"+sno:r.getColumnName())
+							.status(r.getStatus())
+							.build();
+					
+					masterList.add(master);
+					
+					sno++;
+				}
+				
+				productSizeColorMetalMasterRepo.saveAll(masterList);
+				response.setMessage("Success");
+				response.setResponse("Data Saved Successfully");
+				response.setError(null);
+			}else {
+				
+				response.setMessage("Error");
+				response.setResponse(null);
+				response.setError(error);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+
+	private Integer getColorMetlaId(Integer companyId, Integer productId, Integer sizeId, Integer colorId) {
+		Integer metalId =productSizeColorMetalMasterRepo.findByIdCompanyIdAndIdProductIdAndIdSizeIdAndIdColourCode(companyId,productId,sizeId,colorId).size()+1;
+		return metalId;
 	}
 
 	@Override
 	public CommonResponse getColorMetalDetails(GetProductColorMetalReq req) {
-		// TODO Auto-generated method stub
-		return null;
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ProductSizeColorMetalMaster> list =productSizeColorMetalMasterRepo.
+					findByIdCompanyIdAndIdProductIdAndIdSizeIdAndIdColourCode(Integer.valueOf(req.getCompanyId()),Integer.valueOf(req.getProductId()),Integer.valueOf(req.getSizeId()),Integer.valueOf(req.getColorCode()));
+			if(!list.isEmpty()) {
+				List<Map<String,String>> mapList = new ArrayList<>();
+				list.forEach(p ->{
+					Map<String,String> map = new HashMap<String, String>();
+					map.put("CompanyId", p.getId().getCompanyId().toString());
+					map.put("ProductId", p.getId().getProductId().toString());
+					map.put("SizeId", p.getId().getSizeId().toString());
+					map.put("ColorCode", p.getId().getColourCode().toString());
+					map.put("MetalId", p.getId().getMetalId().toString());
+					map.put("MetalName", p.getMetalName());
+					map.put("ColumnName", p.getColumnName());
+					map.put("MesurementType", p.getMesurementType());
+					map.put("MesurementValue", p.getMesurementValue().toString());
+					map.put("MesurementPieces", p.getMesurementPieces().toString());
+					map.put("Status", p.getStatus());
+					map.put("DisplayOrder", p.getDisplayOrder().toString());
+					map.put("CreatedDate", sdf.format(p.getEntryDate()));
+					mapList.add(map);
+				});
+				response.setMessage("Success");
+				response.setResponse(mapList);
+				response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Record found");
+				response.setError(null);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
 	}
 
+
 	@Override
-	public CommonResponse editColorMetalDetails(GetProductColorMetalReq req) {
-		// TODO Auto-generated method stub
-		return null;
+	public CommonResponse editColorMetalDetails(GetProductColorMetalReq r) {
+		CommonResponse response = new CommonResponse();
+		try {
+
+			ProductSizeColorMetalMasterId id = ProductSizeColorMetalMasterId.builder()
+					.companyId(Integer.valueOf(r.getCompanyId()))
+					.productId(Integer.valueOf(r.getProductId()))
+					.sizeId(Integer.valueOf(r.getSizeId()))
+					.metalId(Integer.valueOf(r.getColorCode()))
+					.metalId(Integer.valueOf(r.getMetalId()))			
+					.build();
+			
+			Optional<ProductSizeColorMetalMaster> data =productSizeColorMetalMasterRepo.findById(id);
+			
+			if(data.isPresent()) {
+				
+				ProductSizeColorMetalMaster p =data.get();
+				
+				Map<String,String> map = new HashMap<String, String>();
+				map.put("CompanyId", p.getId().getCompanyId().toString());
+				map.put("ProductId", p.getId().getProductId().toString());
+				map.put("SizeId", p.getId().getSizeId().toString());
+				map.put("MetalId", p.getId().getMetalId().toString());
+				map.put("ColorCode", p.getId().getColourCode().toString());
+				map.put("MetalName", p.getMetalName());
+				map.put("ColumnName", p.getColumnName());
+				map.put("MesurementType", p.getMesurementType());
+				map.put("MesurementValue", p.getMesurementValue().toString());
+				map.put("MesurementPieces", p.getMesurementPieces().toString());
+				map.put("Status", p.getStatus());
+				map.put("DisplayOrder", p.getDisplayOrder().toString());
+				map.put("CreatedDate", sdf.format(p.getEntryDate()));
+				
+				response.setMessage("Success");
+				response.setResponse(map);
+				response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Record found");
+				response.setError(null);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
 	}
+
 
 }

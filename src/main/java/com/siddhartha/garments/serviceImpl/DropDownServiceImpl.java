@@ -15,6 +15,7 @@ import com.siddhartha.garments.entity.DistrictMaster;
 import com.siddhartha.garments.entity.OperatorMaster;
 import com.siddhartha.garments.entity.ProductColorMaster;
 import com.siddhartha.garments.entity.ProductMaster;
+import com.siddhartha.garments.entity.ProductSizeColorMaster;
 import com.siddhartha.garments.entity.ProductSizeMaster;
 import com.siddhartha.garments.entity.SectionMaster;
 import com.siddhartha.garments.entity.StateMaster;
@@ -25,6 +26,8 @@ import com.siddhartha.garments.repository.DistrictMasterRepository;
 import com.siddhartha.garments.repository.OperatorMasterRepository;
 import com.siddhartha.garments.repository.ProductColorMasterRepository;
 import com.siddhartha.garments.repository.ProductMasterRepository;
+import com.siddhartha.garments.repository.ProductSizeColorMasterRepository;
+import com.siddhartha.garments.repository.ProductSizeMasterRepo;
 import com.siddhartha.garments.repository.ProductSizeMasterRepository;
 import com.siddhartha.garments.repository.SectionMasterRepository;
 import com.siddhartha.garments.repository.StateMasterRepository;
@@ -68,6 +71,14 @@ public class DropDownServiceImpl implements DropDownService{
 	
 	@Autowired
 	private CompanyProductRepository companyProductRepo;
+	
+
+	@Autowired
+	private ProductSizeMasterRepo productSizeMasterRepo;
+	
+	@Autowired
+	private ProductSizeColorMasterRepository productSizeColorMasterRepo;
+	
 
 
 
@@ -463,5 +474,58 @@ public class DropDownServiceImpl implements DropDownService{
 		return null;
 	}
 
+	@Override
+	public CommonResponse getProductSize(Integer companyId, Integer productId) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ProductSizeMaster> list =productSizeMasterRepo.findByIdCompanyIdAndIdProductIdAndStatusIgnoreCase(companyId,productId,"Y");
+			if(!list.isEmpty()) {
+				List<Map<String,String>> res = new ArrayList<>();
+				list.forEach(p ->{
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("Code", p.getId().getSizeId().toString());
+					map.put("CodeDesc", p.getSize().toString());
+					res.add(map);
+				});
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(res);
+			}else {
+				response.setError(null);
+				response.setMessage("Failed");
+				response.setResponse("No data found");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse getProductSizeColor(Integer companyId, Integer productId, Integer sizeId) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ProductSizeColorMaster> list =productSizeColorMasterRepo.findByIdCompanyIdAndIdProductIdAndIdSizeIdAndStatusIgnoreCase(companyId,productId,sizeId,"Y");
+			if(!list.isEmpty()) {
+				List<Map<String,String>> res = new ArrayList<>();
+				list.forEach(p ->{
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("Code", p.getId().getColourCode().toString());
+					map.put("CodeDesc", p.getColourName());
+					res.add(map);
+				});
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(res);
+			}else {
+				response.setError(null);
+				response.setMessage("Failed");
+				response.setResponse("No data found");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
 	
 }

@@ -35,7 +35,7 @@ public class ProductSizeColorMetalMaster {
 	private String mesurementType;
 	
 	@Column(name="MESUREMENT_VALUE")
-	private Integer mesurementValue;
+	private Double mesurementValue;
 	
 	@Column(name="MESUREMENT_PIECES")
 	private Integer mesurementPieces;

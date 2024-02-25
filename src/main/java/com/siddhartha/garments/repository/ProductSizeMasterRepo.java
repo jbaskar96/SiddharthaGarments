@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.siddhartha.garments.entity.CompanyProductMaster;
 import com.siddhartha.garments.entity.ProductSizeMaster;
 import com.siddhartha.garments.entity.ProductSizeMasterId;
 
@@ -12,5 +13,8 @@ import com.siddhartha.garments.entity.ProductSizeMasterId;
 public interface ProductSizeMasterRepo extends JpaRepository<ProductSizeMaster, ProductSizeMasterId> {
 
 	List<ProductSizeMaster> findByIdCompanyIdAndIdProductId(Integer companyId, Integer productId);
+
+	List<ProductSizeMaster> findByIdCompanyIdAndIdProductIdAndStatusIgnoreCase(Integer companyId, Integer productId,
+			String string);
 
 }
