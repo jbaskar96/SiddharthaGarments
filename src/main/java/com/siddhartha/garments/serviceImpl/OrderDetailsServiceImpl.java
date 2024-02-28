@@ -8,9 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.siddhartha.garments.dto.EditOrderDetailsReq;
@@ -293,6 +295,42 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 				response.setError(null);
 			}
 			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse getAllOrderDeatils(String status) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<OrderDetails> list =orderDetailsRepos.findByStatusIgnoreCase(status,Sort.by("entryDate").descending());
+			if(!list.isEmpty()) {
+				List<Map<String,String>> mapList = new ArrayList<>();
+				list.forEach(p ->{
+					List<OrderChallanDetails> challan =orderChallanDetailsRepos.findByIdOrderId(p.getOrderId());
+					Map<String,String> map =new HashMap<String,String>();
+					map.put("OrderId", p.getOrderId());
+					map.put("InwardDate", sdf.format(p.getInwardDate()));
+					map.put("LotNumber", p.getLotNumber());
+					map.put("Status", status);
+					map.put("NoOfChallans", String.valueOf(challan.size()));
+					map.put("TotalPieces", challan.stream().map(k ->k.getTotalPieces()).collect(Collectors.summingInt(c-> c)).toString());
+					map.put("OrderCreatedDate", sdf.format(p.getEntryDate()));
+					
+					mapList.add(map);
+					
+				});
+				
+				response.setMessage("Success");
+				response.setResponse(mapList);
+				response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Record Found");
+				response.setError(null);
+			}
 		}catch (Exception e) {
 			e.printStackTrace();
 		}

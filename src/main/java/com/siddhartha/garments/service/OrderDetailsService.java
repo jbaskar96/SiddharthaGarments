@@ -20,4 +20,6 @@ public interface OrderDetailsService {
 
 	CommonResponse editOrderColorDetails(GetOrderSizeColorReq req);
 
+	CommonResponse getAllOrderDeatils(String status);
+
 }

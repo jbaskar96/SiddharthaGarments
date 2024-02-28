@@ -19,4 +19,7 @@ public interface ProductSizeMetalMasterRepository extends JpaRepository<ProductS
 	List<ProductSizeMetalMaster> findByIdCompanyIdAndIdProductIdAndIdSizeId(Integer valueOf, Integer valueOf2,
 			Integer valueOf3);
 
+	List<ProductSizeMetalMaster> findByIdCompanyIdAndIdProductIdAndIdSizeIdOrderByDisplayOrder(Integer productId,
+			Integer companyId, Integer sizeId);
+
 }
