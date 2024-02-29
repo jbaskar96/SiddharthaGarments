@@ -56,6 +56,9 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 	
 	@Autowired
 	private  JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	private MetalCalculationServiceImpl metalServiceImpl;
 
 	@Override
 	public CommonResponse doSizeCalc(EditOrderDetailsReq req) {
@@ -84,10 +87,10 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 						overAllCalc =calcVal * ocd.getTotalPieces()/1000;
 					}else if("M".equals(calctype)) {// meter
 						overAllCalc = calcVal * ocd.getTotalPieces();
-					}else if("P".equals(calctype)) {
+					}else if("P".equals(calctype)) {//precentage
 						Double result =calcVal * ocd.getTotalPieces();
 						overAllCalc =overAllCalc - result;
-					}else if("N".equals(calctype)) {
+					}else if("N".equals(calctype)) {// no calc or count
 						overAllCalc=Double.valueOf(ocd.getTotalPieces());
 					}
 					required[index] =overAllCalc;
@@ -117,8 +120,12 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 			response.setError(null);
 			response.setResponse(calcResponse);
 			
-			insertdata(calcResponse);
 			
+			GenerateCalcThread calcThread =new GenerateCalcThread(calcResponse,metalServiceImpl);
+			Thread thread = new Thread(calcThread);
+			thread.setName("METAL_CALC");
+			thread.setPriority(Thread.MAX_PRIORITY);
+			thread.start();
 			
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -158,7 +165,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 				List<String> prepare = getDyanamicColumn(strArray);
 				
 				try {
-					String requiredQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,OREDER_ID,CHALLAN_ID,SIZE_ID,SIZE,TYPE_NAME,CHALLAN_DATE,CHALLAN_NO,PIECES,"
+					String requiredQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,ORDER_ID,CHALLAN_ID,SIZE_ID,SIZE,TYPE_NAME,CHALLAN_DATE,CHALLAN_NO,PIECES,"
 							+ columnsName+") VALUES (?,?,?,?,?,?,?,?,?,?,"+StringUtils.join(prepare,",")+")";
 					
 					jdbcTemplate.execute(requiredQuery,new PreparedStatementCallback<Boolean>(){
@@ -186,19 +193,29 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 					});
 				}catch (Exception e) {
 					e.printStackTrace();
+				}finally {
+					jdbcTemplate.getDataSource().getConnection().close();
 				}	
 				
 				
 			}
 			
-
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			map.put("OrderId", req.getOrderId());
+			
+			response.setMessage("Success");
+			response.setError(null);
+			response.setResponse(map);
 		}catch (Exception e) {
 			e.printStackTrace();
+			response.setMessage("Failed");
+			response.setError(null);
+			response.setResponse(null);
 		}
 		return response;
 	}
 	
-	private void insertdata(Map<Object,Object> data) {
+	public void insertCalcdata(Map<Object,Object> data) {
 		try {
 			
 			@SuppressWarnings("unchecked")
@@ -222,7 +239,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 				
 				
 				try {
-					String requiredQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,OREDER_ID,CHALLAN_ID,SIZE_ID,SIZE,TYPE_NAME,CHALLAN_DATE,CHALLAN_NO,PIECES,"
+					String requiredQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,ORDER_ID,CHALLAN_ID,SIZE_ID,SIZE,TYPE_NAME,CHALLAN_DATE,CHALLAN_NO,PIECES,"
 							+ columnsName+") VALUES (?,?,?,?,?,?,?,?,?,?,"+StringUtils.join(prepare,",")+")";
 					
 					jdbcTemplate.execute(requiredQuery,new PreparedStatementCallback<Boolean>(){
@@ -250,7 +267,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 					});
 					
 					
-					String metalQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,OREDER_ID,CHALLAN_ID,SIZE_ID,SIZE,TYPE_NAME,CHALLAN_DATE,CHALLAN_NO,PIECES,METAL_COLUMNS"
+					String metalQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,ORDER_ID,CHALLAN_ID,SIZE_ID,SIZE,TYPE_NAME,CHALLAN_DATE,CHALLAN_NO,PIECES,METAL_COLUMNS"
 							+") VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 					
 					jdbcTemplate.execute(metalQuery,new PreparedStatementCallback<Boolean>(){
@@ -273,7 +290,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 					});
 					
 					
-					String paramsQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,OREDER_ID,CHALLAN_ID,SIZE_ID,SIZE,TYPE_NAME,CHALLAN_DATE,CHALLAN_NO,PIECES,METAL_COLUMNS"
+					String paramsQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,ORDER_ID,CHALLAN_ID,SIZE_ID,SIZE,TYPE_NAME,CHALLAN_DATE,CHALLAN_NO,PIECES,METAL_COLUMNS"
 							+") VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 					
 					jdbcTemplate.execute(paramsQuery,new PreparedStatementCallback<Boolean>(){
@@ -348,16 +365,15 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 						.collect(Collectors.joining());
 					
 				
-				String required ="select "+params+" from METAL_CALC_DEATILS where OREDER_ID =? and CHALLAN_ID=? and TYPE_NAME=?";
+				String required ="select "+params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and TYPE_NAME=?";
 				
-				String received ="select "+params+" from METAL_CALC_DEATILS where OREDER_ID =? and CHALLAN_ID=? and TYPE_NAME=?";
+				String received ="select "+params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and TYPE_NAME=?";
 				
 				query =em.createNativeQuery(required)
 						.setParameter(1, req.getOrderId())
 						.setParameter(2, challanId)
 						.setParameter(3, "REQUIRED");
 				
-				@SuppressWarnings("unchecked")
 				Object reqArray =query.getSingleResult();
 				
 				query =em.createNativeQuery(received)
@@ -384,7 +400,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 				mapList.add(map);
 			}
 			
-			calcResponse.put("OrderId",list.get(0).get("OREDER_ID"));
+			calcResponse.put("OrderId",list.get(0).get("ORDER_ID"));
 			calcResponse.put("CompanyId", list.get(0).get("COMPANY_ID"));
 			calcResponse.put("ProductId", list.get(0).get("PRODUCT_ID"));
 			calcResponse.put("SizeFoldingDetails", mapList);
