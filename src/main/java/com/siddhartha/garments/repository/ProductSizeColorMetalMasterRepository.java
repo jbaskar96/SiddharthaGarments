@@ -14,4 +14,7 @@ public interface ProductSizeColorMetalMasterRepository extends JpaRepository<Pro
 	List<ProductSizeColorMetalMaster> findByIdCompanyIdAndIdProductIdAndIdSizeIdAndIdColourCode(Integer companyId, Integer productId, Integer sizeId,
 			Integer colorId);
 
+	List<ProductSizeColorMetalMaster> findByIdCompanyIdAndIdProductIdAndIdSizeIdAndIdColourCode(Integer companyId, Integer productId, Integer sizeId,
+			String colorId);
+
 }

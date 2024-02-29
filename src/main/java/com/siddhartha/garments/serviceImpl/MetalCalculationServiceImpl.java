@@ -2,6 +2,7 @@ package com.siddhartha.garments.serviceImpl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,9 +28,14 @@ import com.siddhartha.garments.dto.InsertSizeCalcRequest;
 import com.siddhartha.garments.dto.SizeFoldingDetailsReq;
 import com.siddhartha.garments.entity.OrderChallanDetails;
 import com.siddhartha.garments.entity.OrderDetails;
+import com.siddhartha.garments.entity.OrderSizeColorDetails;
+import com.siddhartha.garments.entity.ProductSizeColorMetalMaster;
 import com.siddhartha.garments.entity.ProductSizeMetalMaster;
 import com.siddhartha.garments.repository.OrderChallanDetailsRepository;
 import com.siddhartha.garments.repository.OrderDetailsRepository;
+import com.siddhartha.garments.repository.OrderSizeColorDetailsRepository;
+import com.siddhartha.garments.repository.ProductSizeColorMasterRepository;
+import com.siddhartha.garments.repository.ProductSizeColorMetalMasterRepository;
 import com.siddhartha.garments.repository.ProductSizeMetalMasterRepository;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.MetalCalculationService;
@@ -49,6 +55,12 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 	@Autowired
 	private ProductSizeMetalMasterRepository sizeMetalRepo;
 	
+	@Autowired
+	private OrderSizeColorDetailsRepository orderSizeColorRepo;
+	
+	@Autowired
+	private ProductSizeColorMetalMasterRepository colorMetalRepo;
+	
 	@PersistenceContext
 	private EntityManager em;
 	
@@ -56,6 +68,9 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 	
 	@Autowired
 	private  JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	private SimpleDateFormat sdf;
 	
 	@Autowired
 	private MetalCalculationServiceImpl metalServiceImpl;
@@ -138,8 +153,78 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 
 	@Override
 	public CommonResponse doSizeColorCalc(EditOrderDetailsReq req) {
-		// TODO Auto-generated method stub
-		return null;
+		CommonResponse response = new CommonResponse();
+		try {
+			String orderId =req.getOrderId();
+			OrderDetails od =orderDetailsRepo.findById(orderId).get();
+			Integer companyId =od.getCompanyId();
+			Integer productId =od.getProductId();
+			List<OrderChallanDetails> challan =challanRepo.findByIdOrderId(orderId);
+			Map<String,Object> orderMap =new HashMap<String, Object>();
+			List<Map<String,Object>> listCha =new ArrayList<>();
+			for(OrderChallanDetails c : challan) {
+				List<OrderSizeColorDetails> color =orderSizeColorRepo.findByIdOrderIdAndIdChallanId(orderId,c.getId().getChallanId());
+				Map<String,Object> chaMap =new HashMap<String, Object>();
+				List<Map<String,Object>> listMet =new ArrayList<>();
+				for(OrderSizeColorDetails col : color) {
+					List<ProductSizeColorMetalMaster> metal =colorMetalRepo.findByIdCompanyIdAndIdProductIdAndIdSizeIdAndIdColourCode(companyId, productId, c.getSizeId(), col.getId().getColorId());
+					int index=0;
+					String [] metalName =new String[metal.size()];
+					Object [] required =new Object[metal.size()];
+					StringJoiner params =new StringJoiner(",");
+					Map<String,Object> map =new HashMap<String, Object>();
+					for(ProductSizeColorMetalMaster met : metal) {
+						String calctype =met.getMesurementType();
+						Double calcVal =met.getMesurementValue();
+						Double overAllCalc =0D;
+						if("G".equals(calctype)) {// gram
+							overAllCalc =calcVal * col.getTotalPieces()/1000;
+						}else if("M".equals(calctype)) {// meter
+							overAllCalc = calcVal * col.getTotalPieces();
+						}else if("P".equals(calctype)) {//precentage
+							Double result =calcVal * col.getTotalPieces();
+							overAllCalc =overAllCalc - result;
+						}else if("N".equals(calctype)) {// no calc or count
+							overAllCalc=Double.valueOf(col.getTotalPieces());
+						}
+						required[index] =overAllCalc;
+						metalName[index]=met.getMetalName();
+						index++;
+						params.add(met.getColumnName());
+					}
+					map.put("Required", required);
+					map.put("ColorId", col.getId().getColorId());
+					map.put("ColorName", col.getColorName());
+					map.put("TotalPieces",col.getTotalPieces());
+					map.put("MetalName", metalName);
+					map.put("Params", params.toString());
+					
+					listMet.add(map);
+				
+				}
+			
+				chaMap.put("ChallanNo", c.getChallanNumber());
+				chaMap.put("ChallanId", c.getId().getChallanId());
+				chaMap.put("ChallanDate", sdf.format(c.getChallanDate()));
+				chaMap.put("SizeId", c.getSizeId());
+				chaMap.put("Size", c.getSizeId());
+				chaMap.put("TotalPieces",c.getTotalPieces());
+				chaMap.put("ColorFoldingDetails",listMet);
+				listCha.add(chaMap);
+			}
+			orderMap.put("OrderId", od.getOrderId());
+			orderMap.put("CompanyId", od.getCompanyId());
+			orderMap.put("ProductId", od.getProductId());
+			orderMap.put("ChallanDetails", listCha);
+			
+			response.setMessage("Success");
+			response.setError(null);
+			response.setResponse(orderMap);
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
 	}
 
 	@Override
@@ -416,6 +501,42 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 			response.setResponse(null);
 		}
 		return response;
+	}
+	
+	public void inserColorBasedCalc(Map<String,Object> req) {
+		try {
+			String orderId =req.get("OrderId")==null?"":req.get("OrderId").toString();
+			String companyId =req.get("CompanyId")==null?"":req.get("CompanyId").toString();
+			String productId =req.get("ProductId")==null?"":req.get("ProductId").toString();
+			List<Map<String,Object>> challanDet =(List<Map<String,Object>>) req.get("ChallanDetails");
+			for(Map<String,Object> cha : challanDet) {
+				
+				String challanNo =req.get("ChallanNo")==null?"":req.get("ChallanNo").toString();
+				String challanId =req.get("ChallanId")==null?"":req.get("ChallanId").toString();
+				String challanDate =req.get("ChallanDate")==null?"":req.get("ChallanDate").toString();
+				String sizeId =req.get("SizeId")==null?"":req.get("SizeId").toString();
+				String size =req.get("Size")==null?"":req.get("Size").toString();
+				List<Map<String,Object>>  colorList =req.get("ColorFoldingDetails")==null?null:(List<Map<String,Object>>)req.get("ColorFoldingDetails");
+				
+				for(Map<String,Object> col : colorList) {
+					Object[] required =(Object[]) col.get("Required");
+					String[] metalName =(String[])col.get("MetalName");
+					String columnsName =col.get("Params").toString();
+					String ColorId =col.get("ColorId")==null?"":col.get("ColorId").toString();
+					String ColorName =col.get("ColorName")==null?"":col.get("ColorName").toString();
+					String TotalPieces =col.get("TotalPieces")==null?"":col.get("TotalPieces").toString();
+					String params =req.get("Params")==null?"":req.get("Params").toString();
+					
+					
+					
+					
+				}
+			
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }
