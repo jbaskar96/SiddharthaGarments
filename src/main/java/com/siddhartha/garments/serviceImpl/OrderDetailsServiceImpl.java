@@ -119,13 +119,10 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 		String number ="";
 		
 		if("O".equals(type)) {
-			LocalDateTime  localDate = LocalDateTime .now();
-			Integer day =localDate.getDayOfMonth();
-			Integer month =localDate.getMonthValue();
-			Integer year =localDate.getYear();
-			
+			Date date = new Date();
+			String strDate =sdf.format(date);
 			Integer no =(int)orderDetailsRepos.count()+1;
-			number="ORDER/"+day+"/"+month+"/"+year+"/1000"+no+"";
+			number="ORDER/"+strDate+"/1000"+no+"";
 		}else if("C".equals(type)) {
 			Integer no =orderChallanDetailsRepos.countByIdOrderId(orderId)+1;
 			number="CHA/1000"+no+"";

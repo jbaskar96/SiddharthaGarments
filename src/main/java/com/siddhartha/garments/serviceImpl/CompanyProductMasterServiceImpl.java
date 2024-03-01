@@ -429,7 +429,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	public CommonResponse saveSize(List<ProductSizeMasterReq> req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<ErrorList> error = new ArrayList<ErrorList>();
+			List<ErrorList> error = validation.size(req);
 			if(error.isEmpty()) {
 				for(ProductSizeMasterReq r :req) {
 					
@@ -548,7 +548,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	public CommonResponse saveSizeMetal(List<ProductSizeMetalReq> req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<ErrorList> error = new ArrayList<ErrorList>();
+			List<ErrorList> error = validation.sizeMetal(req);
 			if(error.isEmpty()) {
 				
 				int sno =1;
@@ -688,7 +688,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	public CommonResponse saveSizeColor(List<ProductSizeColorRequest> req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<ErrorList> error = new ArrayList<ErrorList>();
+			List<ErrorList> error = validation.color(req);
 			if(error.isEmpty()) {
 			
 				for(ProductSizeColorRequest r :req) {
@@ -808,7 +808,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	public CommonResponse saveColorMetal(List<SaveProductSizeColorMetalReq> req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<ErrorList> error = new ArrayList<ErrorList>();
+			List<ErrorList> error = validation.colorMetal(req);
 			if(error.isEmpty()) {
 			    int sno =1;
 				for(SaveProductSizeColorMetalReq r :req) {

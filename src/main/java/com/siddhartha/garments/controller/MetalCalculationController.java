@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.siddhartha.garments.dto.EditOrderDetailsReq;
 import com.siddhartha.garments.dto.InsertSizeCalcRequest;
+import com.siddhartha.garments.request.InserSizeColorRequest;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.MetalCalculationService;
 
@@ -38,6 +39,16 @@ public class MetalCalculationController {
 	@PostMapping("/view/size/calc")
 	public CommonResponse viewSizeCalc(@RequestBody EditOrderDetailsReq req) {
 		return service.viewSizeCalc(req);
+	}
+	
+	@PostMapping("/view/size/color/calc")
+	public CommonResponse viewSizeColorCalc(@RequestBody EditOrderDetailsReq req) {
+		return service.viewSizeColorCalc(req);
+	}
+	
+	@PostMapping("insert/size/color/calc")
+	public CommonResponse insertSizeColorCalc(@RequestBody InserSizeColorRequest req) {
+		return service.insertSizeColorCalc(req);
 	}
 	
 }

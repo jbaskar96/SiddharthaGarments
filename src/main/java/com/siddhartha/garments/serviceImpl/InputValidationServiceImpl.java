@@ -12,6 +12,10 @@ import org.springframework.stereotype.Component;
 import com.siddhartha.garments.dto.OrderChallanColorReq;
 import com.siddhartha.garments.dto.OrderChallanInfoReq;
 import com.siddhartha.garments.dto.OrderDetailsRequest;
+import com.siddhartha.garments.dto.ProductSizeColorRequest;
+import com.siddhartha.garments.dto.ProductSizeMasterReq;
+import com.siddhartha.garments.dto.ProductSizeMetalReq;
+import com.siddhartha.garments.dto.SaveProductSizeColorMetalReq;
 import com.siddhartha.garments.entity.LoginMaster;
 import com.siddhartha.garments.repository.LoginMasterRepository;
 import com.siddhartha.garments.request.ChallanInfoRequest;
@@ -741,6 +745,186 @@ public class InputValidationServiceImpl {
 				}
 				if(StringUtils.isBlank(r.getTotalPieces())) {
 					errorLists.add(new ErrorList("TotalPieces","Row : "+rowno+"","Please enter TotalPieces"));
+				}
+				
+				rowno++;
+			}
+		}
+		return errorLists;
+	}
+
+	public List<ErrorList> size(List<ProductSizeMasterReq> req) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		if(req.isEmpty()) {
+			errorLists.add(new ErrorList("ColorInfo","101","Please enter SizeInfo"));
+		}else {
+			int rowno =1;
+			for(ProductSizeMasterReq r : req) {
+				
+				if(StringUtils.isBlank(r.getSize())) {
+					errorLists.add(new ErrorList("Size","Row : "+rowno+"","Please enter Size"));
+				}
+				if(StringUtils.isBlank(r.getSizeId())) {
+					errorLists.add(new ErrorList("SizeId","Row : "+rowno+"","Please enter SizeId"));
+				}
+				if(StringUtils.isBlank(r.getSizeType())) {
+					errorLists.add(new ErrorList("SizeType","Row : "+rowno+"","Please enter SizeType"));
+				}
+				if(StringUtils.isBlank(r.getStatus())) {
+					errorLists.add(new ErrorList("Status","Row : "+rowno+"","Please enter Status"));
+				}
+				
+				rowno++;
+			}
+		}
+		return errorLists;
+	}
+
+	public List<ErrorList> sizeMetal(List<ProductSizeMetalReq> req) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		if(req.isEmpty()) {
+			errorLists.add(new ErrorList("ColorInfo","101","Please enter SizeMetalInfo"));
+		}else {
+			int rowno =1;
+			for(ProductSizeMetalReq r : req) {
+				
+				if(StringUtils.isBlank(r.getDisplayOrder())) {
+					errorLists.add(new ErrorList("DisplayOrder","Row : "+rowno+"","Please enter DisplayOrder"));
+				}else if(!r.getDisplayOrder().matches("[0-9]*")) {
+					errorLists.add(new ErrorList("DisplayOrder","Row : "+rowno+"","DisplayOrder only allows digits"));
+				}
+				
+				if(StringUtils.isBlank(r.getMesurementPieces())) {
+					errorLists.add(new ErrorList("MesurementPieces","Row : "+rowno+"","Please enter MesurementPieces"));
+				}else if(!r.getMesurementPieces().matches("[0-9]*")) {
+					errorLists.add(new ErrorList("MesurementPieces","Row : "+rowno+"","MesurementPieces allows only digits"));
+				}
+				
+				if(StringUtils.isBlank(r.getMesurementType())) {
+					errorLists.add(new ErrorList("MesurementType","Row : "+rowno+"","Please enter MesurementType"));
+				}
+				
+				if(StringUtils.isBlank(r.getMesurementValue())) {
+					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","Please enter MesurementValue"));
+				}else if(!r.getMesurementValue().matches("[0-9]*")) {
+					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","MesurementValue allows only digits"));
+				}
+				
+				if(StringUtils.isBlank(r.getMetalName())) {
+					errorLists.add(new ErrorList("MetalName","Row : "+rowno+"","Please enter MetalName"));
+				}
+				
+				if(StringUtils.isBlank(r.getSizeId())) {
+					errorLists.add(new ErrorList("Size","Row : "+rowno+"","Please enter Size"));
+				}
+				
+				if(StringUtils.isBlank(r.getCompanyId())) {
+					errorLists.add(new ErrorList("CompanyId","Row : "+rowno+"","Please enter CompanyId"));
+				}
+				
+				if(StringUtils.isBlank(r.getProductId())) {
+					errorLists.add(new ErrorList("ProductId","Row : "+rowno+"","Please enter ProductId"));
+				}
+				
+				
+				if(StringUtils.isBlank(r.getStatus())) {
+					errorLists.add(new ErrorList("Status","Row : "+rowno+"","Please enter Status"));
+				}
+				
+				rowno++;
+			}
+		}
+		return errorLists;
+	}
+
+	public List<ErrorList> color(List<ProductSizeColorRequest> req) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		if(req.isEmpty()) {
+			errorLists.add(new ErrorList("ColorInfo","101","Please enter ColorInfo"));
+		}else {
+			int rowno =1;
+			for(ProductSizeColorRequest r : req) {
+				
+				if(StringUtils.isBlank(r.getColorName())) {
+					errorLists.add(new ErrorList("ColorName","Row : "+rowno+"","Please enter ColorName"));
+				}
+				if(StringUtils.isBlank(r.getColorCode())) {
+					errorLists.add(new ErrorList("ColorCode","Row : "+rowno+"","Please enter ColorCode"));
+				}
+				if(StringUtils.isBlank(r.getSizeId())) {
+					errorLists.add(new ErrorList("SizeId","Row : "+rowno+"","Please enter SizeId"));
+				}
+				
+				if(StringUtils.isBlank(r.getProductId())) {
+					errorLists.add(new ErrorList("ProductId","Row : "+rowno+"","Please enter ProductId"));
+				}
+				
+				if(StringUtils.isBlank(r.getCompanyId())) {
+					errorLists.add(new ErrorList("CompanyId","Row : "+rowno+"","Please enter CompanyId"));
+				}
+				
+				if(StringUtils.isBlank(r.getStatus())) {
+					errorLists.add(new ErrorList("Status","Row : "+rowno+"","Please enter Status"));
+				}
+				
+				rowno++;
+			}
+		}
+		return errorLists;
+	}
+
+	public List<ErrorList> colorMetal(List<SaveProductSizeColorMetalReq> req) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		if(req.isEmpty()) {
+			errorLists.add(new ErrorList("ColorInfo","101","Please enter SizeMetalInfo"));
+		}else {
+			int rowno =1;
+			for(SaveProductSizeColorMetalReq r : req) {
+				
+				if(StringUtils.isBlank(r.getDisplayOrder())) {
+					errorLists.add(new ErrorList("DisplayOrder","Row : "+rowno+"","Please enter DisplayOrder"));
+				}else if(!r.getDisplayOrder().matches("[0-9]*")) {
+					errorLists.add(new ErrorList("DisplayOrder","Row : "+rowno+"","DisplayOrder only allows digits"));
+				}
+				
+				if(StringUtils.isBlank(r.getMesurementPieces())) {
+					errorLists.add(new ErrorList("MesurementPieces","Row : "+rowno+"","Please enter MesurementPieces"));
+				}else if(!r.getMesurementPieces().matches("[0-9]*")) {
+					errorLists.add(new ErrorList("MesurementPieces","Row : "+rowno+"","MesurementPieces allows only digits"));
+				}
+				
+				if(StringUtils.isBlank(r.getMesurementType())) {
+					errorLists.add(new ErrorList("MesurementType","Row : "+rowno+"","Please enter MesurementType"));
+				}
+				
+				if(StringUtils.isBlank(r.getMesurementValue())) {
+					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","Please enter MesurementValue"));
+				}else if(!r.getMesurementValue().matches("[0-9]*")) {
+					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","MesurementValue allows only digits"));
+				}
+				
+				if(StringUtils.isBlank(r.getMetalName())) {
+					errorLists.add(new ErrorList("MetalName","Row : "+rowno+"","Please enter MetalName"));
+				}
+				
+				if(StringUtils.isBlank(r.getSizeId())) {
+					errorLists.add(new ErrorList("Size","Row : "+rowno+"","Please enter Size"));
+				}
+				
+				if(StringUtils.isBlank(r.getCompanyId())) {
+					errorLists.add(new ErrorList("CompanyId","Row : "+rowno+"","Please enter CompanyId"));
+				}
+				
+				if(StringUtils.isBlank(r.getProductId())) {
+					errorLists.add(new ErrorList("ProductId","Row : "+rowno+"","Please enter ProductId"));
+				}
+				
+				if(StringUtils.isBlank(r.getColorCode())) {
+					errorLists.add(new ErrorList("ColorCode","Row : "+rowno+"","Please enter ColorCode"));
+				}
+				
+				if(StringUtils.isBlank(r.getStatus())) {
+					errorLists.add(new ErrorList("Status","Row : "+rowno+"","Please enter Status"));
 				}
 				
 				rowno++;
