@@ -18,7 +18,7 @@ import io.swagger.annotations.Api;
 @RestController
 @RequestMapping("/section")
 @Api(tags = "MASTER : SECTION CONTROLLER",description = "API'S")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class SectionMasterController {
 	
 	@Autowired

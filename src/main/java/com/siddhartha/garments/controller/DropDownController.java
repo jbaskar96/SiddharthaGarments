@@ -20,7 +20,7 @@ import io.swagger.annotations.Api;
 @RestController
 @RequestMapping("/dropdown")
 @Api(tags = "DROPDOWN CONTROLLER" ,description = "API'S")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class DropDownController {
 	
 	

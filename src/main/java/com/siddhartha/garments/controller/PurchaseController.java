@@ -16,7 +16,7 @@ import com.siddhartha.garments.service.PurchaseService;
 
 @RestController
 @RequestMapping("/purchase")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class PurchaseController {
 	
 	

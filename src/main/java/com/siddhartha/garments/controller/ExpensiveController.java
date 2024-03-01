@@ -15,7 +15,7 @@ import com.siddhartha.garments.service.ExpensiveService;
 
 @RestController
 @RequestMapping("/expensive")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ExpensiveController {
 	
 	@Autowired

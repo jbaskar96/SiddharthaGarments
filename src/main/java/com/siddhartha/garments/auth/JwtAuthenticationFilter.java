@@ -65,10 +65,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			if (validtoken) {
 				String refreshtoken = jwtTokenUtil.doGenerateToken(username);
 				logger.info("new refresh token generated ======> "+refreshtoken);
-				int deletecount = sessionRep.deleteByTempTokenid(table.getTempTokenid());
-				logger.info("delete session table and insert new token ======> "+deletecount);
-				table.getSessionPk().setTokenId(refreshtoken);  
-				sessionRep.save(table);
+				int tokenCount =sessionRep.deleteByTempTokenid(table.getTempTokenid());
+				logger.info("delete session table and insert new token ======> "+tokenCount);
+				table.getSessionPk().setTokenId(refreshtoken); 
+				table.getSessionPk().setLoginId(username);
+				sessionRep.saveAndFlush(table);
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 						userDetails, null, Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")));
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(requestWrapper));

@@ -18,7 +18,7 @@ import io.swagger.annotations.Api;
 @RestController
 @RequestMapping("/color")
 @Api(tags = "MASTER : COLOR CONTROLLER",description = "API'S")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ProductColorController {
 	
 	@Autowired

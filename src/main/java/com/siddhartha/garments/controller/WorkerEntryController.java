@@ -18,7 +18,7 @@ import io.swagger.annotations.Api;
 @RestController	
 @RequestMapping("/worker")
 @Api(tags = "WORKER DATA ENTRY CONTROLLER",description = "API'S")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class WorkerEntryController {
 	
 	@Autowired

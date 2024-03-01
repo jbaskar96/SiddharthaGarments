@@ -18,7 +18,7 @@ import io.swagger.annotations.Api;
 @RestController
 @RequestMapping("/usertype")
 @Api(tags = "MASTER : USERTYPE CONTROLLER",description = "API'S")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class UserTypeController {
 	
 	@Autowired

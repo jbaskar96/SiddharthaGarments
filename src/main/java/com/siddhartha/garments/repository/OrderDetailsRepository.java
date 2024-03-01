@@ -15,7 +15,7 @@ public interface OrderDetailsRepository extends JpaRepository<OrderDetails, Stri
 
 	List<OrderDetails> findByStatusIgnoreCase(String status, Sort sort);
 	
-	@Query(nativeQuery=true,value ="select * from METAL_CALC_DEATILS where oreder_id=?1")
+	@Query(nativeQuery=true,value ="select * from METAL_CALC_DEATILS where order_id=?1")
 	List<Map<String,Object>> getMetalDetails(String orderId);
 
 }

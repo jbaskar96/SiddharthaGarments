@@ -17,6 +17,7 @@ import javax.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.siddhartha.garments.entity.SessionDetails;
@@ -38,4 +39,9 @@ public interface SessionDetailsRepository  extends JpaRepository<SessionDetails,
 	@Modifying
 	@Transactional
 	int deleteByTempTokenid(String tempTokenid);
+	
+	@Modifying
+	@Transactional
+	@Query(nativeQuery = true,value="delete from SESSION_TABLE where TEMP_TOKENID=?1")
+	Integer deleteOldToken(String token);
 }

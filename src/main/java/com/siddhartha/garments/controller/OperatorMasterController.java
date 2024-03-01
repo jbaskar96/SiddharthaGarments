@@ -18,7 +18,7 @@ import io.swagger.annotations.Api;
 @RestController
 @RequestMapping("/operator")
 @Api(tags = "MASTER : OPERATOR CONTROLLER",description = "API'S")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class OperatorMasterController {
 	
 	@Autowired

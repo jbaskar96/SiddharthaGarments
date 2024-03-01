@@ -18,7 +18,7 @@ import io.swagger.annotations.Api;
 @RestController
 @RequestMapping("/userdetail")
 @Api(tags = "MASTER : USER DETAILS CONTROLLER",description = "API'S")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class UserDetailMasterController {
 	
 	@Autowired

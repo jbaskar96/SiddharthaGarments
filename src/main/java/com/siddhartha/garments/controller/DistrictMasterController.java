@@ -18,7 +18,7 @@ import io.swagger.annotations.Api;
 @RestController
 @RequestMapping("/district")
 @Api(tags="MASTER : DISTRICT CONTROLLER", description="API's")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class DistrictMasterController {
 	
 	@Autowired
