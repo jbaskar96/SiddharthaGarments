@@ -3,6 +3,9 @@ package com.siddhartha.garments.auth;
 
 
 
+import static com.siddhartha.garments.auth.Constants.ACCESS_TOKEN_VALIDITY_SECONDS;
+import static com.siddhartha.garments.auth.Constants.SIGNING_KEY;
+
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -14,13 +17,11 @@ import java.util.function.Function;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.siddhartha.garments.entity.LoginMaster;
-import com.siddhartha.garments.repository.SessionDetailsRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -28,8 +29,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtTokenUtil implements Serializable {
-	
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public String getUsernameFromToken(String token) {
@@ -46,7 +46,7 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser().setSigningKey(Constants.SIGNING_KEY).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(SIGNING_KEY).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token,HttpServletRequest req) {
@@ -84,14 +84,14 @@ public class JwtTokenUtil implements Serializable {
                 .setClaims(claims)
                 .setIssuer("http://devglan.com")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + Constants.ACCESS_TOKEN_VALIDITY_SECONDS*1000))
-                .signWith(SignatureAlgorithm.HS256, Constants.SIGNING_KEY)
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_SECONDS*1000))
+                .signWith(SignatureAlgorithm.HS256, SIGNING_KEY)
                 .compact();
         return token;
     }
 
     public Boolean validateToken(String token, UserDetails userDetails,HttpServletRequest req) {
         final String username = token;//getUsernameFromToken(token);
-        return (username.equalsIgnoreCase(userDetails.getUsername()) && !isTokenExpired(token,req));
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token,req));
     }
 }

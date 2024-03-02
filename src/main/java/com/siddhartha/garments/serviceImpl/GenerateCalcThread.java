@@ -13,19 +13,26 @@ public class GenerateCalcThread implements Runnable{
 	private Map<Object,Object> map;
 	
 	private MetalCalculationServiceImpl service;
+		
+	private String type;
 	
-	public GenerateCalcThread(Map<Object,Object> map,MetalCalculationServiceImpl service) {
+	public GenerateCalcThread(Map<Object,Object> map,MetalCalculationServiceImpl service,String type) {
 		this.map=map;
 		this.service=service;
+		this.type =type;
 	}
-	
 	
 	
 	@Override
 	public void run() {
 		try {
 			log.info("Cal Thread start ...." +new Date());
-			service.insertCalcdata(map);
+			
+			if("SIZE_FOLDING".equalsIgnoreCase(type)) {
+				service.insertCalcdata(map);
+			}else if("COLOR_FOLDING".equalsIgnoreCase(type)) {
+				service.inserColorBasedCalc(map);
+			}
 			log.info("Cal Thread end ...." +new Date());
 		}catch (Exception e) {
 			log.info(e);

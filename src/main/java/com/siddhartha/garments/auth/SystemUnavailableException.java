@@ -1,5 +1,6 @@
 package com.siddhartha.garments.auth;
 
+
 public class SystemUnavailableException extends Exception 
 {
 	public static String error = "";

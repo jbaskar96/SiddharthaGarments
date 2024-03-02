@@ -21,17 +21,17 @@ public class MetalCalculationController {
 	private MetalCalculationService service;
 	
 	
-	@PostMapping("generate/size/calc")
-	public CommonResponse doSizeCalc(@RequestBody EditOrderDetailsReq req) {
-		return service.doSizeCalc(req);
+	@PostMapping("/generate/size/calc")
+	public CommonResponse generateSizeCalc(@RequestBody EditOrderDetailsReq req) {
+		return service.generateSizeCalc(req);
 	}
 	
-	@PostMapping("generate/size/color/calc")
-	public CommonResponse doSizeColorCalc(@RequestBody EditOrderDetailsReq req) {
-		return service.doSizeColorCalc(req);
+	@PostMapping("/generate/size/color/calc")
+	public CommonResponse generateSizeColorCalc(@RequestBody EditOrderDetailsReq req) {
+		return service.generateSizeColorCalc(req);
 	}
 	
-	@PostMapping("insert/size/calc")
+	@PostMapping("/insert/size/calc")
 	public CommonResponse doInsertSizeCalc(@RequestBody InsertSizeCalcRequest req) {
 		return service.doInsertSizeCalc(req);
 	}
@@ -46,7 +46,7 @@ public class MetalCalculationController {
 		return service.viewSizeColorCalc(req);
 	}
 	
-	@PostMapping("insert/size/color/calc")
+	@PostMapping("/insert/size/color/calc")
 	public CommonResponse insertSizeColorCalc(@RequestBody InserSizeColorRequest req) {
 		return service.insertSizeColorCalc(req);
 	}

@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.siddhartha.garments.dto.EditOrderDetailsReq;
 import com.siddhartha.garments.dto.OrderChallanColorReq;
 import com.siddhartha.garments.dto.OrderChallanInfoReq;
 import com.siddhartha.garments.dto.OrderDetailsRequest;
@@ -18,6 +19,8 @@ import com.siddhartha.garments.dto.ProductSizeMetalReq;
 import com.siddhartha.garments.dto.SaveProductSizeColorMetalReq;
 import com.siddhartha.garments.entity.LoginMaster;
 import com.siddhartha.garments.repository.LoginMasterRepository;
+import com.siddhartha.garments.repository.OrderChallanDetailsRepository;
+import com.siddhartha.garments.repository.ProductSizeMetalMasterRepository;
 import com.siddhartha.garments.request.ChallanInfoRequest;
 import com.siddhartha.garments.request.ColorDetailsRequest;
 import com.siddhartha.garments.request.ColorInfoReq;
@@ -49,6 +52,12 @@ public class InputValidationServiceImpl {
 	
 	@Autowired
 	private LoginMasterRepository loginMasterRepository;
+	
+	@Autowired
+	private OrderChallanDetailsRepository challanDetailsRepo;
+	
+	@Autowired
+	private ProductSizeMetalMasterRepository sizeMetalRepo;
 	
 	
 	public List<ErrorList> validateLoginRequest(LoginRequest req){
@@ -931,6 +940,15 @@ public class InputValidationServiceImpl {
 			}
 		}
 		return errorLists;
+	}
+
+	public List<ErrorList> sizeCalc(EditOrderDetailsReq req) {
+		try {
+			//challanDetailsRepo.fin
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 		

@@ -3,8 +3,11 @@ package com.siddhartha.garments.repository;
 import java.util.List;
 import java.util.Map;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -17,5 +20,10 @@ public interface OrderDetailsRepository extends JpaRepository<OrderDetails, Stri
 	
 	@Query(nativeQuery=true,value ="select * from METAL_CALC_DEATILS where order_id=?1")
 	List<Map<String,Object>> getMetalDetails(String orderId);
+	
+	@Transactional
+	@Modifying
+	@Query(nativeQuery=true,value ="delete from METAL_CALC_DEATILS where order_id=?1")
+	Integer deleteMetalByOrderId(String orderId);
 
 }

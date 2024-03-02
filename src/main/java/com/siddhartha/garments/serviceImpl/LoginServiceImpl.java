@@ -69,18 +69,19 @@ public class LoginServiceImpl implements LoginService,UserDetailsService {
 			String epass = encoder.encodeToString(request.getPassword().trim().getBytes());
 			LoginMaster login =loginMasterRepository.findByLoginIdIgnoreCaseAndPassword(request.getUserName(),epass);
 			if (login!=null) {
-				String token = jwtTokenUtil.doGenerateToken(request.getUserName());
 				servletRequest.getSession().removeAttribute(request.getUserName());
+				String token = jwtTokenUtil.doGenerateToken(request.getUserName());
+				
+				SessionDetailsId id = new SessionDetailsId();
+				id.setLoginId(request.getUserName());
+				id.setTokenId(token);
 				SessionDetails session = new SessionDetails();
-				SessionDetailsId details = new SessionDetailsId();
-				details.setLoginId(request.getUserName());
-				details.setTokenId(token);
+				session.setSessionPk(id);
 				session.setStatus("Y");
-				session.setUserType(login.getUsertype());
 				String temptoken = bCryptPasswordEncoder.encode("CommercialClaim");
 				session.setTempTokenid(temptoken);
 				session.setEntryDate(new Date());
-				session.setSessionPk(details);
+				session.setUserType(login.getUsertype());
 				session =sessionDetailsRepository.save(session);
 				response= setTokenResponse(session,login);
 			}
@@ -96,7 +97,7 @@ public class LoginServiceImpl implements LoginService,UserDetailsService {
 	private Map<String, String> setTokenResponse(SessionDetails session, LoginMaster login) {
 		Map<String, String> response = new HashMap<String,String>();
 		try {
-			String userType =session.getUserType();
+			//String userType =session.getUserType();
 			response.put("Token", session.getTempTokenid());
 			response.put("UserName", login.getLoginId());
 			response.put("UserType", "admin");

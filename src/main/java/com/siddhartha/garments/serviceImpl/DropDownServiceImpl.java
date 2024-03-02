@@ -310,15 +310,25 @@ public class DropDownServiceImpl implements DropDownService{
 			List<Map<String,String>> res = new ArrayList<>();
 			
 			HashMap<String, String> map1 = new HashMap<String, String>();
-			map1.put("Code","Required");
-			map1.put("CodeDesc","Required");
+			map1.put("Code","G");
+			map1.put("CodeDesc","KilloGram");
 			
 			HashMap<String, String> map2 = new HashMap<String, String>();
-			map2.put("Code","Received");
-			map2.put("CodeDesc","Received");
+			map2.put("Code","M");
+			map2.put("CodeDesc","Meter");
+			
+			HashMap<String, String> map3 = new HashMap<String, String>();
+			map2.put("Code","P");
+			map2.put("CodeDesc","Percentage");
+			
+			HashMap<String, String> map4 = new HashMap<String, String>();
+			map2.put("Code","N");
+			map2.put("CodeDesc","NetQuantity");
 			
 			res.add(map2);
 			res.add(map1);
+			res.add(map3);
+			res.add(map4);
 			response.setError(null);
 			response.setMessage("Success");
 			response.setResponse(res);
@@ -522,6 +532,47 @@ public class DropDownServiceImpl implements DropDownService{
 				response.setMessage("Failed");
 				response.setResponse("No data found");
 			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse sizeType() {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<Map<String,String>> res = new ArrayList<>();
+			
+			HashMap<String, String> map1 = new HashMap<String, String>();
+			map1.put("Code","XL");
+			map1.put("CodeDesc","XL");
+			
+			HashMap<String, String> map2 = new HashMap<String, String>();
+			map2.put("Code","Large");
+			map2.put("CodeDesc","Large");
+			
+			HashMap<String, String> map3 = new HashMap<String, String>();
+			map2.put("Code","XXL");
+			map2.put("CodeDesc","XXL");
+			
+			HashMap<String, String> map4 = new HashMap<String, String>();
+			map2.put("Code","Medium");
+			map2.put("CodeDesc","Medium");
+			
+			HashMap<String, String> map5 = new HashMap<String, String>();
+			map2.put("Code","Small");
+			map2.put("CodeDesc","Small");
+			
+			res.add(map2);
+			res.add(map1);
+			res.add(map3);
+			res.add(map4);
+			res.add(map5);
+			response.setError(null);
+			response.setMessage("Success");
+			response.setResponse(res);
+
 		}catch (Exception e) {
 			e.printStackTrace();
 		}

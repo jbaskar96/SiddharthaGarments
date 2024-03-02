@@ -1,5 +1,7 @@
 package com.siddhartha.garments.auth;
 
+
+
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -9,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,13 +23,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.siddhartha.garments.entity.SessionDetails;
 import com.siddhartha.garments.repository.SessionDetailsRepository;
 
-
-
+import static com.siddhartha.garments.auth.Constants.HEADER_STRING;
+import static com.siddhartha.garments.auth.Constants.TOKEN_PREFIX;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+	@Lazy
 	@Autowired
-	private UserDetailsService userDetailsService;
+	UserDetailsService userDetailsService;
 
 	@Autowired
 	private SessionDetailsRepository sessionRep;
@@ -35,41 +39,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private JwtTokenUtil jwtTokenUtil;
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
-			throws IOException, ServletException {
-		String header = req.getHeader(Constants.HEADER_STRING);
+	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)	throws IOException, ServletException {
+
+		String header = req.getHeader(HEADER_STRING);
 		String username = null;
 		String authToken = null;
+		String companyId = null;
 		SessionDetails table = new SessionDetails();
 		HeaderMapRequestWrapper requestWrapper = new HeaderMapRequestWrapper(req);
-		if (header != null && header.startsWith(Constants.TOKEN_PREFIX)) {
-			authToken = header.replace(Constants.TOKEN_PREFIX, "");
+		if (header != null && header.startsWith(TOKEN_PREFIX)) {
+			authToken = header.replace(TOKEN_PREFIX, "");
 			table = sessionRep.findByTempTokenid(authToken);
 			authToken = table.getSessionPk().getTokenId();
-	        requestWrapper.addHeader(Constants.HEADER_STRING, authToken);
+	        requestWrapper.addHeader(HEADER_STRING, authToken);
 			try {
 				username = jwtTokenUtil.getUsernameFromToken(authToken);
 			} catch (IllegalArgumentException e) {
 				logger.error("an error occured during getting username from token", e);
 			} catch (Exception e) {
 				logger.warn("the token is expired and not valid anymore");
-				username = table.getSessionPk().getLoginId();
+				username = table.getSessionPk().getTokenId();
 			} 
 		} else {
-			//req.getSession().invalidate();
 			logger.warn("couldn't find bearer string, will ignore the header");
 		}
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+			
+			//Added for getting companyid
+			String combinedUsername = username;
+			
+			UserDetails userDetails = userDetailsService.loadUserByUsername(combinedUsername);
 			boolean validtoken = jwtTokenUtil.validateToken(username, userDetails,req);
+			
+			if(validtoken && table.getStatus().equals("DE-ACTIVE")) {
+				validtoken = false;
+				res.setHeader(username, "This session has been terminated. User logged in to a new session");
+			}
+			
 			if (validtoken) {
-				String refreshtoken = jwtTokenUtil.doGenerateToken(username);
-				logger.info("new refresh token generated ======> "+refreshtoken);
-				int tokenCount =sessionRep.deleteByTempTokenid(table.getTempTokenid());
-				logger.info("delete session table and insert new token ======> "+tokenCount);
-				table.getSessionPk().setTokenId(refreshtoken); 
-				table.getSessionPk().setLoginId(username);
-				sessionRep.saveAndFlush(table);
+								
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 						userDetails, null, Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")));
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(requestWrapper));
@@ -81,27 +89,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(requestWrapper));
 				logger.info("authenticated user " + username + ", setting security context");
 				SecurityContextHolder.getContext().setAuthentication(authentication);
-			}/*else if (!validtoken) {
-				String refreshtoken = jwtTokenUtil.doGenerateToken(username);
-				logger.info("new refresh token generated ======> "+refreshtoken);
-				int deletecount = sessionRep.deleteByTemptokenid(table.getTempTokenid());
-				logger.info("delete session table and insert new token ======> "+deletecount);
-				table.setTokenId(refreshtoken);  
-				sessionRep.save(table);
-				req.getSession().invalidate();
-				validtoken = jwtTokenUtil.validateToken(username, userDetails,req);
-				if (validtoken) {
-				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-						userDetails, null, Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")));
-				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(requestWrapper));
-				logger.info("authenticated user " + username + ", setting security context");
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-				}
-			}*/
+			}
 		}
 		chain.doFilter(requestWrapper, res);
 	}
-	
-	
-	
 }

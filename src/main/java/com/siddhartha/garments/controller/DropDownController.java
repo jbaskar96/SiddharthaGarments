@@ -168,5 +168,10 @@ public class DropDownController {
 		return response;
 	}
 	
+	@GetMapping("/sizeType")
+	public CommonResponse sizeType() {
+		return service.sizeType();
+	}
+	
 	
 }

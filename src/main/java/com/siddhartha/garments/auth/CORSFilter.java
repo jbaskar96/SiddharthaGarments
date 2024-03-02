@@ -33,13 +33,10 @@ public class CORSFilter implements Filter {
 			throws IOException, ServletException {
 		HttpServletResponse response = (HttpServletResponse) res;
 		response.setHeader("Access-Control-Allow-Origin", "*");
-		response.setHeader("Access-Control-Allow-Credentials", "true");
 		response.setHeader("Access-Control-Allow-Methods", "*");
 		response.setHeader("Access-Control-Max-Age", "3600");
 		response.setHeader("X-Requested-With", "XMLHttpRequest");
 		response.setHeader("Access-Control-Allow-Headers","*");
-		
-		
 		HttpServletRequest httpRequest = (HttpServletRequest) req;
 		if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
 			response.setStatus(HttpServletResponse.SC_OK);

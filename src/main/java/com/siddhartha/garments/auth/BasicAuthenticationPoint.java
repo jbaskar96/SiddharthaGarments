@@ -3,6 +3,7 @@ package com.siddhartha.garments.auth;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,7 +24,7 @@ public class BasicAuthenticationPoint extends BasicAuthenticationEntryPoint {
 
     @Override
     public void afterPropertiesSet()  {
-        setRealmName("/Garments");
+        setRealmName("/claim");
         super.afterPropertiesSet();
     }
 

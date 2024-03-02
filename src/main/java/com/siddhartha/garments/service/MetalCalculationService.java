@@ -7,9 +7,9 @@ import com.siddhartha.garments.response.CommonResponse;
 
 public interface MetalCalculationService {
 
-	CommonResponse doSizeCalc(EditOrderDetailsReq req);
+	CommonResponse generateSizeCalc(EditOrderDetailsReq req);
 
-	CommonResponse doSizeColorCalc(EditOrderDetailsReq req);
+	CommonResponse generateSizeColorCalc(EditOrderDetailsReq req);
 
 	CommonResponse doInsertSizeCalc(InsertSizeCalcRequest req);
 

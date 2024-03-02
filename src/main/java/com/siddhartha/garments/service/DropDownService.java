@@ -40,4 +40,6 @@ public interface DropDownService {
 
 	CommonResponse getProductSizeColor(Integer companyId, Integer productId, Integer sizeId);
 
+	CommonResponse sizeType();
+
 }
