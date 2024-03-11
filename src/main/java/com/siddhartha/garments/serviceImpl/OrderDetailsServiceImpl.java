@@ -30,6 +30,7 @@ import com.siddhartha.garments.repository.OrderDetailsRepository;
 import com.siddhartha.garments.repository.OrderSizeColorDetailsRepository;
 import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.response.CommonResponse;
+import com.siddhartha.garments.response.UpdateOrderStatusReq;
 import com.siddhartha.garments.service.OrderDetailsService;
 
 @Service
@@ -322,6 +323,29 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 				
 				response.setMessage("Success");
 				response.setResponse(mapList);
+				response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Record Found");
+				response.setError(null);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse updateOrderStatus(UpdateOrderStatusReq req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			Optional<OrderDetails> data =orderDetailsRepos.findById(req.getOrderId());
+			if(data.isPresent()) {
+				OrderDetails details =data.get();
+				details.setStatus(req.getOrderStatus());
+				
+				response.setMessage("Success");
+				response.setResponse("Order updated successfully");
 				response.setError(null);
 			}else {
 				response.setMessage("Failed");

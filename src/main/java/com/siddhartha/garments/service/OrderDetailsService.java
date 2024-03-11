@@ -7,6 +7,7 @@ import com.siddhartha.garments.dto.GetOrderSizeColorReq;
 import com.siddhartha.garments.dto.OrderChallanColorReq;
 import com.siddhartha.garments.dto.OrderDetailsRequest;
 import com.siddhartha.garments.response.CommonResponse;
+import com.siddhartha.garments.response.UpdateOrderStatusReq;
 
 public interface OrderDetailsService {
 
@@ -21,5 +22,7 @@ public interface OrderDetailsService {
 	CommonResponse editOrderColorDetails(GetOrderSizeColorReq req);
 
 	CommonResponse getAllOrderDeatils(String status);
+
+	CommonResponse updateOrderStatus(UpdateOrderStatusReq req);
 
 }

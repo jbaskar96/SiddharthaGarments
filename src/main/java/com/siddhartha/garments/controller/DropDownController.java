@@ -6,13 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.siddhartha.garments.response.CommonResponse;
+import com.siddhartha.garments.response.GetSizeDetailsRequest;
 import com.siddhartha.garments.service.DropDownService;
 
 import io.swagger.annotations.Api;
@@ -63,24 +65,24 @@ public class DropDownController {
 		return service.operator();
 	}
 	
-	@GetMapping("/size")
-	public CommonResponse size() {
-		return service.size();
+	@GetMapping("/get/sizeDetails/{orderId}")
+	public CommonResponse size(@RequestBody GetSizeDetailsRequest req) {
+		return service.size(req);
 	}
 	
-	@GetMapping("/get/orderDetails")
+	@GetMapping("/order")
 	public CommonResponse getOrderDetails() {
 		return service.getOrderDetails();
 	}
 	
-	@GetMapping("/get/sizeDetails/{orderId}")
+	//@GetMapping("/get/sizeDetails/{orderId}")
 	public CommonResponse getSizeDetails(@PathVariable("orderId") String orderId) {
 		return service.getSizeDetails(orderId);
 	}
 	
-	@GetMapping("/get/colorDeatilsByOrderId/{orderId}/{sizeId}")
-	public CommonResponse colorDeatilsByOrderId(@PathVariable("orderId") String orderId,@PathVariable("sizeId") String sizeId) {
-		return service.colorDeatilsByOrderId(orderId,sizeId);
+	@GetMapping("/get/colorDeatilsByOrderId")
+	public CommonResponse colorDeatilsByOrderId(@RequestBody GetSizeDetailsRequest req) {
+		return service.colorDeatilsByOrderId(req);
 	}
 	
 	@GetMapping("/metalType")

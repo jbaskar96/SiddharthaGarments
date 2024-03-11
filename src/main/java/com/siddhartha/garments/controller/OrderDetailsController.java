@@ -14,6 +14,7 @@ import com.siddhartha.garments.dto.GetOrderSizeColorReq;
 import com.siddhartha.garments.dto.OrderChallanColorReq;
 import com.siddhartha.garments.dto.OrderDetailsRequest;
 import com.siddhartha.garments.response.CommonResponse;
+import com.siddhartha.garments.response.UpdateOrderStatusReq;
 import com.siddhartha.garments.service.OrderDetailsService;
 
 @RestController
@@ -53,5 +54,25 @@ public class OrderDetailsController {
 	public CommonResponse getAllOrderDeatils() {
 		return service.getAllOrderDeatils("Y");
 	}
+	
+	@GetMapping("/getProductionOrders")
+	public CommonResponse getProductionOrders() {
+		return service.getAllOrderDeatils("P");
+	}
 
+	@GetMapping("/getDeliveryOrders")
+	public CommonResponse getDeliveryOrders() {
+		return service.getAllOrderDeatils("D");
+	}
+	
+	@GetMapping("/getBillingOrders")
+	public CommonResponse getBillingOrders() {
+		return service.getAllOrderDeatils("B");
+	}
+	
+	@PostMapping("/updateOrderStatus")
+	public CommonResponse updateOrderStatus(@RequestBody UpdateOrderStatusReq req) {
+		return service.updateOrderStatus(req);
+	}
+	
 }

@@ -6,6 +6,7 @@ import java.util.Base64.Encoder;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -858,7 +859,7 @@ public class InputValidationServiceImpl {
 					errorLists.add(new ErrorList("ColorName","Row : "+rowno+"","Please enter ColorName"));
 				}
 				if(StringUtils.isBlank(r.getColorCode())) {
-					errorLists.add(new ErrorList("ColorCode","Row : "+rowno+"","Please enter ColorCode"));
+				//	errorLists.add(new ErrorList("ColorCode","Row : "+rowno+"","Please enter ColorCode"));
 				}
 				if(StringUtils.isBlank(r.getSizeId())) {
 					errorLists.add(new ErrorList("SizeId","Row : "+rowno+"","Please enter SizeId"));
@@ -908,7 +909,7 @@ public class InputValidationServiceImpl {
 				
 				if(StringUtils.isBlank(r.getMesurementValue())) {
 					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","Please enter MesurementValue"));
-				}else if(!r.getMesurementValue().matches("[0-9]*")) {
+				}else if(!NumberUtils.isCreatable(r.getMesurementValue())) {
 					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","MesurementValue allows only digits"));
 				}
 				

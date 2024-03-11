@@ -1,6 +1,7 @@
 package com.siddhartha.garments.service;
 
 import com.siddhartha.garments.response.CommonResponse;
+import com.siddhartha.garments.response.GetSizeDetailsRequest;
 
 public interface DropDownService {
 
@@ -41,5 +42,9 @@ public interface DropDownService {
 	CommonResponse getProductSizeColor(Integer companyId, Integer productId, Integer sizeId);
 
 	CommonResponse sizeType();
+
+	CommonResponse size(GetSizeDetailsRequest req);
+
+	CommonResponse colorDeatilsByOrderId(GetSizeDetailsRequest req);
 
 }

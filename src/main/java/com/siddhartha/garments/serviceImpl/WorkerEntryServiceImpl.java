@@ -40,7 +40,7 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 			
 			if(error.isEmpty()) {
 				WorkerEntryDetails workerEntryDetails =WorkerEntryDetails.builder()
-						.serialNo(StringUtils.isBlank(req.getSerialNo())?workerEntryRepository.count()							:Long.valueOf(req.getSerialNo()))
+						.serialNo(StringUtils.isBlank(req.getSerialNo())?workerEntryRepository.count():Long.valueOf(req.getSerialNo()))
 						.challanId(req.getChallanId())
 						.colorId(req.getColorId())
 						.damagedPieces(Integer.valueOf(req.getDamagedPieces()))

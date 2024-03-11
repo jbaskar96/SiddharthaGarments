@@ -104,16 +104,17 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 				for(ProductSizeMetalMaster met : metal) {
 					String calctype =met.getMesurementType();
 					Double calcVal =met.getMesurementValue();
+					Integer noOfpieces =met.getMesurementPieces();
 					Double overAllCalc =0D;
-					Double piecesRate =0D;
+					Integer piecesRate =0;
 					if("G".equals(calctype)) {// gram
-						piecesRate =piecesRate / ocd.getTotalPieces();
-						overAllCalc =calcVal * piecesRate/1000;
+						piecesRate = ocd.getTotalPieces()/ noOfpieces;
+						overAllCalc =calcVal * piecesRate;
 					}else if("M".equals(calctype)) {// meter
-						piecesRate =piecesRate / ocd.getTotalPieces();
+						piecesRate = ocd.getTotalPieces()/ noOfpieces;
 						overAllCalc = calcVal * piecesRate;
 					}else if("P".equals(calctype)) {//precentage
-						Double result =calcVal * piecesRate;
+						Double result =calcVal * noOfpieces;
 						overAllCalc =overAllCalc - result;
 					}else if("N".equals(calctype)) {// no calc or count
 						overAllCalc=Double.valueOf(ocd.getTotalPieces());
@@ -186,7 +187,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 				
 				for(OrderSizeColorDetails col : color) {
 					
-					List<ProductSizeColorMetalMaster> metal =colorMetalRepo.findByIdCompanyIdAndIdProductIdAndIdSizeIdAndIdColourCodeOrderByDisplayOrder(companyId, productId, c.getSizeId(), col.getId().getColorId());
+					List<ProductSizeColorMetalMaster> metal =colorMetalRepo.findByIdCompanyIdAndIdProductIdAndIdSizeIdAndIdColourCodeOrderByDisplayOrder(companyId, productId, c.getSizeId(), col.getColorCode());
 					int index=0;
 					String [] metalName =new String[metal.size()];
 					Object [] required =new Object[metal.size()];
@@ -196,11 +197,12 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 					for(ProductSizeColorMetalMaster met : metal) {
 						String calctype =met.getMesurementType();
 						Double calcVal =met.getMesurementValue();
+						Integer noOfPieces =met.getMesurementPieces();
 						Double overAllCalc =0D;
-						Double piecesRate =0D;
+						Integer piecesRate =0;
 						if("G".equals(calctype)) {// gram
-							piecesRate =piecesRate / col.getTotalPieces();
-							overAllCalc =calcVal * piecesRate/1000;
+							piecesRate = col.getTotalPieces()/noOfPieces;
+							overAllCalc =calcVal * piecesRate ;
 						}else if("M".equals(calctype)) {// meter
 							piecesRate =piecesRate / col.getTotalPieces();
 							overAllCalc = calcVal * piecesRate;
@@ -567,7 +569,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 					
 					try {
 						String requiredQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,ORDER_ID,CHALLAN_ID,SIZE_ID,SIZE,TYPE_NAME,CHALLAN_DATE,CHALLAN_NO,PIECES,COLOR_ID,COLOR_NAME,COLOR_PIECES,"
-								+ columnsName+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,"+StringUtils.join(prepare,",")+")";
+								+ columnsName+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,"+StringUtils.join(prepare,",")+")";
 						
 						jdbcTemplate.execute(requiredQuery,new PreparedStatementCallback<Boolean>(){
 						    @Override
@@ -598,7 +600,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 						
 						
 						String metalQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,ORDER_ID,CHALLAN_ID,SIZE_ID,SIZE,TYPE_NAME,CHALLAN_DATE,CHALLAN_NO,PIECES,METAL_COLUMNS,COLOR_ID,COLOR_NAME,COLOR_PIECES"
-								+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+								+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 						
 						jdbcTemplate.execute(metalQuery,new PreparedStatementCallback<Boolean>(){
 						    @Override
@@ -623,7 +625,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 						
 						
 						String paramsQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,ORDER_ID,CHALLAN_ID,SIZE_ID,SIZE,TYPE_NAME,CHALLAN_DATE,CHALLAN_NO,PIECES,METAL_COLUMNS,COLOR_ID,COLOR_NAME,COLOR_PIECES"
-								+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+								+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 						
 						jdbcTemplate.execute(paramsQuery,new PreparedStatementCallback<Boolean>(){
 						    @Override
@@ -691,7 +693,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 					
 					String colorId =colorEntry.getKey();
 					
-					List<Map<String,Object>> colorData =sizeEntry.getValue();
+					List<Map<String,Object>> colorData =colorEntry.getValue();
 					
 					String params =colorData.stream()
 							.filter(p ->p.get("TYPE_NAME").toString().equals("PARAMS"))
@@ -706,7 +708,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 						
 						String required ="select "+params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and COLOR_ID=? and TYPE_NAME=?";
 						
-						String received ="select "+params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and COLOR_ID=? and TYPE_NAME=?";
+						String received ="select "+  params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and COLOR_ID=? and TYPE_NAME=?";
 						
 						query =em.createNativeQuery(required)
 								.setParameter(1, req.getOrderId())

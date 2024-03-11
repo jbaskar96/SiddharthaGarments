@@ -38,6 +38,12 @@ public class OrderDetails {
 	@Column(name = "LOT_NUMBER")
 	private String lotNumber;
 	
+	@Column(name = "DELIVERY_DATE")
+	private Date deliveryDate;
+	
+	@Column(name = "PRODUCTION_DATE")
+	private Date productionDate;
+	
 	@Column(name = "INWARD_DATE")
 	private Date inwardDate;
 	

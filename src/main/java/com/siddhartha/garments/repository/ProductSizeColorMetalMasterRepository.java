@@ -18,6 +18,6 @@ public interface ProductSizeColorMetalMasterRepository extends JpaRepository<Pro
 			String colorId);
 
 	List<ProductSizeColorMetalMaster> findByIdCompanyIdAndIdProductIdAndIdSizeIdAndIdColourCodeOrderByDisplayOrder(
-			Integer companyId, Integer productId, Integer sizeId, String colorId);
+			Integer companyId, Integer productId, Integer sizeId, Integer colorId);
 
 }
