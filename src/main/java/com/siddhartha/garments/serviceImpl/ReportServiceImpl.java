@@ -189,6 +189,32 @@ public class ReportServiceImpl implements ReportService{
 		CommonResponse response = new CommonResponse();
 		try {
 			List<PurchaseMaster> list =query.getPurchaseReport(req);
+			if(!list.isEmpty()) {
+				List<Map<String,String>> mapList = new ArrayList<>();
+				list.forEach(p ->{
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("SerialNo", p.getSerialNo().toString());
+					map.put("CategoryId", p.getCategoryId().toString());
+					map.put("BillRefNo", p.getBillRefNo());
+					map.put("SupplierName", p.getSupplierName());
+					map.put("AmountBeforeTax", p.getAmountBeforetax().toString());
+					map.put("Sgst", p.getSgst().toString());
+					map.put("Cgst", p.getCgst().toString());
+					map.put("SgstTax", p.getSgstTax().toString());
+					map.put("cgstTax", p.getCgstTax().toString());
+					map.put("TotalAmount", p.getTotalAmount().toString());
+					map.put("BillReferenceDate", sdf.format(p.getBillDate()));
+					
+					mapList.add(map);
+				});
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(mapList);
+			}else {
+				response.setError(null);
+				response.setMessage("Failed");
+				response.setResponse("No Record Found");
+			}
 		}catch (Exception e) {
 			e.printStackTrace();
 		}

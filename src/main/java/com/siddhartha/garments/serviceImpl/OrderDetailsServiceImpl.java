@@ -336,24 +336,38 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 	}
 
 	@Override
-	public CommonResponse updateOrderStatus(UpdateOrderStatusReq req) {
+	public CommonResponse updateOrderStatus(UpdateOrderStatusReq reqList) {
 		CommonResponse response = new CommonResponse();
 		try {
-			Optional<OrderDetails> data =orderDetailsRepos.findById(req.getOrderId());
-			if(data.isPresent()) {
-				OrderDetails details =data.get();
-				details.setStatus(req.getOrderStatus());
-				
-				response.setMessage("Success");
-				response.setResponse("Order updated successfully");
-				response.setError(null);
-			}else {
-				response.setMessage("Failed");
-				response.setResponse("No Record Found");
-				response.setError(null);
+			
+			for(String req : reqList.getOrderId()) {
+				Optional<OrderDetails> data =orderDetailsRepos.findById(req);
+				if(data.isPresent()) {
+					OrderDetails details =data.get();
+					details.setStatus(reqList.getOrderStatus());
+					if("P".equalsIgnoreCase(reqList.getOrderStatus())) {
+						details.setProductionDate(new Date());	
+					}else if("D".equalsIgnoreCase(reqList.getOrderStatus())) {
+						details.setDeliveryDate(new Date());
+					}else if("B".equalsIgnoreCase(reqList.getOrderStatus())) {
+						details.setBillingDate(new Date());
+					}
+					
+					orderDetailsRepos.save(details);
+			
+				}
 			}
+				
+		  response.setMessage("Success");
+		  response.setResponse("Order updated successfully");
+		  response.setError(null);
+			
 		}catch (Exception e) {
 			e.printStackTrace();
+			response.setMessage("Failed");
+			response.setResponse(e.getMessage());
+			response.setError(null);
+			return response;
 		}
 		return response;
 	}

@@ -44,6 +44,9 @@ public class OrderDetails {
 	@Column(name = "PRODUCTION_DATE")
 	private Date productionDate;
 	
+	@Column(name = "BILLING_DATE")
+	private Date billingDate;
+	
 	@Column(name = "INWARD_DATE")
 	private Date inwardDate;
 	

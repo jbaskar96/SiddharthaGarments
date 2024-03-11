@@ -65,7 +65,7 @@ public class DropDownController {
 		return service.operator();
 	}
 	
-	@GetMapping("/get/sizeDetails/{orderId}")
+	@PostMapping("/get/sizeDetails")
 	public CommonResponse size(@RequestBody GetSizeDetailsRequest req) {
 		return service.size(req);
 	}
@@ -80,7 +80,7 @@ public class DropDownController {
 		return service.getSizeDetails(orderId);
 	}
 	
-	@GetMapping("/get/colorDeatilsByOrderId")
+	@PostMapping("/get/colorDeatilsByOrderId")
 	public CommonResponse colorDeatilsByOrderId(@RequestBody GetSizeDetailsRequest req) {
 		return service.colorDeatilsByOrderId(req);
 	}
