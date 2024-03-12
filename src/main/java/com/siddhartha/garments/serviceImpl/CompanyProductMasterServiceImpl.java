@@ -597,7 +597,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	}
 
 	private Integer getSizeMetalId(Integer companyId, Integer productId, Integer sizeId) {
-		Integer metalid =ProductSizeMetalMasterRepo.findByIdCompanyIdAndIdProductIdAndIdMetalId(companyId,productId,sizeId).size()+1;
+		Integer metalid =ProductSizeMetalMasterRepo.findByIdCompanyIdAndIdProductIdAndIdSizeId(companyId,productId,sizeId).size()+1;
 		return metalid;
 	}
 

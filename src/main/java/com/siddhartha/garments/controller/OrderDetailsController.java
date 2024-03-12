@@ -1,6 +1,8 @@
 package com.siddhartha.garments.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +15,9 @@ import com.siddhartha.garments.dto.EditOrderDetailsReq;
 import com.siddhartha.garments.dto.GetOrderSizeColorReq;
 import com.siddhartha.garments.dto.OrderChallanColorReq;
 import com.siddhartha.garments.dto.OrderDetailsRequest;
+import com.siddhartha.garments.response.BoxCalculateReq;
 import com.siddhartha.garments.response.CommonResponse;
+import com.siddhartha.garments.response.OrderBillingRequest;
 import com.siddhartha.garments.response.UpdateOrderStatusReq;
 import com.siddhartha.garments.service.OrderDetailsService;
 
@@ -75,6 +79,41 @@ public class OrderDetailsController {
 		return service.updateOrderStatus(req);
 	}
 	
+	@PostMapping("/save/orderBilling")
+	public CommonResponse saveOrderBilling(@RequestBody OrderBillingRequest req) {
+		return service.saveOrderBilling(req);
+	}
 	
+	@PostMapping("/view/orderBilling")
+	public CommonResponse viewOrderBilling(@RequestBody EditOrderDetailsReq req) {
+		return service.viewOrderBilling(req);
+	}
+	
+	@GetMapping("/getAll/orderBilling")
+	public CommonResponse getAllOrderBilling() {
+		return service.getAllOrderBilling();
+	}
+	
+	
+	@PostMapping("/calculateOrderBox")
+	public CommonResponse calculateOrderBox(@RequestBody  BoxCalculateReq req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			Integer totalPieces = Integer.valueOf(req.getTotalPieces());
+			Integer noOfPieces = Integer.valueOf(req.getNoOfPieces());
+			
+			double totalBoxes =totalPieces / noOfPieces;
+			
+			Map<String,String> res = new HashMap<String,String>();
+			res.put("Response", String.valueOf(totalBoxes));
+			
+			response.setMessage("Success");
+			response.setResponse(res);
+			response.setError(null);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
 	
 }

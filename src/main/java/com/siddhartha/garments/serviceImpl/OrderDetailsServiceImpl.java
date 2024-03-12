@@ -1,7 +1,6 @@
 package com.siddhartha.garments.serviceImpl;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,21 +14,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.siddhartha.garments.dto.EditOrderDetailsReq;
 import com.siddhartha.garments.dto.GetOrderSizeColorReq;
 import com.siddhartha.garments.dto.OrderChallanColorReq;
 import com.siddhartha.garments.dto.OrderChallanInfoReq;
 import com.siddhartha.garments.dto.OrderDetailsRequest;
+import com.siddhartha.garments.entity.OrderBillingDetails;
 import com.siddhartha.garments.entity.OrderChallanDetails;
 import com.siddhartha.garments.entity.OrderChallanDetailsId;
 import com.siddhartha.garments.entity.OrderDetails;
 import com.siddhartha.garments.entity.OrderSizeColorDetails;
 import com.siddhartha.garments.entity.OrderSizeColorDetailsId;
+import com.siddhartha.garments.repository.OrderBillingDetailRepository;
 import com.siddhartha.garments.repository.OrderChallanDetailsRepository;
 import com.siddhartha.garments.repository.OrderDetailsRepository;
 import com.siddhartha.garments.repository.OrderSizeColorDetailsRepository;
 import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.response.CommonResponse;
+import com.siddhartha.garments.response.OrderBillingRequest;
 import com.siddhartha.garments.response.UpdateOrderStatusReq;
 import com.siddhartha.garments.service.OrderDetailsService;
 
@@ -50,6 +53,9 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 	
 	@Autowired
 	private InputValidationServiceImpl validation;
+	
+	@Autowired
+	private OrderBillingDetailRepository orderBillingRepo;
 	
 	@Override
 	public CommonResponse saveOrder(OrderDetailsRequest req) {
@@ -368,6 +374,106 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 			response.setResponse(e.getMessage());
 			response.setError(null);
 			return response;
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse saveOrderBilling(OrderBillingRequest req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ErrorList> error = validation.orderBilling(req);
+			if(error.isEmpty()) {
+				OrderBillingDetails billingDetails =OrderBillingDetails.builder()
+						.deliveryType(req.getDeliveryType())
+						.entryDate(new Date())
+						.noOfboxDozens(Integer.valueOf(req.getNoOfBoxesPerPieces()))
+						.noOfPieces(Integer.valueOf(req.getNoOfPieces()))
+						.orderId(req.getOrderId())
+						.remarks(StringUtils.isBlank(req.getRemarks())?null:req.getRemarks())
+						.status("Y")
+						.totalBox(Integer.valueOf(req.getTotalBox()))
+						.totalPieces(Integer.valueOf(req.getTotalPieces()))
+						.updatedBy(req.getUpdatedBy())
+						.build();
+				
+				orderBillingRepo.save(billingDetails);
+				
+				response.setMessage("Success");
+				response.setResponse("Data saved Successfully");
+				response.setError(null);
+			}else {
+				response.setMessage("Error");
+				response.setResponse(null);
+				response.setError(error);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse viewOrderBilling(EditOrderDetailsReq req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			Optional<OrderBillingDetails> data =orderBillingRepo.findById(req.getOrderId());
+			if(data.isPresent()) {
+				OrderBillingDetails obd =data.get();
+				HashMap<String, String> res = new HashMap<String, String>();
+				res.put("OrderId", obd.getOrderId());
+				res.put("TotalPieces", obd.getTotalPieces().toString());
+				res.put("DeliveryType", obd.getDeliveryType());
+				res.put("NoOfBoxOrDozens", obd.getNoOfboxDozens().toString());
+				res.put("NoOfPieces", obd.getNoOfPieces().toString());
+				res.put("TotalBox", obd.getTotalBox().toString());
+				res.put("Remarks", obd.getRemarks());
+				res.put("UpdatedBy", obd.getUpdatedBy());
+				res.put("EntryDate", sdf.format(obd.getEntryDate()));
+				response.setMessage("Success");
+				response.setResponse(res);
+				response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Data Found");
+				response.setError(null);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse getAllOrderBilling() {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<OrderBillingDetails> data =orderBillingRepo.findAll();
+			if(data.size()>0) {
+				List<Map<String,String>> resList = new ArrayList<Map<String,String>>();
+				for(OrderBillingDetails obd : data) {
+					HashMap<String, String> res = new HashMap<String, String>();
+					res.put("OrderId", obd.getOrderId());
+					res.put("TotalPieces", obd.getTotalPieces().toString());
+					res.put("DeliveryType", obd.getDeliveryType());
+					res.put("NoOfBoxOrDozens", obd.getNoOfboxDozens().toString());
+					res.put("NoOfPieces", obd.getNoOfPieces().toString());
+					res.put("TotalBox", obd.getTotalBox().toString());
+					res.put("Remarks", obd.getRemarks());
+					res.put("UpdatedBy", obd.getUpdatedBy());
+					res.put("EntryDate", sdf.format(obd.getEntryDate()));
+					resList.add(res);
+				}
+					response.setMessage("Success");
+					response.setResponse(resList);
+					response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Data Found");
+				response.setError(null);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
 		return response;
 	}

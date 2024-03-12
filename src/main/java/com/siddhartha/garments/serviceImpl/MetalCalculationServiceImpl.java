@@ -107,6 +107,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 					Integer noOfpieces =met.getMesurementPieces();
 					Double overAllCalc =0D;
 					Integer piecesRate =0;
+					String calctypeDesc="";
 					if("G".equals(calctype)) {// gram
 						piecesRate = ocd.getTotalPieces()/ noOfpieces;
 						overAllCalc =calcVal * piecesRate;
@@ -122,7 +123,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 					
 					required[index] =overAllCalc;
 					received[index] =0;
-					metalName[index]=met.getMetalName();
+					metalName[index]=met.getMetalName() + "("+calcVal+"%) "+calctype+"";
 					params.add(met.getColumnName());
 					
 					index++;

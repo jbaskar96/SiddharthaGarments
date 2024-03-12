@@ -5,6 +5,8 @@ import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,7 @@ import com.siddhartha.garments.request.StateSaveRequest;
 import com.siddhartha.garments.request.UserDetailsRequest;
 import com.siddhartha.garments.request.UserTypeRequest;
 import com.siddhartha.garments.request.WorkerEntryDetailsReq;
+import com.siddhartha.garments.response.OrderBillingRequest;
 
 @Component
 public class InputValidationServiceImpl {
@@ -816,7 +819,7 @@ public class InputValidationServiceImpl {
 				
 				if(StringUtils.isBlank(r.getMesurementValue())) {
 					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","Please enter MesurementValue"));
-				}else if(!r.getMesurementValue().matches("[0-9]*")) {
+				}else if(NumberUtils.isDigits(r.getMesurementValue())) {
 					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","MesurementValue allows only digits"));
 				}
 				
@@ -909,7 +912,7 @@ public class InputValidationServiceImpl {
 				
 				if(StringUtils.isBlank(r.getMesurementValue())) {
 					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","Please enter MesurementValue"));
-				}else if(!NumberUtils.isCreatable(r.getMesurementValue())) {
+				}else if(!NumberUtils.isParsable(r.getMesurementValue())) {
 					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","MesurementValue allows only digits"));
 				}
 				
@@ -952,5 +955,48 @@ public class InputValidationServiceImpl {
 		return null;
 	}
 
+	
+	
+	@PostConstruct
+	public void tst() {
+		String val ="3.55t";
+		String val2 ="t5.0";
+		String val3 ="u7";
+		
+		if(NumberUtils.isParsable(val)) {
+			System.out.println(val);
+		}if(NumberUtils.isParsable(val2)) {
+			System.out.println(val2);
+		}if(NumberUtils.isParsable(val3)) {
+			System.out.println(val3);
+		}
+		
+	}
+
+	public List<ErrorList> orderBilling(OrderBillingRequest req) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		
+		if(StringUtils.isBlank(req.getDeliveryType())) {
+			errorLists.add(new ErrorList("DeliveryType","101","Please enter DeliveryType"));
+		}
+		
+		if(StringUtils.isBlank(req.getNoOfBoxesPerPieces())) {
+			errorLists.add(new ErrorList("NoOfBoxOrDozens","101","Please enter NoOfBoxOrDozens"));
+		}
+		
+		if(StringUtils.isBlank(req.getNoOfPieces())) {
+			errorLists.add(new ErrorList("NoOfPieces","101","Please enter NoOfPieces"));
+		}
+		
+		if(StringUtils.isBlank(req.getTotalPieces())) {
+			errorLists.add(new ErrorList("TotalPieces","101","Please enter TotalPieces"));
+		}
+		
+		if(StringUtils.isBlank(req.getOrderId())) {
+			errorLists.add(new ErrorList("OrderId","101","Please enter OrderId"));
+		}
+		
+		return errorLists;
+	}
 		
 }
