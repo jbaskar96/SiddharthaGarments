@@ -27,7 +27,7 @@ public class ExpensiveDetails {
 	private Long serialNo;
 	
 	@Column(name="ACCOUNT_TYPE")
-	private String acountType;
+	private String accountType;
 
 	@Column(name="CATEGORY_TYPE")
 	private String categoryType;

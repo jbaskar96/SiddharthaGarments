@@ -43,7 +43,7 @@ public class ExpensiveServiceImpl implements ExpensiveService{
 			List<ErrorList> errorLists =validation.validateExpensive(req);
 			if(errorLists.isEmpty()) {
 				ExpensiveDetails expensiveDetails = ExpensiveDetails.builder()
-						.acountType(req.getAccountType())
+						.accountType(req.getAccountType())
 						.amount(Double.valueOf(req.getAmount()))
 						.categoryType(req.getCategoryType())
 						.entryDate(new Date())
@@ -83,7 +83,7 @@ public class ExpensiveServiceImpl implements ExpensiveService{
 					HashMap<String, String> map = new HashMap<String, String>();
 					map.put("SerialNo", p.getSerialNo().toString());
 					map.put("CategoryId", p.getCategoryType());
-					map.put("AccountType", p.getAcountType());
+					map.put("AccountType", p.getAccountType());
 					map.put("Amount",p.getAmount().toString());
 					map.put("Notes", p.getNotes());
 					map.put("ExpensiveDate", sdf.format(p.getExpeniveDate()));
@@ -115,7 +115,7 @@ public class ExpensiveServiceImpl implements ExpensiveService{
 				HashMap<String, String> map = new HashMap<String, String>();
 				map.put("SerialNo", p.getSerialNo().toString());
 				map.put("CategoryId", p.getCategoryType());
-				map.put("AccountId", p.getAcountType());
+				map.put("AccountId", p.getAccountType());
 				map.put("Amount",p.getAmount().toString());
 				map.put("Notes", p.getNotes());
 				map.put("ExpensiveDate", sdf.format(p.getExpeniveDate()));

@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Tuple;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -18,12 +20,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
 
+import com.siddhartha.garments.entity.ExpensiveDetails;
 import com.siddhartha.garments.entity.PurchaseMaster;
 import com.siddhartha.garments.entity.WorkerEntryDetails;
 import com.siddhartha.garments.repository.WorkerEntryRepository;
 import com.siddhartha.garments.request.PurchaseReportReq;
 import com.siddhartha.garments.request.WorkerEntryDetailsReq;
 import com.siddhartha.garments.response.CommonResponse;
+import com.siddhartha.garments.response.ExpensiveReportRequest;
+import com.siddhartha.garments.response.OrderReportReq;
+import com.siddhartha.garments.response.WorkerReportReq;
 import com.siddhartha.garments.service.ReportService;
 
 @Service
@@ -39,7 +45,7 @@ public class ReportServiceImpl implements ReportService{
 	private WorkerEntryRepository workerEntryRepository;
 	
 	@Override
-	public CommonResponse getWorkerReport(WorkerEntryDetailsReq req) {
+	public CommonResponse getWorkerReport(WorkerReportReq req) {
 		CommonResponse response = new CommonResponse();
 		try {
 			List<WorkerEntryDetails> list = query.getWorkerReportDetails(req);
@@ -205,6 +211,70 @@ public class ReportServiceImpl implements ReportService{
 					map.put("TotalAmount", p.getTotalAmount().toString());
 					map.put("BillReferenceDate", sdf.format(p.getBillDate()));
 					
+					mapList.add(map);
+				});
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(mapList);
+			}else {
+				response.setError(null);
+				response.setMessage("Failed");
+				response.setResponse("No Record Found");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse getOrderReport(OrderReportReq req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<Tuple> list =query.getOrderReport(req);
+			if(!list.isEmpty()) {
+				List<Map<String,String>> mapList = new ArrayList<>();
+				list.forEach(p ->{
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("OrderId", p.get("orderId")==null?"":p.get("orderId").toString());
+					map.put("TotalChallan",p.get("totalChallan")==null?"":p.get("totalChallan").toString());
+					map.put("TotalPieces", p.get("totalPieces")==null?"":p.get("totalPieces").toString());
+					map.put("Status", p.get("statusDesc")==null?"":p.get("statusDesc").toString());
+					map.put("CompanyId", p.get("companyId")==null?"":p.get("companyId").toString());
+					map.put("ProductId", p.get("productId")==null?"":p.get("productId").toString());
+					map.put("LotNumber",p.get("lotNumber")==null?"":p.get("lotNumber").toString());
+					map.put("OrderDate", p.get("entryDate")==null?"":sdf.format(p.get("entryDate")));
+					mapList.add(map);
+				});
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(mapList);
+			}else {
+				response.setError(null);
+				response.setMessage("Failed");
+				response.setResponse("No Record Found");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse getExpensiveReport(ExpensiveReportRequest req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ExpensiveDetails> list =query.getExpensiveReport(req);
+			if(!list.isEmpty()) {
+				List<Map<String,String>> mapList = new ArrayList<>();
+				list.forEach(p ->{
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("SerialNo", p.getSerialNo().toString());
+					map.put("CategoryType", p.getCategoryType());
+					map.put("AccountType", p.getAccountType());
+					map.put("Amount", p.getAmount().toString());
+					map.put("Notes", p.getNotes());
+					map.put("ExpensiveDate",sdf.format(p.getExpeniveDate()));		
 					mapList.add(map);
 				});
 				response.setError(null);
