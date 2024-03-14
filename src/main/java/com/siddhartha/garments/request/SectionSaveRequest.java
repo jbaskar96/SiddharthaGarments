@@ -10,6 +10,9 @@ public class SectionSaveRequest {
 	@JsonProperty("SectionId")
 	private String sectionId;
 	
+	@JsonProperty("CompanyId")
+	private String companyId;
+	
 	@JsonProperty("SectionName")
 	private String sectionName;
 	

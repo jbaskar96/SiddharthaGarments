@@ -35,9 +35,9 @@ public class SectionMasterController {
 		return service.getAllSection();
 	}
 	
-	@GetMapping("/edit/{sectionId}")
-	public CommonResponse editSection(@PathVariable("sectionId") Integer sectionId) {
-		return service.editSection(sectionId);
+	@GetMapping("/edit/{companyId}/{sectionId}")
+	public CommonResponse editSection(@PathVariable("companyId") Integer companyId,@PathVariable("sectionId") Integer sectionId) {
+		return service.editSection(companyId,sectionId);
 	}
 	
 	@GetMapping("/delete/{sectionId}")

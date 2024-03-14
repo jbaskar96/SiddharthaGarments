@@ -62,4 +62,10 @@ public class OrderDetails {
 	@Column(name = "CREATEDBY")
 	private String createdBy;
 	
+	@Column(name = "SIZE_FOLDINGYN")
+	private String sizefoldingYn;
+	
+	@Column(name = "COLOR_FOLDINGYN")
+	private String colorFoldingYn;
+	
 }

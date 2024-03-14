@@ -17,6 +17,7 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
+import org.hibernate.query.internal.NativeQueryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -321,6 +322,9 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 					jdbcTemplate.getDataSource().getConnection().close();
 				}	
 				
+				OrderDetails order =orderDetailsRepo.findById(req.getOrderId()).get();
+				order.setSizefoldingYn("Y");
+				orderDetailsRepo.save(order);
 				
 			}
 			
@@ -488,25 +492,38 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 						.map(P ->P.get("METAL_COLUMNS").toString())
 						.collect(Collectors.joining());
 					
-				
+					
 				String required ="select "+params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and TYPE_NAME=?";
 				
 				String received ="select "+params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and TYPE_NAME=?";
 				
-				query =em.createNativeQuery(required)
+				query =em.createNativeQuery(required);
+						query.unwrap(NativeQueryImpl.class)
 						.setParameter(1, req.getOrderId())
 						.setParameter(2, challanId)
 						.setParameter(3, "REQUIRED");
 				
 				Object reqArray =query.getSingleResult();
 				
-				query =em.createNativeQuery(received)
+				if(reqArray instanceof String) {
+					
+					reqArray = new Object[] {reqArray};
+					
+				}
+				
+				query =em.createNativeQuery(received);
+						query.unwrap(NativeQueryImpl.class)
 						.setParameter(1, req.getOrderId())
 						.setParameter(2, challanId)
 						.setParameter(3, "RECEIVED");
 				
-				Object receivedArray =query.getResultList();
+				Object receivedArray =query.getSingleResult();
 				
+				if(receivedArray instanceof String) {
+					
+					receivedArray = new Object[] {receivedArray};
+					
+				}
 				
 				
 				String[] metal_name =metal.split(",");
@@ -719,14 +736,26 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 						
 						Object reqArray =query.getSingleResult();
 						
+						if(reqArray instanceof String) {
+							
+							reqArray = new Object[] {reqArray};
+							
+						}
+						
+						
 						query =em.createNativeQuery(received)
 								.setParameter(1, req.getOrderId())
 								.setParameter(2, challanId)
 								.setParameter(3, colorId)
 								.setParameter(4, "RECEIVED");
 						
-						Object receivedArray =query.getResultList();
+						Object receivedArray =query.getSingleResult();
 						
+						if(receivedArray instanceof String) {
+							
+							receivedArray = new Object[] {receivedArray};
+							
+						}
 						
 						String[] metal_name =metal.split(",");
 						HashMap<String, Object> map = new HashMap<String, Object>();
@@ -848,6 +877,9 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 						jdbcTemplate.getDataSource().getConnection().close();
 					}	
 					
+					OrderDetails order =orderDetailsRepo.findById(req.getOrderId()).get();
+					order.setColorFoldingYn("Y");
+					orderDetailsRepo.save(order);
 					
 				}
 				

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.siddhartha.garments.entity.SectionMaster;
+import com.siddhartha.garments.entity.SectionMasterId;
 import com.siddhartha.garments.repository.SectionMasterRepository;
 import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.SectionSaveRequest;
@@ -37,9 +38,15 @@ public class SectionMasterServiceImpl implements SectionMasterService {
 			List<ErrorList> error =validation.validateMasterInfo(req, "SECTION");
 			
 			if(error.isEmpty()) {
-				Long sectionId =repository.count()+1;
-				SectionMaster sectionMaster =SectionMaster.builder()
+				Long sectionId =repository.countByIdCompanyId(Integer.valueOf(req.getCompanyId()))+1;
+				
+				SectionMasterId id = SectionMasterId.builder()
 						.sectionId(StringUtils.isBlank(req.getSectionId())?sectionId.intValue():Integer.valueOf(req.getSectionId()))
+						.companyId(Integer.valueOf(req.getCompanyId()))
+						.build();
+				
+				SectionMaster sectionMaster =SectionMaster.builder()
+						.id(id)
 						.sectionName(req.getSectionName())
 						.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
 						.entryDate(new Date())
@@ -68,11 +75,12 @@ public class SectionMasterServiceImpl implements SectionMasterService {
 		CommonResponse response = new CommonResponse();
 		try {
 			List<SectionMaster> list =repository.findAll();
-			if(list.isEmpty()) {
+			if(!list.isEmpty()) {
 				List<Map<String, String>> res = new ArrayList<>();
 				list.forEach(p ->{
 					HashMap<String, String> map = new HashMap<String, String>();
-					map.put("SectionId", p.getSectionId().toString());
+					map.put("SectionId", p.getId().getSectionId().toString());
+					map.put("CompanyId", p.getId().getCompanyId().toString());
 					map.put("SectionName", p.getSectionName());
 					map.put("Status", p.getStatus());
 					map.put("CreatedDate", sdf.format(p.getEntryDate()));
@@ -93,13 +101,15 @@ public class SectionMasterServiceImpl implements SectionMasterService {
 	}
 
 	@Override
-	public CommonResponse editSection(Integer sectionId) {
+	public CommonResponse editSection(Integer companyId, Integer sectionId) {
 		CommonResponse response = new CommonResponse();
 		try {
-			SectionMaster p =repository.findById(sectionId).orElse(null);
+			SectionMasterId id =SectionMasterId.builder().companyId(companyId).sectionId(sectionId).build();
+			SectionMaster p =repository.findById(id).orElse(null);
 			if(p!=null) {
 				HashMap<String, String> map = new HashMap<String, String>();
-				map.put("SectionId", p.getSectionId().toString());
+				map.put("SectionId", p.getId().getSectionId().toString());
+				map.put("CompanyId", p.getId().getCompanyId().toString());
 				map.put("SectionName", p.getSectionName());
 				map.put("Status", p.getStatus());
 				map.put("CreatedDate", sdf.format(p.getEntryDate()));
@@ -121,7 +131,7 @@ public class SectionMasterServiceImpl implements SectionMasterService {
 	public CommonResponse deleteSection(Integer sectionId) {
 		CommonResponse response = new CommonResponse();
 		try {
-			repository.deleteById(sectionId);
+			//repository.deleteById(sectionId);
 			response.setError(null);
 			response.setMessage("Success");
 			response.setResponse("data deleted successfully");

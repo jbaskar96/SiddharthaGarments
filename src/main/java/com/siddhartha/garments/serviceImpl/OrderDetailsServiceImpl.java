@@ -155,6 +155,8 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 				orderRes.put("Status", o.getStatus());
 				orderRes.put("CreatedBy", o.getCreatedBy());
 				orderRes.put("Remarks", StringUtils.isBlank(o.getRemarks())?"":o.getRemarks());
+				orderRes.put("SizeFoldingYn", StringUtils.isBlank(o.getSizefoldingYn())?"N":o.getSizefoldingYn());
+				orderRes.put("ColorFoldingYn", StringUtils.isBlank(o.getColorFoldingYn())?"":o.getColorFoldingYn());
 				
 				List<OrderChallanDetails> challan =orderChallanDetailsRepos.findByIdOrderId(o.getOrderId());
 				List<Map<String,String>> challanList = new ArrayList<>();

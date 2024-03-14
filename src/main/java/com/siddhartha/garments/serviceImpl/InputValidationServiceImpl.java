@@ -778,7 +778,7 @@ public class InputValidationServiceImpl {
 					errorLists.add(new ErrorList("Size","Row : "+rowno+"","Please enter Size"));
 				}
 				if(StringUtils.isBlank(r.getSizeId())) {
-					errorLists.add(new ErrorList("SizeId","Row : "+rowno+"","Please enter SizeId"));
+					//errorLists.add(new ErrorList("SizeId","Row : "+rowno+"","Please enter SizeId"));
 				}
 				if(StringUtils.isBlank(r.getSizeType())) {
 					errorLists.add(new ErrorList("SizeType","Row : "+rowno+"","Please enter SizeType"));
@@ -819,8 +819,8 @@ public class InputValidationServiceImpl {
 				
 				if(StringUtils.isBlank(r.getMesurementValue())) {
 					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","Please enter MesurementValue"));
-				}else if(NumberUtils.isDigits(r.getMesurementValue())) {
-					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","MesurementValue allows only digits"));
+				}else if(NumberUtils.isParsable(r.getMesurementValue())) {
+					//errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","MesurementValue allows only digits"));
 				}
 				
 				if(StringUtils.isBlank(r.getMetalName())) {
@@ -913,7 +913,7 @@ public class InputValidationServiceImpl {
 				if(StringUtils.isBlank(r.getMesurementValue())) {
 					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","Please enter MesurementValue"));
 				}else if(!NumberUtils.isParsable(r.getMesurementValue())) {
-					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","MesurementValue allows only digits"));
+					//errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","MesurementValue allows only digits"));
 				}
 				
 				if(StringUtils.isBlank(r.getMetalName())) {

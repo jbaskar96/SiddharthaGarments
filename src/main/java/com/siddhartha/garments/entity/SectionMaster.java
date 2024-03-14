@@ -3,8 +3,8 @@ package com.siddhartha.garments.entity;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -23,9 +23,8 @@ import lombok.Setter;
 public class SectionMaster {
 
 	
-	@Id
-	@Column(name="SECTION_ID")
-	private Integer sectionId;
+	@EmbeddedId
+	private SectionMasterId id;
 	
 	@Column(name="SECTION_NAME")
 	private String sectionName;

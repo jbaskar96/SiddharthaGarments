@@ -9,7 +9,7 @@ public interface SectionMasterService {
 
 	CommonResponse getAllSection();
 
-	CommonResponse editSection(Integer sectionId);
+	CommonResponse editSection(Integer companyId, Integer sectionId);
 
 	CommonResponse deleteSection(Integer sectionId);
 
