@@ -11,13 +11,13 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
-import org.hibernate.query.internal.NativeQueryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -87,7 +87,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 			//List<ErrorList> error = validation.sizeCalc(req);
 			String orderId =req.getOrderId();
 			OrderDetails od =orderDetailsRepo.findById(orderId).get();
-			orderDetailsRepo.deleteMetalByOrderId(orderId);
+			orderDetailsRepo.deleteSizeMetalByOrderId(orderId);
 			Integer companyId =od.getCompanyId();
 			Integer productId =od.getProductId();
 			List<OrderChallanDetails> challan =challanRepo.findByIdOrderId(orderId);
@@ -173,7 +173,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 		CommonResponse response = new CommonResponse();
 		try {
 			String orderId =req.getOrderId();
-			orderDetailsRepo.deleteMetalByOrderId(orderId);
+			orderDetailsRepo.deleteColorMetalByOrderId(orderId);
 			OrderDetails od =orderDetailsRepo.findById(orderId).get();
 			Integer companyId =od.getCompanyId();
 			Integer productId =od.getProductId();
@@ -199,17 +199,17 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 					for(ProductSizeColorMetalMaster met : metal) {
 						String calctype =met.getMesurementType();
 						Double calcVal =met.getMesurementValue();
-						Integer noOfPieces =met.getMesurementPieces();
+						Integer noOfpieces =met.getMesurementPieces();
 						Double overAllCalc =0D;
 						Integer piecesRate =0;
 						if("G".equals(calctype)) {// gram
-							piecesRate = col.getTotalPieces()/noOfPieces;
-							overAllCalc =calcVal * piecesRate ;
+							piecesRate = col.getTotalPieces()/ noOfpieces;
+							overAllCalc =calcVal * piecesRate;
 						}else if("M".equals(calctype)) {// meter
-							piecesRate =piecesRate / col.getTotalPieces();
+							piecesRate = col.getTotalPieces()/ noOfpieces;
 							overAllCalc = calcVal * piecesRate;
 						}else if("P".equals(calctype)) {//precentage
-							Double result =calcVal * piecesRate;
+							Double result =calcVal * noOfpieces;
 							overAllCalc =overAllCalc - result;
 						}else if("N".equals(calctype)) {// no calc or count
 							overAllCalc=Double.valueOf(col.getTotalPieces());
@@ -217,7 +217,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 						
 						required[index] =overAllCalc;
 						received[index] =0;
-						metalName[index]=met.getMetalName();
+						metalName[index]=met.getMetalName() + "("+calcVal+"%) "+calctype+"";
 						params.add(met.getColumnName());
 						
 						index++;
@@ -471,6 +471,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 			List<Map<String,Object>> list =orderDetailsRepo.getMetalDetails(req.getOrderId());
 						
 			Map<String,List<Map<String,Object>>> sizeBasedGroup =list.stream()
+					.filter(p ->p.get("COLOR_ID")==null)
 					.collect(Collectors.groupingBy( p->p.get("CHALLAN_ID").toString()));
 			
 			HashMap<String, Object> calcResponse = new HashMap<String, Object>();
@@ -493,12 +494,11 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 						.collect(Collectors.joining());
 					
 					
-				String required ="select "+params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and TYPE_NAME=?";
+				String required ="select "+params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and color_id is null and TYPE_NAME=?";
 				
-				String received ="select "+params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and TYPE_NAME=?";
+				String received ="select "+params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and color_id is null and  TYPE_NAME=?";
 				
-				query =em.createNativeQuery(required);
-						query.unwrap(NativeQueryImpl.class)
+				query =em.createNativeQuery(required)
 						.setParameter(1, req.getOrderId())
 						.setParameter(2, challanId)
 						.setParameter(3, "REQUIRED");
@@ -511,13 +511,17 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 					
 				}
 				
-				query =em.createNativeQuery(received);
-						query.unwrap(NativeQueryImpl.class)
+				query =em.createNativeQuery(received)
 						.setParameter(1, req.getOrderId())
 						.setParameter(2, challanId)
 						.setParameter(3, "RECEIVED");
 				
-				Object receivedArray =query.getSingleResult();
+				Object receivedArray = null;
+				try {
+					receivedArray = query.getSingleResult();
+				} catch (NoResultException e) {
+				    log.debug("No result forund for... " +receivedArray);
+				}
 				
 				if(receivedArray instanceof String) {
 					
@@ -529,7 +533,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 				String[] metal_name =metal.split(",");
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				map.put("Required", reqArray);
-				map.put("Received", receivedArray);
+				map.put("Received", receivedArray ==null?new Object[]{} :receivedArray);
 				map.put("MetalName", metal_name);
 				map.put("ChallanId", challanId);
 				map.put("ChallanNumber",sizeList.get(0).get("CHALLAN_NO"));
@@ -701,6 +705,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 				List<Map<String,Object>> colorList =sizeEntry.getValue();
 				
 				Map<String,List<Map<String,Object>>> colorBasedGroup =colorList.stream()
+						.filter(p ->p.get("COLOR_ID")!=null)
 						.collect(Collectors.groupingBy(p ->p.get("COLOR_ID").toString()));
 				
 				List<Map<String,Object>> colorResList =new ArrayList<Map<String,Object>>();
@@ -724,9 +729,9 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 								.collect(Collectors.joining());
 							
 						
-						String required ="select "+params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and COLOR_ID=? and TYPE_NAME=?";
+						String required ="select "+params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and COLOR_ID=? and color_id is not null and TYPE_NAME=?";
 						
-						String received ="select "+  params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and COLOR_ID=? and TYPE_NAME=?";
+						String received ="select "+  params+" from METAL_CALC_DEATILS where ORDER_ID =? and CHALLAN_ID=? and COLOR_ID=? and color_id is not null and TYPE_NAME=?";
 						
 						query =em.createNativeQuery(required)
 								.setParameter(1, req.getOrderId())
@@ -749,7 +754,12 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 								.setParameter(3, colorId)
 								.setParameter(4, "RECEIVED");
 						
-						Object receivedArray =query.getSingleResult();
+						Object receivedArray = null;
+						try {
+							receivedArray = query.getSingleResult();
+						} catch (NoResultException e) {
+						    log.debug("No result forund for... " +receivedArray);
+						}
 						
 						if(receivedArray instanceof String) {
 							
@@ -757,10 +767,12 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 							
 						}
 						
+						
+						
 						String[] metal_name =metal.split(",");
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put("Required", reqArray);
-						map.put("Received", receivedArray);
+						map.put("Received", receivedArray ==null?new Object[]{} :receivedArray);
 						map.put("MetalName", metal_name);
 						map.put("ColorId", colorId);
 						map.put("ColorName", "Not Found..");
