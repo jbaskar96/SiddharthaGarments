@@ -177,12 +177,12 @@ public class CriteriaQueryServiceImpl {
 			//No of pieces subquery
 			Subquery<Long> totalPieces =query.subquery(Long.class);
 			Root<OrderChallanDetails> ocd1 =totalPieces.from(OrderChallanDetails.class);
-			totalChallan.select(cb.sum(ocd1.get("totalPieces"))).where(cb.equal(od.get("orderId"), ocd1.get("id").get("orderId")));
+			totalPieces.select(cb.sum(ocd1.get("totalPieces"))).where(cb.equal(od.get("orderId"), ocd1.get("id").get("orderId")));
 			
 			Expression<String> statusDesc =cb.selectCase()
 					.when(cb.equal(od.get("status"), "Y"), "INWARD")
 					.when(cb.equal(od.get("status"), "P"), "PRODUCTION")
-					.when(cb.equal(ocd.get("status"), "D"), "DELIVERED")
+					.when(cb.equal(od.get("status"), "D"), "DELIVERED")
 					.otherwise("BILLING").as(String.class);
 			
 			query.multiselect(od.get("orderId").alias("orderId"),totalChallan.alias("totalChallan"),

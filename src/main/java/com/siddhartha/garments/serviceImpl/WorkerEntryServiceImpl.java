@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 			
 			if(error.isEmpty()) {
 				WorkerEntryDetails workerEntryDetails =WorkerEntryDetails.builder()
-						.serialNo(StringUtils.isBlank(req.getSerialNo())?workerEntryRepository.count():Long.valueOf(req.getSerialNo()))
+						.serialNo(StringUtils.isBlank(req.getSerialNo())?workerEntryRepository.count()+1:Long.valueOf(req.getSerialNo()))
 						.challanId(req.getChallanId())
 						.colorId(req.getColorId())
 						.damagedPieces(Integer.valueOf(req.getDamagedPieces()))
@@ -53,6 +54,7 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 						.updatedBy(req.getUpdatedBy())
 						.goodPieces(Integer.valueOf(req.getGoodPieces()))
 						.workedPieces(Integer.valueOf(req.getWorkedPieces()))
+						.totalPieces(Integer.valueOf(req.getTotalPieces()))
 						.build();
 				workerEntryRepository.save(workerEntryDetails);
 				
@@ -90,7 +92,7 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 					map.put("GoodPieces", p.getGoodPieces().toString());
 					map.put("DamagePieces", p.getDamagedPieces().toString());
 					map.put("UpdatedBy", p.getUpdatedBy());
-					
+					map.put("TotalPieces", p.getTotalPieces().toString());
 					mapList.add(map);
 					
 				});
@@ -129,6 +131,7 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 					map.put("GoodPieces", p.getGoodPieces().toString());
 					map.put("DamagePieces", p.getDamagedPieces().toString());
 					map.put("UpdatedBy", p.getUpdatedBy());
+					map.put("TotalPieces", p.getTotalPieces().toString());
 					mapList.add(map);
 					
 				});
@@ -146,5 +149,41 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 		}
 		return response;
 	}
+
+	@Override
+	public CommonResponse editWorkerEntryDetail(String serialNo) {
+		CommonResponse response = new CommonResponse();
+		try {
+			Optional<WorkerEntryDetails> workerDetails =workerEntryRepository.findById(Long.valueOf(serialNo));
+			if(workerDetails.isPresent()) {
+				WorkerEntryDetails p =workerDetails.get();
+				HashMap<String, String> map =new HashMap<String, String>();
+				map.put("SerialNo", p.getSerialNo().toString());
+				map.put("OperatorId", p.getOperatorId());
+				map.put("SectionId", p.getSectionId().toString());
+				map.put("OrderId", p.getOrderId());
+				map.put("ChallanId", p.getChallanId());
+				map.put("ColorId", p.getColorId().toString());
+				map.put("WokedDate", sdf.format(p.getEntryDate()));
+				map.put("Wokedpieces", p.getWorkedPieces().toString());
+				map.put("GoodPieces", p.getGoodPieces().toString());
+				map.put("DamagePieces", p.getDamagedPieces().toString());
+				map.put("UpdatedBy", p.getUpdatedBy());
+				map.put("TotalPieces", p.getTotalPieces().toString());
+					
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(map);
+			}else {
+				response.setError(null);
+				response.setMessage("Failed");
+				response.setResponse("No data Found");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
 
 }

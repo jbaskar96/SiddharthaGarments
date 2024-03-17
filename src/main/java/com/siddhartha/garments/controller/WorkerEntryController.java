@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.siddhartha.garments.dto.EditOrderDetailsReq;
 import com.siddhartha.garments.request.WorkerEntryDetailsReq;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.WorkerEntryService;
@@ -29,14 +30,19 @@ public class WorkerEntryController {
 		return service.workerEntrySave(req);
 	}
 	
-	@GetMapping("/getWorkerEntryByOrderId/{orderId}")
-	public CommonResponse getWorkerEntryByOrderId(@PathVariable("orderId") String orderId) {
-		return service.getWorkerEntryByOrderId(orderId);
+	@PostMapping("/getWorkerEntryByOrderId")
+	public CommonResponse getWorkerEntryByOrderId(@RequestBody EditOrderDetailsReq req) {
+		return service.getWorkerEntryByOrderId(req.getOrderId());
 	}
 	
 	@GetMapping("/getAllWorkerEntryDetail")
 	public CommonResponse getAllWorkerEntryDetail() {
 		return service.getAllWorkerEntryDetail();
+	}
+	
+	@GetMapping("/editWorkerEntryDetail/{serialNo}")
+	public CommonResponse editWorkerEntryDetail(@PathVariable("serialNo") String serialNo) {
+		return service.editWorkerEntryDetail(serialNo);
 	}
 	
 

@@ -11,4 +11,6 @@ public interface WorkerEntryService {
 
 	CommonResponse getAllWorkerEntryDetail();
 
+	CommonResponse editWorkerEntryDetail(String serialNo);
+
 }

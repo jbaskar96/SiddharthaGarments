@@ -25,6 +25,9 @@ public class WorkerEntryDetailsReq {
 	@JsonProperty("ColorId")
 	private String colorId;
 	
+	@JsonProperty("TotalPieces")
+	private String totalPieces;
+	
 	@JsonProperty("WorkedPieces")
 	private String workedPieces;
 	

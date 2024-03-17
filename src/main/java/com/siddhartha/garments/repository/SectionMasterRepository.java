@@ -15,4 +15,7 @@ public interface SectionMasterRepository extends JpaRepository<SectionMaster, Se
 
 	Long countByIdCompanyId(Integer companyId);
 
+
+	List<SectionMaster> findByIdCompanyIdAndStatusIgnoreCase(Integer companyId, String string);
+
 }

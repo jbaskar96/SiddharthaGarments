@@ -41,6 +41,9 @@ public class WorkerEntryDetails {
 	@Column(name="COLOR_ID")
 	private String colorId;
 	
+	@Column(name="TOTAL_PIECES")
+	private Integer totalPieces;
+	
 	@Column(name="WORKED_PIECES")
 	private Integer workedPieces;
 	

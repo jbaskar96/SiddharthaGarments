@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.siddhartha.garments.dto.EditOrderDetailsReq;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.response.GetSizeDetailsRequest;
 import com.siddhartha.garments.service.DropDownService;
@@ -30,9 +31,9 @@ public class DropDownController {
 	private DropDownService service;
 	
 	
-	@GetMapping("/section")
-	public CommonResponse section() {
-		return service.section();
+	@PostMapping("/section")
+	public CommonResponse section(@RequestBody EditOrderDetailsReq req) {
+		return service.section(req);
 	}
 	
 	@GetMapping("/product")
@@ -278,6 +279,11 @@ public class DropDownController {
 		response.setMessage("Success");
 		response.setResponse(list);
 		return response;
+	}
+	
+	@PostMapping("/order/sizes")
+	public CommonResponse orderSizes(@RequestBody EditOrderDetailsReq req) {
+		return service.orderSizes(req);
 	}
 	
 }

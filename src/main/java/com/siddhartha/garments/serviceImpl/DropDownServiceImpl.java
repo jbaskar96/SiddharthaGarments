@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.siddhartha.garments.dto.EditOrderDetailsReq;
 import com.siddhartha.garments.entity.CompanyMaster;
 import com.siddhartha.garments.entity.CompanyProductMaster;
 import com.siddhartha.garments.entity.DistrictMaster;
@@ -95,10 +96,12 @@ public class DropDownServiceImpl implements DropDownService{
 
 
 	@Override
-	public CommonResponse section() {
+	public CommonResponse section(EditOrderDetailsReq req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<SectionMaster> list =sectionRepo.findByStatusIgnoreCase("Y");
+			
+			Integer companyId =orderRepo.findById(req.getOrderId()).get().getCompanyId();
+			List<SectionMaster> list =sectionRepo.findByIdCompanyIdAndStatusIgnoreCase(companyId,"Y");
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
@@ -651,6 +654,34 @@ public class DropDownServiceImpl implements DropDownService{
 					HashMap<String, String> map = new HashMap<String, String>();
 					map.put("Code", p.getId().getColorId());
 					map.put("CodeDesc", p.getColorName());
+					map.put("TotalPieces", p.getTotalPieces().toString());
+					res.add(map);
+				});
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(res);
+			}else {
+				response.setError(null);
+				response.setMessage("Failed");
+				response.setResponse("No data found");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse orderSizes(EditOrderDetailsReq req) {
+		CommonResponse response =new CommonResponse();
+		try {
+			List<OrderChallanDetails> list = orderChallanRepo.findByIdOrderId(req.getOrderId());
+			if(!list.isEmpty()) {
+				List<Map<String,String>> res = new ArrayList<>();
+				list.forEach(p ->{
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("Code", p.getId().getChallanId());
+					map.put("CodeDesc", p.getSize().toString());
 					res.add(map);
 				});
 				response.setError(null);
