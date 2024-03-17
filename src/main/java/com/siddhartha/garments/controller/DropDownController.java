@@ -43,8 +43,26 @@ public class DropDownController {
 	
 	@GetMapping("/usertype")
 	public CommonResponse usertype() {
-		return service.usertype();
+		CommonResponse response = new CommonResponse();
+		Map<String,Object> map1 =new HashMap<String,Object>();
+		Map<String,Object> map2 =new HashMap<String,Object>();
+		Map<String,Object> map3 =new HashMap<String,Object>();
+		
+		map1.put("1", "Admin");
+		map2.put("2", "User");
+		map3.put("3", "Operator");
+		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		list.add(map1);
+		list.add(map2);
+		list.add(map3);
+		
+		response.setError(null);
+		response.setMessage("Success");
+		response.setResponse(list);
+		return response;
 	}
+		
+	
 	
 	@GetMapping("/color")
 	public CommonResponse color() {

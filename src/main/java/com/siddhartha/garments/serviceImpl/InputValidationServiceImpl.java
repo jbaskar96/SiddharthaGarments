@@ -306,17 +306,22 @@ public class InputValidationServiceImpl {
 			if(StringUtils.isBlank(req.getMobileNo())) {
 				errorLists.add(new ErrorList("MobileNo","450","Please enter MobileNo"));
 			}
-			if(StringUtils.isBlank(req.getPassword())) {
-				errorLists.add(new ErrorList("Password","450","Please enter Password"));
+			
+			if(StringUtils.isBlank(req.getUserType())) {
+				errorLists.add(new ErrorList("UserType","450","Please enter UserType"));
 			}
 			if(StringUtils.isBlank(req.getStateCode())) {
 				errorLists.add(new ErrorList("State","450","Please choose your State"));
 			}
-			if(StringUtils.isBlank(req.getUserName())) {
-				errorLists.add(new ErrorList("UserName","450","Please enter UserName"));
-			}
-			if(StringUtils.isBlank(req.getUserType())) {
-				errorLists.add(new ErrorList("UserType","450","Please enter UserType"));
+			
+			
+			if(!"Operator".equalsIgnoreCase(req.getUserType())) {
+				if(StringUtils.isBlank(req.getPassword())) {
+					errorLists.add(new ErrorList("Password","450","Please enter Password"));
+				}
+				if(StringUtils.isBlank(req.getUserName())) {
+					errorLists.add(new ErrorList("UserName","450","Please enter UserName"));
+				}
 			}
 			
 		}catch (Exception e) {

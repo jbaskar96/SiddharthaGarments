@@ -55,7 +55,4 @@ public class UserDetailsRequest {
 	@JsonProperty("Address")
 	private String address;
 	
-	@JsonProperty("EditYn")
-	private String editYn;
-	
 }

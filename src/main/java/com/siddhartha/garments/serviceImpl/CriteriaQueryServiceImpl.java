@@ -258,6 +258,28 @@ public class CriteriaQueryServiceImpl {
 		}
 		return list;
 	}
+
+
+	public List<Tuple> getOperatorList(String userId) {
+		List<Tuple> list = new ArrayList<>();
+		try {
+			CriteriaBuilder cb =em.getCriteriaBuilder();
+			CriteriaQuery<Tuple> query =cb.createTupleQuery();
+			Root<UserDetailsMaster> user = query.from(UserDetailsMaster.class);
+			
+			query.multiselect(user.get("userId").alias("userId"),user.get("firstName").alias("firstName"),user.get("lastName").alias("lastName"),
+					user.get("mobileNo").alias("mobileNo"),user.get("aadharNo").alias("aadharNo"),user.get("email").alias("email"),user.get("dateOfBirth").alias("dateOfBirth"),
+					user.get("createdBy").alias("createdBy"),user.get("status").alias("status"),user.get("userType").alias("userType"),user.get("stateCode").alias("stateCode"),
+					user.get("districtCode").alias("districtCode"),user.get("city").alias("city"),user.get("address").alias("address")
+					).where(cb.equal(user.get("userId"), userId));
+	
+			TypedQuery<Tuple> typedQuery = em.createQuery(query);
+			list=typedQuery.getResultList();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
 	
 	
 	
