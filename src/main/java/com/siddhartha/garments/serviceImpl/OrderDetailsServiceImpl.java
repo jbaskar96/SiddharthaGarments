@@ -64,6 +64,11 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 			List<ErrorList> error = validation.validateOrder(req);
 			if(error.isEmpty()) {
 				
+				OrderDetails ord =new OrderDetails();
+				if(StringUtils.isNotBlank(req.getOrderId())) {
+					 ord = orderDetailsRepos.findById(req.getOrderId()).get();
+				}
+				
 				OrderDetails orderDetails = OrderDetails.builder()
 						.orderId(StringUtils.isBlank(req.getOrderId())?generateNumber("O",""):req.getOrderId())
 						.companyId(Integer.valueOf(req.getCompanyId()))
@@ -75,6 +80,8 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 						.remarks(StringUtils.isBlank(req.getRemarks())?"":req.getRemarks())
 						.styleId(Integer.valueOf(req.getStyleId()))
 						.status(req.getStatus())
+						.colorFoldingYn(StringUtils.isBlank(req.getOrderId())?"N":StringUtils.isBlank(ord.getColorFoldingYn())?"N":ord.getColorFoldingYn())
+						.sizefoldingYn(StringUtils.isBlank(req.getOrderId())?"N":StringUtils.isBlank(ord.getSizefoldingYn())?"N":ord.getSizefoldingYn())
 						.build();
 				
 				OrderDetails details =orderDetailsRepos.save(orderDetails);
@@ -156,7 +163,7 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 				orderRes.put("CreatedBy", o.getCreatedBy());
 				orderRes.put("Remarks", StringUtils.isBlank(o.getRemarks())?"":o.getRemarks());
 				orderRes.put("SizeFoldingYn", StringUtils.isBlank(o.getSizefoldingYn())?"N":o.getSizefoldingYn());
-				orderRes.put("ColorFoldingYn", StringUtils.isBlank(o.getColorFoldingYn())?"":o.getColorFoldingYn());
+				orderRes.put("ColorFoldingYn", StringUtils.isBlank(o.getColorFoldingYn())?"N":o.getColorFoldingYn());
 				
 				List<OrderChallanDetails> challan =orderChallanDetailsRepos.findByIdOrderId(o.getOrderId());
 				List<Map<String,String>> challanList = new ArrayList<>();

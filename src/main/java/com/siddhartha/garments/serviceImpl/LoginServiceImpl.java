@@ -97,10 +97,10 @@ public class LoginServiceImpl implements LoginService,UserDetailsService {
 	private Map<String, String> setTokenResponse(SessionDetails session, LoginMaster login) {
 		Map<String, String> response = new HashMap<String,String>();
 		try {
-			//String userType =session.getUserType();
+			String userType =session.getUserType();
 			response.put("Token", session.getTempTokenid());
 			response.put("UserName", login.getLoginId());
-			response.put("UserType", "admin");
+			response.put("UserType", userType);
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
