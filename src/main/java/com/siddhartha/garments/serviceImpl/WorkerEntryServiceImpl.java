@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.siddhartha.garments.entity.WorkerEntryDetails;
 import com.siddhartha.garments.repository.WorkerEntryRepository;
 import com.siddhartha.garments.request.ErrorList;
@@ -55,6 +56,11 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 						.goodPieces(Integer.valueOf(req.getGoodPieces()))
 						.workedPieces(Integer.valueOf(req.getWorkedPieces()))
 						.totalPieces(Integer.valueOf(req.getTotalPieces()))
+						.challanNo(req.getChallanNumber())
+						.operatorName(req.getOperatorName())
+						.sectionName(req.getSectionName())
+						.colorName(req.getColorName())
+						.lotNumber(req.getLotNumber())
 						.build();
 				workerEntryRepository.save(workerEntryDetails);
 				
@@ -93,6 +99,11 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 					map.put("DamagePieces", p.getDamagedPieces().toString());
 					map.put("UpdatedBy", p.getUpdatedBy());
 					map.put("TotalPieces", p.getTotalPieces().toString());
+					map.put("OperatorName", p.getOperatorName());
+					map.put("SectionName", p.getSectionName());
+					map.put("LotNumber", p.getLotNumber());
+					map.put("ChallanNumber", p.getChallanNo());
+					map.put("ColorName", p.getColorName());
 					mapList.add(map);
 					
 				});
@@ -132,6 +143,11 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 					map.put("DamagePieces", p.getDamagedPieces().toString());
 					map.put("UpdatedBy", p.getUpdatedBy());
 					map.put("TotalPieces", p.getTotalPieces().toString());
+					map.put("OperatorName", p.getOperatorName());
+					map.put("SectionName", p.getSectionName());
+					map.put("LotNumber", p.getLotNumber());
+					map.put("ChallanNumber", p.getChallanNo());
+					map.put("ColorName", p.getColorName());
 					mapList.add(map);
 					
 				});
@@ -170,7 +186,11 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 				map.put("DamagePieces", p.getDamagedPieces().toString());
 				map.put("UpdatedBy", p.getUpdatedBy());
 				map.put("TotalPieces", p.getTotalPieces().toString());
-					
+				map.put("OperatorName", p.getOperatorName());
+				map.put("SectionName", p.getSectionName());
+				map.put("LotNumber", p.getLotNumber());
+				map.put("ChallanNumber", p.getChallanNo());
+				map.put("ColorName", p.getColorName());
 				response.setError(null);
 				response.setMessage("Success");
 				response.setResponse(map);

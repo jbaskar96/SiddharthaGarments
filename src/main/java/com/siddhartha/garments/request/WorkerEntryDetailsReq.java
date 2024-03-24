@@ -13,17 +13,32 @@ public class WorkerEntryDetailsReq {
 	@JsonProperty("OperatorId")
 	private String operatorId;
 	
+	@JsonProperty("OperatorName")
+	private String operatorName;
+	
 	@JsonProperty("SectionId")
 	private String sectionId;
+	
+	@JsonProperty("SectionName")
+	private String sectionName;
 	
 	@JsonProperty("OrderId")
 	private String orderId;
 	
+	@JsonProperty("LotNumber")
+	private String lotNumber;
+	
 	@JsonProperty("ChallanId")
 	private String challanId;
 	
+	@JsonProperty("ChallanNumber")
+	private String challanNumber;
+	
 	@JsonProperty("ColorId")
 	private String colorId;
+	
+	@JsonProperty("ColorName")
+	private String colorName;
 	
 	@JsonProperty("TotalPieces")
 	private String totalPieces;

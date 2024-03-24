@@ -29,17 +29,32 @@ public class WorkerEntryDetails {
 	@Column(name="OPERATOR_ID")
 	private String operatorId;
 	
+	@Column(name="OPERATOR_NAME")
+	private String operatorName;
+	
 	@Column(name="SECTION_ID")
 	private Integer sectionId;
+	
+	@Column(name="SECTION_NAME")
+	private String sectionName;
 	
 	@Column(name="ORDER_ID")
 	private String orderId;
 	
+	@Column(name="LOT_NUMBER")
+	private String lotNumber;
+	
 	@Column(name="CHALLAN_ID")
 	private String challanId;
 	
+	@Column(name="CHALLAN_NO")
+	private String challanNo;
+	
 	@Column(name="COLOR_ID")
 	private String colorId;
+	
+	@Column(name="COLOR_NAME")
+	private String colorName;
 	
 	@Column(name="TOTAL_PIECES")
 	private Integer totalPieces;
