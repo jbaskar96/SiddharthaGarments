@@ -340,10 +340,16 @@ public class DropDownServiceImpl implements DropDownService{
 			map4.put("Code","N");
 			map4.put("CodeDesc","NetQuantity");
 			
+			HashMap<String, String> map5 = new HashMap<String, String>();
+			map5.put("Code","I");
+			map5.put("CodeDesc","Inch");
+			
+			
 			res.add(map2);
 			res.add(map1);
 			res.add(map3);
 			res.add(map4);
+			res.add(map5);
 			response.setError(null);
 			response.setMessage("Success");
 			response.setResponse(res);
@@ -590,16 +596,16 @@ public class DropDownServiceImpl implements DropDownService{
 			map2.put("CodeDesc","Large");
 			
 			HashMap<String, String> map3 = new HashMap<String, String>();
-			map2.put("Code","XXL");
-			map2.put("CodeDesc","XXL");
+			map3.put("Code","XXL");
+			map3.put("CodeDesc","XXL");
 			
 			HashMap<String, String> map4 = new HashMap<String, String>();
-			map2.put("Code","Medium");
-			map2.put("CodeDesc","Medium");
+			map4.put("Code","Medium");
+			map4.put("CodeDesc","Medium");
 			
 			HashMap<String, String> map5 = new HashMap<String, String>();
-			map2.put("Code","Small");
-			map2.put("CodeDesc","Small");
+			map5.put("Code","Small");
+			map5.put("CodeDesc","Small");
 			
 			res.add(map2);
 			res.add(map1);

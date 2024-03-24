@@ -34,5 +34,15 @@ public interface OrderDetailsRepository extends JpaRepository<OrderDetails, Stri
 
 	@Query(nativeQuery=true,value ="select ?1 from METAL_CALC_DEATILS where ORDER_ID =?2 and CHALLAN_ID=?3 and TYPE_NAME=?4")
 	Object[] getOrderSizeRequired(String params, String orderId, String challanId, String type);
-
+	
+	
+	@Transactional
+	@Modifying		
+	@Query(nativeQuery = true,value ="delete from METAL_CALC_DEATILS where order_id=?1 and CHALLAN_ID=?2 and color_id is null and TYPE_NAME=?3")
+	Integer deleteReceivedMetal(String orderId,String challanId,String type);
+	
+	@Transactional
+	@Modifying		
+	@Query(nativeQuery = true,value ="delete from METAL_CALC_DEATILS where order_id=?1 and CHALLAN_ID=?2 and color_id=?3 and TYPE_NAME=?4")
+	Integer deleteReceivedMetal(String orderId,String challanId,String colorId ,String type);
 }
