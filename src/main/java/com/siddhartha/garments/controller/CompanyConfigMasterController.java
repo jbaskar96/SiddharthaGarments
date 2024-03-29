@@ -21,12 +21,14 @@ import com.siddhartha.garments.request.CompanyMasterRequest;
 import com.siddhartha.garments.request.CompanyProductRequest;
 import com.siddhartha.garments.request.ProductStyleMasterRequest;
 import com.siddhartha.garments.response.CommonResponse;
+import com.siddhartha.garments.response.GetProductMetalReq;
+import com.siddhartha.garments.response.ProductMetalReq;
 import com.siddhartha.garments.service.CompanyProductMasterService;
 
 
 @RestController
 @RequestMapping("/company")
-public class CompanyProductMasterController {
+public class CompanyConfigMasterController {
 	
 	@Autowired
 	private CompanyProductMasterService service;
@@ -140,4 +142,16 @@ public class CompanyProductMasterController {
 	public CommonResponse editColorMetalDetails(@RequestBody GetProductColorMetalReq req) {
 		return service.editColorMetalDetails(req);
 	}
+	
+	@PostMapping("/save/product/metal")
+	private CommonResponse saveProductMetal(@RequestBody List<ProductMetalReq> req) {
+		return service.saveProductMetal(req);
+	}
+	
+	@PostMapping("/getProductMetalDetails")
+	public CommonResponse getProductMetalDetails(@RequestBody GetProductMetalReq req) {
+		return service.getProductMetalDetails(req);
+	}
+	
+	
 }

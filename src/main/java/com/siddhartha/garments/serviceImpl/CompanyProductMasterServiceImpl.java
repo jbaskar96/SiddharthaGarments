@@ -21,12 +21,14 @@ import com.siddhartha.garments.dto.ProductSizeMasterReq;
 import com.siddhartha.garments.dto.ProductSizeMetalReq;
 import com.siddhartha.garments.dto.SaveProductSizeColorMetalReq;
 import com.siddhartha.garments.entity.CompanyMaster;
-import com.siddhartha.garments.entity.ProductMaster;
-import com.siddhartha.garments.entity.ProductMasterId;
 import com.siddhartha.garments.entity.ProductColorMaster;
 import com.siddhartha.garments.entity.ProductColorMasterId;
 import com.siddhartha.garments.entity.ProductColorMetalMaster;
 import com.siddhartha.garments.entity.ProductColorMetalMasterId;
+import com.siddhartha.garments.entity.ProductMaster;
+import com.siddhartha.garments.entity.ProductMasterId;
+import com.siddhartha.garments.entity.ProductMetalMaster;
+import com.siddhartha.garments.entity.ProductMetalMasterId;
 import com.siddhartha.garments.entity.ProductSizeMaster;
 import com.siddhartha.garments.entity.ProductSizeMasterId;
 import com.siddhartha.garments.entity.ProductSizeMetalMaster;
@@ -34,9 +36,10 @@ import com.siddhartha.garments.entity.ProductSizeMetalMasterId;
 import com.siddhartha.garments.entity.ProductStyleMaster;
 import com.siddhartha.garments.entity.ProductStyleMasterId;
 import com.siddhartha.garments.repository.CompanyMasterRepository;
-import com.siddhartha.garments.repository.ProductRepository;
 import com.siddhartha.garments.repository.ProductColorMasterRepository;
 import com.siddhartha.garments.repository.ProductColorMetalMasterRepository;
+import com.siddhartha.garments.repository.ProductMetalRepository;
+import com.siddhartha.garments.repository.ProductRepository;
 import com.siddhartha.garments.repository.ProductSizeMasterRepo;
 import com.siddhartha.garments.repository.ProductSizeMetalMasterRepository;
 import com.siddhartha.garments.repository.ProductStyleMasterRepository;
@@ -45,6 +48,8 @@ import com.siddhartha.garments.request.CompanyProductRequest;
 import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.ProductStyleMasterRequest;
 import com.siddhartha.garments.response.CommonResponse;
+import com.siddhartha.garments.response.GetProductMetalReq;
+import com.siddhartha.garments.response.ProductMetalReq;
 import com.siddhartha.garments.service.CompanyProductMasterService;
 
 @Service
@@ -74,6 +79,9 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	
 	@Autowired
 	private ProductColorMetalMasterRepository productSizeColorMetalMasterRepo;
+	
+	@Autowired
+	private ProductMetalRepository productMetalRepo;
 	
 	@Autowired
 	private SimpleDateFormat sdf;
@@ -942,5 +950,98 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 		return response;
 	}
 
+	@Override
+	public CommonResponse saveProductMetal(List<ProductMetalReq> req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ErrorList> error = new ArrayList<>();
+			if(error.isEmpty()) {
+				
+				int sno =1;
+				
+				for(ProductMetalReq r :req) {
+					
+					ProductMetalMasterId id = ProductMetalMasterId.builder()
+							.companyId(Integer.valueOf(r.getCompanyId()))
+							.productId(Integer.valueOf(r.getProductId()))
+							.metalId(StringUtils.isBlank(r.getMetalId())?getProductMetalId(Integer.valueOf(r.getCompanyId()),Integer.valueOf(r.getProductId())) 
+									:Integer.valueOf(r.getMetalId()))		
+							.build();
+					
+					ProductMetalMaster master =ProductMetalMaster.builder()
+							.entryDate(new Date())
+							.id(id)
+							.displayOrder(Integer.valueOf(r.getDisplayOrder()))
+							.mesurementPieces(Integer.valueOf(r.getMesurementPieces()))
+							.mesurementType(r.getMesurementType())
+							.mesurementValue(Double.valueOf(r.getMesurementValue()))
+							.metalName(r.getMetalName())
+							.mesurementName(r.getMesurementName())
+							.columnName(StringUtils.isBlank(r.getColumnName())?"PARAM_"+sno:r.getColumnName())
+							.status(r.getStatus())
+							.build();
+					
+					productMetalRepo.save(master);
+					
+					sno++;
+				}
+				
+				
+				response.setMessage("Success");
+				response.setResponse("Data Saved Successfully");
+				response.setError(null);
+			}else {
+				
+				response.setMessage("Error");
+				response.setResponse(null);
+				response.setError(error);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	private Integer getProductMetalId(Integer companyId, Integer productId) {
+		Long metalId =productMetalRepo.countByIdCompanyIdAndIdProductId(companyId,productId);
+		return metalId.intValue() + 1;
+	}
+
+	@Override
+	public CommonResponse getProductMetalDetails(GetProductMetalReq req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<ProductMetalMaster> list =productMetalRepo.findByIdCompanyIdAndIdProductId(Integer.valueOf(req.getCompanyId()),Integer.valueOf(req.getProductId()));
+			if(!list.isEmpty()) {
+				List<Map<String,String>> mapList = new ArrayList<>();
+				list.forEach(p ->{
+					Map<String,String> map = new HashMap<String, String>();
+					map.put("CompanyId", p.getId().getCompanyId().toString());
+					map.put("ProductId", p.getId().getProductId().toString());
+					map.put("MetalId", p.getId().getMetalId().toString());
+					map.put("MetalName", p.getMetalName());
+					map.put("ColumnName", p.getColumnName());
+					map.put("MesurementType", p.getMesurementType());
+					map.put("MesurementValue", p.getMesurementValue().toString());
+					map.put("MesurementPieces", p.getMesurementPieces().toString());
+					map.put("MesurementName", p.getMesurementName());
+					map.put("Status", p.getStatus());
+					map.put("DisplayOrder", p.getDisplayOrder().toString());
+					map.put("CreatedDate", sdf.format(p.getEntryDate()));
+					mapList.add(map);
+				});
+				response.setMessage("Success");
+				response.setResponse(mapList);
+				response.setError(null);
+			}else {
+				response.setMessage("Failed");
+				response.setResponse("No Record found");
+				response.setError(null);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
 
 }

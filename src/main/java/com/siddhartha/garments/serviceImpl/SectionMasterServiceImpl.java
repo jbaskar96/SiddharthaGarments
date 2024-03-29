@@ -90,7 +90,7 @@ public class SectionMasterServiceImpl implements SectionMasterService {
 		try {
 
 			List<ProductSectionMaster> list =repository.findByIdCompanyIdAndIdProductId(companyId,productId);
-			if(list.isEmpty()) {
+			if(!list.isEmpty()) {
 				List<Map<String, String>> res = new ArrayList<>();
 				list.forEach(p ->{
 					HashMap<String, String> map = new HashMap<String, String>();

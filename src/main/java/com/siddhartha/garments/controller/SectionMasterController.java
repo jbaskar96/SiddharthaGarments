@@ -32,7 +32,7 @@ public class SectionMasterController {
 	}
 	
 	@GetMapping("/getSectionByCompanyIdAndProductId/{companyId}/{productId}")
-	public CommonResponse getSectionByCompanyIdAndProductId(Integer companyId,Integer productId) {
+	public CommonResponse getSectionByCompanyIdAndProductId(@PathVariable("companyId") Integer companyId,@PathVariable("productId")Integer productId) {
 		return service.getSectionByCompanyIdAndProductId(companyId,productId);
 	}
 	

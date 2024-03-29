@@ -13,6 +13,8 @@ import com.siddhartha.garments.request.CompanyMasterRequest;
 import com.siddhartha.garments.request.CompanyProductRequest;
 import com.siddhartha.garments.request.ProductStyleMasterRequest;
 import com.siddhartha.garments.response.CommonResponse;
+import com.siddhartha.garments.response.GetProductMetalReq;
+import com.siddhartha.garments.response.ProductMetalReq;
 
 public interface CompanyProductMasterService {
 
@@ -57,5 +59,9 @@ public interface CompanyProductMasterService {
 	CommonResponse getColorMetalDetails(GetProductColorMetalReq req);
 
 	CommonResponse editColorMetalDetails(GetProductColorMetalReq req);
+
+	CommonResponse saveProductMetal(List<ProductMetalReq> req);
+
+	CommonResponse getProductMetalDetails(GetProductMetalReq req);
 
 }
