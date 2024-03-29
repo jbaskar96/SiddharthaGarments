@@ -57,6 +57,7 @@ public class WorkerEntryDetailsReq {
 	
 	@JsonProperty("Status")
 	private String status;
+
 	
 
 }

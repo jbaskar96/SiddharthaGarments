@@ -13,9 +13,6 @@ public class GetProductColorMetalReq {
 	@JsonProperty("ProductId")
 	private String productId;
 	
-	@JsonProperty("SizeId")
-	private String sizeId;
-	
 	@JsonProperty("ColorCode")
 	private String colorCode;
 	

@@ -13,9 +13,6 @@ public class SaveProductSizeColorMetalReq {
 	@JsonProperty("ProductId")
 	private String productId;
 	
-	@JsonProperty("SizeId")
-	private String sizeId;
-	
 	@JsonProperty("ColorCode")
 	private String colorCode;
 	
@@ -45,5 +42,8 @@ public class SaveProductSizeColorMetalReq {
 	
 	@JsonProperty("DisplayOrder")
 	private String displayOrder;
+	
+	@JsonProperty("MesurementName")
+	private String mesurementName;
 
 }

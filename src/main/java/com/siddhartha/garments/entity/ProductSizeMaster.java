@@ -30,9 +30,6 @@ public class ProductSizeMaster {
 	@Column(name="SIZE")
 	private Integer size;
 	
-	@Column(name="SIZE_TYPE")
-	private String sizeType;
-	
 	@Column(name="REMARKS")
 	private String remarks;
 	

@@ -13,9 +13,6 @@ public class ProductSizeColorRequest {
 	@JsonProperty("ProductId")
 	private String productId;
 	
-	@JsonProperty("SizeId")
-	private String sizeId;
-	
 	@JsonProperty("ColorCode")
 	private String colorCode;
 	

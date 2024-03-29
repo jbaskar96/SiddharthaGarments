@@ -16,4 +16,6 @@ public interface WorkerEntryRepository  extends JpaRepository<WorkerEntryDetails
 	@Query(nativeQuery=true,value="select * from WORKER_ENTRY_DETAILS")
 	Object[][] getReportDeatils();
 
+	List<WorkerEntryDetails> findByOrderIdAndChallanIdAndColorId(String orderId, String challanId, String colorId);
+
 }

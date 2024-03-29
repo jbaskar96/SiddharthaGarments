@@ -6,10 +6,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.siddhartha.garments.entity.ProductColorMaster;
+import com.siddhartha.garments.entity.ProductColorMasterId;
 
 @Repository
-public interface ProductColorMasterRepository extends JpaRepository<ProductColorMaster, Integer>{
+public interface ProductColorMasterRepository extends JpaRepository<ProductColorMaster, ProductColorMasterId>{
 
-	List<ProductColorMaster> findByStatusIgnoreCase(String status);
+	List<ProductColorMaster> findByIdCompanyIdAndIdProductId(Integer valueOf, Integer valueOf2);
+			
+
+	List<ProductColorMaster> findByIdCompanyIdAndIdProductIdAndStatusIgnoreCase(Integer companyId,
+			Integer productId, String string);
+
+
+	List<ProductColorMaster> findByStatusIgnoreCase(String string);
 
 }

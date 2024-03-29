@@ -13,9 +13,6 @@ public class ProductSizeMasterReq {
 	@JsonProperty("ProductId")
 	private String productId;
 	
-	@JsonProperty("SizeType")
-	private String sizeType;
-	
 	@JsonProperty("SizeId")
 	private String sizeId;
 	

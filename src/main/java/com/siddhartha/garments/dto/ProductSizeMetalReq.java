@@ -47,5 +47,8 @@ public class ProductSizeMetalReq {
 	@JsonProperty("DisplayOrder")
 	private String displayOrder;
 	
+	@JsonProperty("MesurementName")
+	private String mesurementName;
+	
 
 }

@@ -18,12 +18,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "PRODUCT_SIZE_COLOUR_METAL_MASTER")
+@Table(name = "PRODUCT_COLOR_METAL_MASTER")
 @Builder
-public class ProductSizeColorMetalMaster {
+public class ProductColorMetalMaster {
 
 	@EmbeddedId
-	private ProductSizeColorMetalMasterId id;
+	private ProductColorMetalMasterId id;
 	
 	@Column(name="METAL_NAME")
 	private String metalName;
@@ -49,4 +49,6 @@ public class ProductSizeColorMetalMaster {
 	@Column(name="ENTRY_DATE")
 	private Date entryDate;
 	
+	@Column(name="MESUREMENT_NAME")
+	private String mesurementName;
 }

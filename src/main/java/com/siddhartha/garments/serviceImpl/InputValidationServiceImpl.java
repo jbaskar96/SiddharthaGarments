@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.util.List;
-
-import javax.annotation.PostConstruct;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.siddhartha.garments.dto.EditOrderDetailsReq;
+import com.siddhartha.garments.dto.InsertSizeCalcRequest;
 import com.siddhartha.garments.dto.OrderChallanColorReq;
 import com.siddhartha.garments.dto.OrderChallanInfoReq;
 import com.siddhartha.garments.dto.OrderDetailsRequest;
@@ -20,12 +21,17 @@ import com.siddhartha.garments.dto.ProductSizeColorRequest;
 import com.siddhartha.garments.dto.ProductSizeMasterReq;
 import com.siddhartha.garments.dto.ProductSizeMetalReq;
 import com.siddhartha.garments.dto.SaveProductSizeColorMetalReq;
+import com.siddhartha.garments.dto.SizeFoldingDetailsReq;
 import com.siddhartha.garments.entity.LoginMaster;
+import com.siddhartha.garments.entity.WorkerEntryDetails;
 import com.siddhartha.garments.repository.LoginMasterRepository;
 import com.siddhartha.garments.repository.OrderChallanDetailsRepository;
 import com.siddhartha.garments.repository.ProductSizeMetalMasterRepository;
+import com.siddhartha.garments.repository.WorkerEntryRepository;
+import com.siddhartha.garments.request.ChallanDetailsInfo;
 import com.siddhartha.garments.request.ChallanInfoRequest;
 import com.siddhartha.garments.request.ColorDetailsRequest;
+import com.siddhartha.garments.request.ColorFoldingDetailsReq;
 import com.siddhartha.garments.request.ColorInfoReq;
 import com.siddhartha.garments.request.ColorSaveRequest;
 import com.siddhartha.garments.request.CompanyMasterRequest;
@@ -33,6 +39,7 @@ import com.siddhartha.garments.request.CompanyProductRequest;
 import com.siddhartha.garments.request.DisrictRequest;
 import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.ExpensiveRequest;
+import com.siddhartha.garments.request.InserSizeColorRequest;
 import com.siddhartha.garments.request.LoginRequest;
 import com.siddhartha.garments.request.LotDetailsRequest;
 import com.siddhartha.garments.request.MeterialDetailsRequest;
@@ -62,6 +69,12 @@ public class InputValidationServiceImpl {
 	
 	@Autowired
 	private ProductSizeMetalMasterRepository sizeMetalRepo;
+	
+	@Autowired
+	private WorkerEntryRepository workerEntryRepo;
+	
+	@Autowired
+	private AsyncProcessServiceImpl asyncProcess;
 	
 	
 	public List<ErrorList> validateLoginRequest(LoginRequest req){
@@ -440,6 +453,7 @@ public class InputValidationServiceImpl {
 					errorLists.add(new ErrorList("SectionName","450","Please enter SectionName"));
 				}
 				
+				
 			}else if("STATE".equalsIgnoreCase(type)) {
 				
 				StateSaveRequest d =(StateSaveRequest)req;
@@ -478,12 +492,19 @@ public class InputValidationServiceImpl {
 			if(StringUtils.isBlank(d.getColorId())) {
 				errorLists.add(new ErrorList("Color","450","Please choose color"));
 			}
+			
 			if(StringUtils.isBlank(d.getGoodPieces())) {
 				errorLists.add(new ErrorList("GoodPieces","450","Please enter GoodPieces"));
+			}else if(!NumberUtils.isCreatable(d.getGoodPieces())) {
+				errorLists.add(new ErrorList("GoodPieces","450","GoodPieces allows only digits"));
 			}
+			
 			if(StringUtils.isBlank(d.getDamagedPieces())) {
 				errorLists.add(new ErrorList("DamagedPieces","450","Please enter DamagedPieces"));
+			}else if(!NumberUtils.isCreatable(d.getDamagedPieces())) {
+				errorLists.add(new ErrorList("DamagedPieces","450","DamagedPieces allows only digits"));
 			}
+			
 			if(StringUtils.isBlank(d.getOperatorId())) {
 				errorLists.add(new ErrorList("Operator","450","Please choose operator"));
 			}
@@ -495,13 +516,62 @@ public class InputValidationServiceImpl {
 			}
 			if(StringUtils.isBlank(d.getWorkedPieces())) {
 				errorLists.add(new ErrorList("WorkedPieces","450","Please enter WorkedPieces"));
+			}else if(!NumberUtils.isCreatable(d.getWorkedPieces())) {
+				errorLists.add(new ErrorList("WorkedPieces","450","WorkedPieces allows only digits"));
 			}
-			if(StringUtils.isBlank(d.getWorkedPieces())) {
-				errorLists.add(new ErrorList("WorkedPieces","450","Please enter WorkedPieces"));
+			
+			if(StringUtils.isBlank(d.getTotalPieces())) {
+				errorLists.add(new ErrorList("TotalPieces","450","Please enter TotalPieces"));
+			}else if(!NumberUtils.isCreatable(d.getTotalPieces())) {
+				errorLists.add(new ErrorList("TotalPieces","450","TotalPieces allows only digits"));
 			}
+			
 			if(StringUtils.isBlank(d.getOrderId())) {
 				errorLists.add(new ErrorList("Order","450","Please choose LotNumber"));
 			}
+			
+			
+			if(StringUtils.isNotEmpty(d.getDamagedPieces()) && NumberUtils.isCreatable(d.getDamagedPieces()) &&
+					StringUtils.isNotEmpty(d.getWorkedPieces()) && NumberUtils.isCreatable(d.getWorkedPieces()) &&	
+							StringUtils.isNotEmpty(d.getGoodPieces()) && NumberUtils.isCreatable(d.getGoodPieces())){
+						
+					  Long workedPieces =Long.valueOf(d.getWorkedPieces());
+					  Long damage_pieces =Long.valueOf(d.getDamagedPieces());
+					  Long good_pieces =Long.valueOf(d.getGoodPieces());
+					  Long totalWorkerPieces = workedPieces + damage_pieces + good_pieces;
+					  Long totalPieces =Long.valueOf(d.getTotalPieces());
+					  
+					  if(totalPieces>totalWorkerPieces) {
+							errorLists.add(new ErrorList("Error","450","Your daliy entry pieces should not greater than total pieces"));
+
+					  }if(workedPieces>totalPieces) {
+						  
+							errorLists.add(new ErrorList("Error","450","Your daliy worked pieces should not greater than total pieces"));
+						  
+					  }if(damage_pieces>totalPieces) {
+						  
+							errorLists.add(new ErrorList("Error","450","Your daliy damage pieces should not greater than total pieces"));
+
+						  
+					  }if(good_pieces>totalPieces) {
+						  
+							errorLists.add(new ErrorList("Error","450","Your daliy good pieces should not greater than total pieces"));
+ 
+					  }
+					  
+					  List<WorkerEntryDetails> workerList =workerEntryRepo.findByOrderIdAndChallanIdAndColorId(d.getOrderId(),d.getChallanId(),d.getColorId());
+					  
+					  Long existingPieces =workerList.stream()
+							  .map(p ->Long.valueOf(p.getWorkedPieces())
+							  ).collect(Collectors.summingLong(k ->k));
+					  
+					  if(totalWorkerPieces > existingPieces) {
+						  
+							errorLists.add(new ErrorList("Error","450","Your daliy entry pieces ("+totalWorkerPieces+") should not greater than existing pieces  ("+existingPieces+""));
+
+					  }
+					  
+					}
 			
 			
 		}catch (Exception e) {
@@ -633,6 +703,8 @@ public class InputValidationServiceImpl {
 		}
 		if(StringUtils.isBlank(req.getMobileNo())) {
 			errorLists.add(new ErrorList("MobileNo","108","Please enter Mobile Number"));
+		}else if(!StringUtils.isNumeric(req.getMobileNo())) {
+			errorLists.add(new ErrorList("MobileNo","108","MobileNumber allows only digits"));
 		}
 		if(StringUtils.isBlank(req.getState())) {
 			errorLists.add(new ErrorList("StateCode","110","Please choose your State"));
@@ -653,7 +725,6 @@ public class InputValidationServiceImpl {
 		if(StringUtils.isBlank(req.getCreatedBy())) {
 			errorLists.add(new ErrorList("CreatedBy","103","Please enter CreatedBy"));
 		}
-
 		if(StringUtils.isBlank(req.getProductName())) {
 			errorLists.add(new ErrorList("ProductName","110","Please enter your ProductName"));
 		}
@@ -727,12 +798,18 @@ public class InputValidationServiceImpl {
 				}
 				if(StringUtils.isBlank(r.getChallanNumber())) {
 					errorLists.add(new ErrorList("ChallanNumber","Row : "+rowno+"","Please enter ChallanNumber"));
+				}else if(!StringUtils.isNumeric(r.getChallanNumber())) {
+					errorLists.add(new ErrorList("ChallanNumber","Row : "+rowno+"","ChallanNumber allows only digits"));
+
 				}
 				if(StringUtils.isBlank(r.getSize())) {
 					errorLists.add(new ErrorList("Size","Row : "+rowno+"","Please enter Size"));
 				}
 				if(StringUtils.isBlank(r.getTotalPieces())) {
 					errorLists.add(new ErrorList("TotalPieces","Row : "+rowno+"","Please enter TotalPieces"));
+				}else if(!StringUtils.isNumeric(r.getTotalPieces())) {
+					errorLists.add(new ErrorList("TotalPieces","Row : "+rowno+"","TotalPieces allows only digits"));
+
 				}
 				rowno++;
 			}
@@ -761,8 +838,8 @@ public class InputValidationServiceImpl {
 				if(StringUtils.isBlank(r.getTotalPieces())) {
 					errorLists.add(new ErrorList("TotalPieces","Row : "+rowno+"","Please enter TotalPieces"));
 				}
-				if(StringUtils.isBlank(r.getTotalPieces())) {
-					errorLists.add(new ErrorList("TotalPieces","Row : "+rowno+"","Please enter TotalPieces"));
+				else if(!StringUtils.isNumeric(r.getTotalPieces())) {
+					errorLists.add(new ErrorList("TotalPieces","Row : "+rowno+"","TotalPieces allows only digits"));
 				}
 				
 				rowno++;
@@ -781,19 +858,34 @@ public class InputValidationServiceImpl {
 				
 				if(StringUtils.isBlank(r.getSize())) {
 					errorLists.add(new ErrorList("Size","Row : "+rowno+"","Please enter Size"));
+				}else if(!StringUtils.isNumeric(r.getSize())) {
+					errorLists.add(new ErrorList("Size","Row : "+rowno+"","Please enter digits only"));
 				}
 				if(StringUtils.isBlank(r.getSizeId())) {
 					//errorLists.add(new ErrorList("SizeId","Row : "+rowno+"","Please enter SizeId"));
 				}
-				if(StringUtils.isBlank(r.getSizeType())) {
-					errorLists.add(new ErrorList("SizeType","Row : "+rowno+"","Please enter SizeType"));
-				}
+				
 				if(StringUtils.isBlank(r.getStatus())) {
 					errorLists.add(new ErrorList("Status","Row : "+rowno+"","Please enter Status"));
 				}
 				
 				rowno++;
 			}
+			
+			Map<String,List<ProductSizeMasterReq>> duplicateCheck =
+					req.stream().collect(Collectors.groupingBy(p ->p.getSize()));
+			
+			for(Map.Entry<String,List<ProductSizeMasterReq>> entry :  duplicateCheck.entrySet()) {
+				
+				if(entry.getValue().size()>1) {
+					
+					errorLists.add(new ErrorList("Size","Row : "+rowno+"","Duplicate size does not allow :"+entry.getKey()+""));
+					
+					break ;
+				}
+			}
+			
+			
 		}
 		return errorLists;
 	}
@@ -866,12 +958,7 @@ public class InputValidationServiceImpl {
 				if(StringUtils.isBlank(r.getColorName())) {
 					errorLists.add(new ErrorList("ColorName","Row : "+rowno+"","Please enter ColorName"));
 				}
-				if(StringUtils.isBlank(r.getColorCode())) {
-				//	errorLists.add(new ErrorList("ColorCode","Row : "+rowno+"","Please enter ColorCode"));
-				}
-				if(StringUtils.isBlank(r.getSizeId())) {
-					errorLists.add(new ErrorList("SizeId","Row : "+rowno+"","Please enter SizeId"));
-				}
+				
 				
 				if(StringUtils.isBlank(r.getProductId())) {
 					errorLists.add(new ErrorList("ProductId","Row : "+rowno+"","Please enter ProductId"));
@@ -925,9 +1012,6 @@ public class InputValidationServiceImpl {
 					errorLists.add(new ErrorList("MetalName","Row : "+rowno+"","Please enter MetalName"));
 				}
 				
-				if(StringUtils.isBlank(r.getSizeId())) {
-					errorLists.add(new ErrorList("Size","Row : "+rowno+"","Please enter Size"));
-				}
 				
 				if(StringUtils.isBlank(r.getCompanyId())) {
 					errorLists.add(new ErrorList("CompanyId","Row : "+rowno+"","Please enter CompanyId"));
@@ -951,33 +1035,45 @@ public class InputValidationServiceImpl {
 		return errorLists;
 	}
 
-	public List<ErrorList> sizeCalc(EditOrderDetailsReq req) {
+	public List<ErrorList> sizeCalc(InsertSizeCalcRequest req) {
+		List<ErrorList> errorLists = new ArrayList<>();
 		try {
-			//challanDetailsRepo.fin
+			
+			if(req.getSizeFoldingDetails().isEmpty() || req.getSizeFoldingDetails()==null) {
+				errorLists.add(new ErrorList("SizeFoldingDetails","1001","Please enter folding details"));
+			}else {
+				
+				List<CompletableFuture<List<ErrorList>>> futureList =new ArrayList<>();
+				
+				for(SizeFoldingDetailsReq data : req.getSizeFoldingDetails()) {
+					
+					CompletableFuture<List<ErrorList>> future= asyncProcess.validateSizeFolding(data);
+					
+					futureList.add(future);
+				}
+				
+				CompletableFuture<?> [] future_array =new CompletableFuture<?> [futureList.size()];
+				
+				CompletableFuture.anyOf(futureList.toArray(future_array)).join();
+				
+				Object obj = CompletableFuture.anyOf(futureList.toArray(future_array)).get();
+				
+				List<List<ErrorList>> errorList =(List<List<ErrorList>>) obj;
+				
+				errorLists = errorList.stream()
+						.flatMap(p -> p.stream())
+						.collect(Collectors.toList());
+				
+
+			}
+			
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return errorLists;
 	}
 
 	
-	
-	@PostConstruct
-	public void tst() {
-		String val ="3.55t";
-		String val2 ="t5.0";
-		String val3 ="u7";
-		
-		if(NumberUtils.isParsable(val)) {
-			System.out.println(val);
-		}if(NumberUtils.isParsable(val2)) {
-			System.out.println(val2);
-		}if(NumberUtils.isParsable(val3)) {
-			System.out.println(val3);
-		}
-		
-	}
-
 	public List<ErrorList> orderBilling(OrderBillingRequest req) {
 		List<ErrorList> errorLists = new ArrayList<>();
 		
@@ -1002,6 +1098,38 @@ public class InputValidationServiceImpl {
 		}
 		
 		return errorLists;
+	}
+	
+	
+
+
+	public List<ErrorList> colorCalc(InserSizeColorRequest req) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		try {
+			List<ChallanDetailsInfo> challanList =req.getChallanDetails();
+			
+			if(challanList.isEmpty() || challanList==null) {
+				errorLists.add(new ErrorList("ChallanDetails","101","Please enter ChallanDetails"));
+			}else {
+				
+				for(ChallanDetailsInfo cha : challanList) {
+					
+					List<ColorFoldingDetailsReq> colorFold =cha.getColorFoldingDetails();
+					
+					
+					
+				}
+			}
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return errorLists;
+	}
+
+	public List<ErrorList> validateSection(List<SectionSaveRequest> req) {
+		// TODO Auto-generated method stub
+		return new ArrayList<ErrorList>();
 	}
 		
 }

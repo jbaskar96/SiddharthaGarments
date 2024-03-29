@@ -21,22 +21,22 @@ import com.siddhartha.garments.dto.ProductSizeMasterReq;
 import com.siddhartha.garments.dto.ProductSizeMetalReq;
 import com.siddhartha.garments.dto.SaveProductSizeColorMetalReq;
 import com.siddhartha.garments.entity.CompanyMaster;
-import com.siddhartha.garments.entity.CompanyProductMaster;
-import com.siddhartha.garments.entity.CompanyProductMasterId;
-import com.siddhartha.garments.entity.ProductSizeColorMaster;
-import com.siddhartha.garments.entity.ProductSizeColorMasterId;
-import com.siddhartha.garments.entity.ProductSizeColorMetalMaster;
-import com.siddhartha.garments.entity.ProductSizeColorMetalMasterId;
+import com.siddhartha.garments.entity.ProductMaster;
+import com.siddhartha.garments.entity.ProductMasterId;
+import com.siddhartha.garments.entity.ProductColorMaster;
+import com.siddhartha.garments.entity.ProductColorMasterId;
+import com.siddhartha.garments.entity.ProductColorMetalMaster;
+import com.siddhartha.garments.entity.ProductColorMetalMasterId;
 import com.siddhartha.garments.entity.ProductSizeMaster;
 import com.siddhartha.garments.entity.ProductSizeMasterId;
 import com.siddhartha.garments.entity.ProductSizeMetalMaster;
 import com.siddhartha.garments.entity.ProductSizeMetalMasterId;
 import com.siddhartha.garments.entity.ProductStyleMaster;
 import com.siddhartha.garments.entity.ProductStyleMasterId;
-import com.siddhartha.garments.repository.CompanyProductMasterRepository;
-import com.siddhartha.garments.repository.CompanyProductRepository;
-import com.siddhartha.garments.repository.ProductSizeColorMasterRepository;
-import com.siddhartha.garments.repository.ProductSizeColorMetalMasterRepository;
+import com.siddhartha.garments.repository.CompanyMasterRepository;
+import com.siddhartha.garments.repository.ProductRepository;
+import com.siddhartha.garments.repository.ProductColorMasterRepository;
+import com.siddhartha.garments.repository.ProductColorMetalMasterRepository;
 import com.siddhartha.garments.repository.ProductSizeMasterRepo;
 import com.siddhartha.garments.repository.ProductSizeMetalMasterRepository;
 import com.siddhartha.garments.repository.ProductStyleMasterRepository;
@@ -52,10 +52,10 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	
 	
 	@Autowired
-	private CompanyProductMasterRepository companyRepo;
+	private CompanyMasterRepository companyRepo;
 	
 	@Autowired
-	private CompanyProductRepository productRepo;
+	private ProductRepository productRepo;
 	
 	@Autowired
 	private ProductStyleMasterRepository styleMasterRepo;
@@ -70,10 +70,10 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	private ProductSizeMetalMasterRepository ProductSizeMetalMasterRepo;
 	
 	@Autowired
-	private ProductSizeColorMasterRepository productSizeColorMasterRepo;
+	private ProductColorMasterRepository productSizeColorMasterRepo;
 	
 	@Autowired
-	private ProductSizeColorMetalMasterRepository productSizeColorMetalMasterRepo;
+	private ProductColorMetalMasterRepository productSizeColorMetalMasterRepo;
 	
 	@Autowired
 	private SimpleDateFormat sdf;
@@ -123,13 +123,13 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 		try {
 			List<ErrorList> list = validation.product(req);
 			if(list.isEmpty()) {
-					CompanyProductMasterId id = CompanyProductMasterId.builder()
+					ProductMasterId id = ProductMasterId.builder()
 							.companyId(Integer.valueOf(req.getCompanyId()))
 							.productId(StringUtils.isBlank(req.getProductId())?getProductIdByCompanyId(req.getCompanyId())
 									:Integer.valueOf(req.getProductId()))
 							.build();
 					
-					CompanyProductMaster productMaster = CompanyProductMaster.builder()
+					ProductMaster productMaster = ProductMaster.builder()
 							.createdBy(req.getCreatedBy())
 							.entryDate(new Date())
 							.id(id)
@@ -156,7 +156,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 
 	
 	private Integer getProductIdByCompanyId(String companyId) {
-		List<CompanyProductMaster> list =productRepo.findByIdCompanyId(Integer.valueOf(companyId));
+		List<ProductMaster> list =productRepo.findByIdCompanyId(Integer.valueOf(companyId));
 		return list.size()+1;
 	}
 
@@ -282,7 +282,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	public CommonResponse getAllProductByCompanyId(Integer companyId) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<CompanyProductMaster> product =productRepo.findByIdCompanyId(companyId);
+			List<ProductMaster> product =productRepo.findByIdCompanyId(companyId);
 			if(!product.isEmpty()) {
 				List<Map<String,String>> mapList = new ArrayList<>();
 				product.forEach(p ->{
@@ -316,16 +316,16 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	public CommonResponse editProductByCompanyIdAndProductId(Integer companyId, Integer productId) {
 		CommonResponse response = new CommonResponse();
 		try {
-			CompanyProductMasterId productMasterId =CompanyProductMasterId.builder()
+			ProductMasterId productMasterId =ProductMasterId.builder()
 					.companyId(companyId)
 					.productId(productId)
 					.build();
 			
-			Optional<CompanyProductMaster> data =productRepo.findById(productMasterId);
+			Optional<ProductMaster> data =productRepo.findById(productMasterId);
 			
 			if(data.isPresent()) {
 				
-				CompanyProductMaster p =data.get();
+				ProductMaster p =data.get();
 				HashMap<String,String> map = new HashMap<>();
 				map.put("CompanyId", p.getId().getCompanyId().toString());
 				map.put("ProductId", p.getId().getProductId().toString());
@@ -445,7 +445,6 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 							.id(id)
 							.remarks(StringUtils.isBlank(r.getRemarks())?null:r.getRemarks())
 							.size(Integer.valueOf(r.getSize()))
-							.sizeType(r.getSizeType())
 							.status(r.getStatus())
 							.build();
 					
@@ -486,7 +485,6 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 					map.put("ProductId", p.getId().getProductId().toString());
 					map.put("SizeId", p.getId().getSizeId().toString());
 					map.put("Size", p.getSize().toString());
-					map.put("SizeType", p.getSizeType());
 					map.put("Status", p.getStatus());
 					map.put("Remarks", StringUtils.isBlank(p.getRemarks())?"":p.getRemarks());
 					map.put("CreatedDate", sdf.format(p.getEntryDate()));
@@ -525,7 +523,6 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 				map.put("ProductId", p.getId().getProductId().toString());
 				map.put("SizeId", p.getId().getSizeId().toString());
 				map.put("Size", p.getSize().toString());
-				map.put("SizeType", p.getSizeType());
 				map.put("Status", p.getStatus());
 				map.put("Remarks", StringUtils.isBlank(p.getRemarks())?"":p.getRemarks());
 				map.put("CreatedDate", sdf.format(p.getEntryDate()));
@@ -571,6 +568,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 							.mesurementType(r.getMesurementType())
 							.mesurementValue(Double.valueOf(r.getMesurementValue()))
 							.metalName(r.getMetalName())
+							.mesurementName(r.getMesurementName())
 							.columnName(StringUtils.isBlank(r.getColumnName())?"PARAM_"+sno:r.getColumnName())
 							.status(r.getStatus())
 							.build();
@@ -619,6 +617,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 					map.put("MesurementType", p.getMesurementType());
 					map.put("MesurementValue", p.getMesurementValue().toString());
 					map.put("MesurementPieces", p.getMesurementPieces().toString());
+					map.put("MesurementName", p.getMesurementName());
 					map.put("Status", p.getStatus());
 					map.put("DisplayOrder", p.getDisplayOrder().toString());
 					map.put("CreatedDate", sdf.format(p.getEntryDate()));
@@ -666,6 +665,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 				map.put("MesurementType", p.getMesurementType());
 				map.put("MesurementValue", p.getMesurementValue().toString());
 				map.put("MesurementPieces", p.getMesurementPieces().toString());
+				map.put("MesurementName", p.getMesurementName());
 				map.put("Status", p.getStatus());
 				map.put("DisplayOrder", p.getDisplayOrder().toString());
 				map.put("CreatedDate", sdf.format(p.getEntryDate()));
@@ -693,15 +693,14 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 			
 				for(ProductSizeColorRequest r :req) {
 					
-					ProductSizeColorMasterId id = ProductSizeColorMasterId.builder()
+					ProductColorMasterId id = ProductColorMasterId.builder()
 							.companyId(Integer.valueOf(r.getCompanyId()))
 							.productId(Integer.valueOf(r.getProductId()))
-							.sizeId(Integer.valueOf(r.getSizeId()))
-							.colourCode(StringUtils.isBlank(r.getColorCode())?getColorCode(Integer.valueOf(r.getCompanyId()),Integer.valueOf(r.getProductId()),Integer.valueOf(r.getSizeId()))
+							.colourCode(StringUtils.isBlank(r.getColorCode())?getColorCode(Integer.valueOf(r.getCompanyId()),Integer.valueOf(r.getProductId()))
 									:Integer.valueOf(r.getColorCode()))	
 							.build();
 					
-					ProductSizeColorMaster master =ProductSizeColorMaster.builder()
+					ProductColorMaster master =ProductColorMaster.builder()
 							.entryDate(new Date())
 							.id(id)
 							.colourName(r.getColorName())
@@ -728,8 +727,8 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 		return response;
 	}
 
-	private Integer getColorCode(Integer companyId, Integer productId, Integer sizeId) {
-		Integer colorId =productSizeColorMasterRepo.findByIdCompanyIdAndIdProductIdAndIdSizeId(companyId, productId, sizeId).size()+1;
+	private Integer getColorCode(Integer companyId, Integer productId) {
+		Integer colorId =productSizeColorMasterRepo.findByIdCompanyIdAndIdProductId(companyId, productId).size()+1;
 		return colorId;
 	}
 
@@ -737,14 +736,13 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	public CommonResponse getSizeColorDetails(GetProductSizeColorReq req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<ProductSizeColorMaster> list =productSizeColorMasterRepo.findByIdCompanyIdAndIdProductIdAndIdSizeId(Integer.valueOf(req.getCompanyId()),Integer.valueOf(req.getProductId()),Integer.valueOf(req.getSizeId()));
+			List<ProductColorMaster> list =productSizeColorMasterRepo.findByIdCompanyIdAndIdProductId(Integer.valueOf(req.getCompanyId()),Integer.valueOf(req.getProductId()));
 			if(!list.isEmpty()) {
 				List<Map<String,String>> mapList = new ArrayList<>();
 				list.forEach(p ->{
 					Map<String,String> map = new HashMap<String, String>();
 					map.put("CompanyId", p.getId().getCompanyId().toString());
 					map.put("ProductId", p.getId().getProductId().toString());
-					map.put("SizeId", p.getId().getSizeId().toString());
 					map.put("ColorCode", p.getId().getColourCode().toString());
 					map.put("ColorName", p.getColourName());
 					map.put("Status", p.getStatus());
@@ -769,22 +767,20 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 		CommonResponse response = new CommonResponse();
 		try {
 
-			ProductSizeColorMasterId id = ProductSizeColorMasterId.builder()
+			ProductColorMasterId id = ProductColorMasterId.builder()
 					.companyId(Integer.valueOf(r.getCompanyId()))
 					.productId(Integer.valueOf(r.getProductId()))
-					.sizeId(Integer.valueOf(r.getSizeId()))
 					.colourCode(Integer.valueOf(r.getColorCode()))
 					.build();
 			
-			Optional<ProductSizeColorMaster> data =productSizeColorMasterRepo.findById(id);
+			Optional<ProductColorMaster> data =productSizeColorMasterRepo.findById(id);
 			
 			if(data.isPresent()) {
 				
-				ProductSizeColorMaster p =data.get();
+				ProductColorMaster p =data.get();
 				Map<String,String> map = new HashMap<String, String>();
 				map.put("CompanyId", p.getId().getCompanyId().toString());
 				map.put("ProductId", p.getId().getProductId().toString());
-				map.put("SizeId", p.getId().getSizeId().toString());
 				map.put("ColorCode", p.getId().getColourCode().toString());
 				map.put("ColorName", p.getColourName());
 				map.put("Status", p.getStatus());
@@ -813,17 +809,16 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 			    int sno =1;
 				for(SaveProductSizeColorMetalReq r :req) {
 					
-					ProductSizeColorMetalMasterId id = ProductSizeColorMetalMasterId.builder()
+					ProductColorMetalMasterId id = ProductColorMetalMasterId.builder()
 							.companyId(Integer.valueOf(r.getCompanyId()))
 							.productId(Integer.valueOf(r.getProductId()))
-							.sizeId(Integer.valueOf(r.getSizeId()))
 							.colourCode(Integer.valueOf(r.getColorCode()))	
 							.metalId(StringUtils.isBlank(r.getMetalId())?getColorMetlaId(Integer.valueOf(r.getCompanyId()),Integer.valueOf(r.getProductId()),
-									Integer.valueOf(r.getSizeId()),Integer.valueOf(r.getColorCode()))
+									Integer.valueOf(r.getColorCode()))
 									:Integer.valueOf(r.getColorCode()))
 							.build();
 					
-					ProductSizeColorMetalMaster master =ProductSizeColorMetalMaster.builder()
+					ProductColorMetalMaster master =ProductColorMetalMaster.builder()
 							.entryDate(new Date())
 							.id(id)
 							.displayOrder(Integer.valueOf(r.getDisplayOrder()))
@@ -833,6 +828,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 							.metalName(r.getMetalName())
 							.columnName(StringUtils.isBlank(r.getColumnName())?"PARAM_"+sno:r.getColumnName())
 							.status(r.getStatus())
+							.mesurementName(r.getMesurementName())
 							.build();
 					
 					productSizeColorMetalMasterRepo.save(master);
@@ -856,8 +852,8 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	}
 
 
-	private Integer getColorMetlaId(Integer companyId, Integer productId, Integer sizeId, Integer colorId) {
-		Integer metalId =productSizeColorMetalMasterRepo.findByIdCompanyIdAndIdProductIdAndIdSizeIdAndIdColourCode(companyId,productId,sizeId,colorId).size()+1;
+	private Integer getColorMetlaId(Integer companyId, Integer productId, Integer colorId) {
+		Integer metalId =productSizeColorMetalMasterRepo.findByIdCompanyIdAndIdProductIdAndIdColourCode(companyId,productId,colorId).size()+1;
 		return metalId;
 	}
 
@@ -865,15 +861,14 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	public CommonResponse getColorMetalDetails(GetProductColorMetalReq req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<ProductSizeColorMetalMaster> list =productSizeColorMetalMasterRepo.
-					findByIdCompanyIdAndIdProductIdAndIdSizeIdAndIdColourCode(Integer.valueOf(req.getCompanyId()),Integer.valueOf(req.getProductId()),Integer.valueOf(req.getSizeId()),Integer.valueOf(req.getColorCode()));
+			List<ProductColorMetalMaster> list =productSizeColorMetalMasterRepo.
+					findByIdCompanyIdAndIdProductIdAndIdColourCode(Integer.valueOf(req.getCompanyId()),Integer.valueOf(req.getProductId()),Integer.valueOf(req.getColorCode()));
 			if(!list.isEmpty()) {
 				List<Map<String,String>> mapList = new ArrayList<>();
 				list.forEach(p ->{
 					Map<String,String> map = new HashMap<String, String>();
 					map.put("CompanyId", p.getId().getCompanyId().toString());
 					map.put("ProductId", p.getId().getProductId().toString());
-					map.put("SizeId", p.getId().getSizeId().toString());
 					map.put("ColorCode", p.getId().getColourCode().toString());
 					map.put("MetalId", p.getId().getMetalId().toString());
 					map.put("MetalName", p.getMetalName());
@@ -906,24 +901,22 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 		CommonResponse response = new CommonResponse();
 		try {
 
-			ProductSizeColorMetalMasterId id = ProductSizeColorMetalMasterId.builder()
+			ProductColorMetalMasterId id = ProductColorMetalMasterId.builder()
 					.companyId(Integer.valueOf(r.getCompanyId()))
 					.productId(Integer.valueOf(r.getProductId()))
-					.sizeId(Integer.valueOf(r.getSizeId()))
 					.metalId(Integer.valueOf(r.getColorCode()))
 					.metalId(Integer.valueOf(r.getMetalId()))			
 					.build();
 			
-			Optional<ProductSizeColorMetalMaster> data =productSizeColorMetalMasterRepo.findById(id);
+			Optional<ProductColorMetalMaster> data =productSizeColorMetalMasterRepo.findById(id);
 			
 			if(data.isPresent()) {
 				
-				ProductSizeColorMetalMaster p =data.get();
+				ProductColorMetalMaster p =data.get();
 				
 				Map<String,String> map = new HashMap<String, String>();
 				map.put("CompanyId", p.getId().getCompanyId().toString());
 				map.put("ProductId", p.getId().getProductId().toString());
-				map.put("SizeId", p.getId().getSizeId().toString());
 				map.put("MetalId", p.getId().getMetalId().toString());
 				map.put("ColorCode", p.getId().getColourCode().toString());
 				map.put("MetalName", p.getMetalName());

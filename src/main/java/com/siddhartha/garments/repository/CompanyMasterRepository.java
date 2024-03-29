@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.siddhartha.garments.entity.CompanyMaster;
 
 @Repository
-public interface CompanyProductMasterRepository extends JpaRepository<CompanyMaster, Integer> {
+public interface CompanyMasterRepository extends JpaRepository<CompanyMaster, Integer> {
 
 	List<CompanyMaster> findByStatusIgnoreCase(String string);
 

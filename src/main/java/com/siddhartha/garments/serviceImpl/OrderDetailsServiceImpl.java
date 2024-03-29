@@ -136,10 +136,10 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 			Date date = new Date();
 			String strDate =sdf.format(date);
 			Integer no =(int)orderDetailsRepos.count()+1;
-			number="ORDER/"+strDate+"/1000"+no+"";
+			number="ORDER/"+strDate+"/100"+no+"";
 		}else if("C".equals(type)) {
 			Integer no =orderChallanDetailsRepos.countByIdOrderId(orderId)+1;
-			number="CHA/1000"+no+"";
+			number="CHA/100"+no+"";
 		}
 		return number;
 	}
@@ -238,7 +238,7 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 
 	private String getColorId(String orderId, String challanId) {
 		Integer no =orderSizeColorDetailsRepo.findByIdOrderIdAndIdChallanId(orderId,challanId).size()+1;
-		return "COL/1000"+no+"";
+		return "COL/100"+no+"";
 	}
 
 	@Override

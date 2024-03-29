@@ -1,7 +1,8 @@
 package com.siddhartha.garments.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,13 +27,13 @@ public class SectionMasterController {
 	
 	
 	@PostMapping("/save")
-	public CommonResponse saveSection(@RequestBody SectionSaveRequest req) {
+	public CommonResponse saveSection(@RequestBody List<SectionSaveRequest> req) {
 		return service.saveSection(req);
 	}
 	
-	@GetMapping("/getAll")
-	public CommonResponse getAllSection() {
-		return service.getAllSection();
+	@GetMapping("/getSectionByCompanyIdAndProductId/{companyId}/{productId}")
+	public CommonResponse getSectionByCompanyIdAndProductId(Integer companyId,Integer productId) {
+		return service.getSectionByCompanyIdAndProductId(companyId,productId);
 	}
 	
 	@GetMapping("/edit/{companyId}/{sectionId}")

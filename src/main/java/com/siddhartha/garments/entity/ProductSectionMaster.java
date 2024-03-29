@@ -19,12 +19,18 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name="SECTION_MASTER")
-public class SectionMaster {
-
+@Table(name="PRODUCT_SECTION_MASTER")
+public class ProductSectionMaster {
+	
 	
 	@EmbeddedId
-	private SectionMasterId id;
+	private ProductSectionMasterId id;
+
+	@Column(name="NOOF_PIECES")
+	private Integer noOfPieces;
+	
+	@Column(name="PIECE_AMOUNT")
+	private Double piecesAmount;
 	
 	@Column(name="SECTION_NAME")
 	private String sectionName;

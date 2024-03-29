@@ -7,29 +7,33 @@ import javax.persistence.Embeddable;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Embeddable
 @Builder
-public class ProductSizeColorMasterId implements Serializable{/**
+@Embeddable
+public class ProductColorMetalMasterId implements Serializable{
+
+	
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	@Column(name="COMPANY_ID")
 	private Integer companyId;
 	
 	@Column(name="PRODUCT_ID")
 	private Integer productId;
 	
-	@Column(name="SIZE_ID")
-	private Integer sizeId;
-	
 	@Column(name="COLOUR_CODE")
 	private Integer colourCode;
-
+	
+	@Column(name="METAL_ID")
+	private Integer metalId;
 }

@@ -1,19 +1,10 @@
 package com.siddhartha.garments.serviceImpl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.siddhartha.garments.entity.ProductColorMaster;
 import com.siddhartha.garments.repository.ProductColorMasterRepository;
 import com.siddhartha.garments.request.ColorSaveRequest;
-import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.service.ProductColorService;
 
@@ -27,7 +18,7 @@ public class ProductColorServiceImpl implements ProductColorService {
 	@Autowired
 	private InputValidationServiceImpl validation;
 
-	@Override
+	/*@Override
 	public CommonResponse saveColor(ColorSaveRequest req) {
 		CommonResponse response = new CommonResponse();
 		try {
@@ -59,9 +50,9 @@ public class ProductColorServiceImpl implements ProductColorService {
 			response.setResponse("Data saved Failed");
 		}
 		return response;
-	}
+	}*/
 
-	@Override
+	/*@Override
 	public CommonResponse getAllColor() {
 		CommonResponse response = new CommonResponse();
 		try {
@@ -88,10 +79,10 @@ public class ProductColorServiceImpl implements ProductColorService {
 			e.printStackTrace();
 		}
 		return response;
-	}
+	}*/
 
 
-	@Override
+	/*@Override
 	public CommonResponse editColor(Integer colorId) {
 		CommonResponse response = new CommonResponse();
 		try {
@@ -116,13 +107,13 @@ public class ProductColorServiceImpl implements ProductColorService {
 			
 		}
 		return response;
-	}
+	}*/
 
 	@Override
 	public CommonResponse deleteColor(Integer colorId) {
 		CommonResponse response = new CommonResponse();
 		try {
-			repository.deleteById(colorId);
+			//repository.deleteById(colorId);
 			response.setError(null);
 			response.setMessage("Success");
 			response.setResponse("Data seleted Successfully");
@@ -133,6 +124,24 @@ public class ProductColorServiceImpl implements ProductColorService {
 			response.setResponse("Data deleted Failed");
 		}
 		return response;
+	}
+
+	@Override
+	public CommonResponse saveColor(ColorSaveRequest req) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CommonResponse getAllColor() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CommonResponse editColor(Integer colorId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

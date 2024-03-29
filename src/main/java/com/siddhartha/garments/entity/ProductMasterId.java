@@ -15,28 +15,17 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Embeddable
-public class ProductSizeColorMetalMasterId implements Serializable{
-
-	
-	/**
+@Builder
+public class ProductMasterId implements Serializable{/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	@Column(name="COMPANY_ID")
+	
+	@Column(name ="COMPANY_ID")
 	private Integer companyId;
 	
-	@Column(name="PRODUCT_ID")
+	@Column(name ="PRODUCT_ID")
 	private Integer productId;
-	
-	@Column(name="SIZE_ID")
-	private Integer sizeId;
-	
-	@Column(name="COLOUR_CODE")
-	private Integer colourCode;
-	
-	@Column(name="METAL_ID")
-	private Integer metalId;
+
 }

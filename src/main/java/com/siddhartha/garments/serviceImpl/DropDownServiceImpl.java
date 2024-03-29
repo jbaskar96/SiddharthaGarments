@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.siddhartha.garments.dto.EditOrderDetailsReq;
 import com.siddhartha.garments.entity.CompanyMaster;
-import com.siddhartha.garments.entity.CompanyProductMaster;
+import com.siddhartha.garments.entity.ProductMaster;
 import com.siddhartha.garments.entity.DistrictMaster;
 import com.siddhartha.garments.entity.OperatorMaster;
 import com.siddhartha.garments.entity.OrderChallanDetails;
@@ -20,13 +20,13 @@ import com.siddhartha.garments.entity.OrderDetails;
 import com.siddhartha.garments.entity.OrderSizeColorDetails;
 import com.siddhartha.garments.entity.ProductColorMaster;
 import com.siddhartha.garments.entity.ProductMaster;
-import com.siddhartha.garments.entity.ProductSizeColorMaster;
+import com.siddhartha.garments.entity.ProductColorMaster;
 import com.siddhartha.garments.entity.ProductSizeMaster;
-import com.siddhartha.garments.entity.SectionMaster;
+import com.siddhartha.garments.entity.ProductSectionMaster;
 import com.siddhartha.garments.entity.StateMaster;
 import com.siddhartha.garments.entity.UserTypeMaster;
-import com.siddhartha.garments.repository.CompanyProductMasterRepository;
-import com.siddhartha.garments.repository.CompanyProductRepository;
+import com.siddhartha.garments.repository.CompanyMasterRepository;
+import com.siddhartha.garments.repository.ProductRepository;
 import com.siddhartha.garments.repository.DistrictMasterRepository;
 import com.siddhartha.garments.repository.OperatorMasterRepository;
 import com.siddhartha.garments.repository.OrderChallanDetailsRepository;
@@ -34,10 +34,10 @@ import com.siddhartha.garments.repository.OrderDetailsRepository;
 import com.siddhartha.garments.repository.OrderSizeColorDetailsRepository;
 import com.siddhartha.garments.repository.ProductColorMasterRepository;
 import com.siddhartha.garments.repository.ProductMasterRepository;
-import com.siddhartha.garments.repository.ProductSizeColorMasterRepository;
+import com.siddhartha.garments.repository.ProductColorMasterRepository;
 import com.siddhartha.garments.repository.ProductSizeMasterRepo;
 import com.siddhartha.garments.repository.ProductSizeMasterRepository;
-import com.siddhartha.garments.repository.SectionMasterRepository;
+import com.siddhartha.garments.repository.ProductSectionMasterRepository;
 import com.siddhartha.garments.repository.StateMasterRepository;
 import com.siddhartha.garments.repository.UserTypeMasterRepository;
 import com.siddhartha.garments.response.CommonResponse;
@@ -48,7 +48,7 @@ import com.siddhartha.garments.service.DropDownService;
 public class DropDownServiceImpl implements DropDownService{
 	
 	@Autowired
-	private SectionMasterRepository sectionRepo;
+	private ProductSectionMasterRepository sectionRepo;
 
 	@Autowired
 	private ProductMasterRepository productRepo;
@@ -76,17 +76,17 @@ public class DropDownServiceImpl implements DropDownService{
 	private OrderSizeColorDetailsRepository  orderColorRepo;
 	
 	@Autowired
-	private CompanyProductMasterRepository companyRepo;
+	private CompanyMasterRepository companyRepo;
 	
 	@Autowired
-	private CompanyProductRepository companyProductRepo;
+	private ProductRepository companyProductRepo;
 	
 
 	@Autowired
 	private ProductSizeMasterRepo productSizeMasterRepo;
 	
 	@Autowired
-	private ProductSizeColorMasterRepository productSizeColorMasterRepo;
+	private ProductColorMasterRepository productSizeColorMasterRepo;
 	
 	@Autowired
 	private OrderDetailsRepository orderRepo;
@@ -99,9 +99,8 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse section(EditOrderDetailsReq req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			
-			Integer companyId =orderRepo.findById(req.getOrderId()).get().getCompanyId();
-			List<SectionMaster> list =sectionRepo.findByIdCompanyIdAndStatusIgnoreCase(companyId,"Y");
+
+			List<ProductSectionMaster> list =sectionRepo.findByStatusIgnoreCase("Y");
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
@@ -133,7 +132,7 @@ public class DropDownServiceImpl implements DropDownService{
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
 					HashMap<String, String> map = new HashMap<String, String>();
-					map.put("Code", p.getProductId().toString());
+					map.put("Code", p.getId().getProductId().toString());
 					map.put("CodeDesc", p.getProductName());
 					res.add(map);
 				});
@@ -187,8 +186,8 @@ public class DropDownServiceImpl implements DropDownService{
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
 					HashMap<String, String> map = new HashMap<String, String>();
-					map.put("Code", p.getColorId().toString());
-					map.put("CodeDesc", p.getColorName());
+					map.put("Code", p.getId().getColourCode().toString());
+					map.put("CodeDesc", p.getColourName());
 					res.add(map);
 				});
 				response.setError(null);
@@ -464,7 +463,7 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse getProduct(Integer companyId) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<CompanyProductMaster> list =companyProductRepo.findByIdCompanyIdAndStatusIgnoreCase(companyId,"Y");
+			List<ProductMaster> list =companyProductRepo.findByIdCompanyIdAndStatusIgnoreCase(companyId,"Y");
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{
@@ -558,7 +557,7 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse getProductSizeColor(Integer companyId, Integer productId, Integer sizeId) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<ProductSizeColorMaster> list =productSizeColorMasterRepo.findByIdCompanyIdAndIdProductIdAndIdSizeIdAndStatusIgnoreCase(companyId,productId,sizeId,"Y");
+			List<ProductColorMaster> list =productSizeColorMasterRepo.findByIdCompanyIdAndIdProductIdAndStatusIgnoreCase(companyId,productId,"Y");
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{

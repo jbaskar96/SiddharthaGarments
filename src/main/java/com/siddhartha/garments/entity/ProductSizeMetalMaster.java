@@ -49,5 +49,8 @@ public class ProductSizeMetalMaster {
 	@Column(name="ENTRY_DATE")
 	private Date entryDate;
 	
+	@Column(name="MESUREMENT_NAME")
+	private String mesurementName;
+	
 
 }
