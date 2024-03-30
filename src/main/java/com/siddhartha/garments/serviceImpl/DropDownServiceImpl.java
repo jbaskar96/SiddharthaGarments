@@ -12,32 +12,29 @@ import org.springframework.stereotype.Service;
 
 import com.siddhartha.garments.dto.EditOrderDetailsReq;
 import com.siddhartha.garments.entity.CompanyMaster;
-import com.siddhartha.garments.entity.ProductMaster;
 import com.siddhartha.garments.entity.DistrictMaster;
 import com.siddhartha.garments.entity.OperatorMaster;
 import com.siddhartha.garments.entity.OrderChallanDetails;
-import com.siddhartha.garments.entity.OrderDetails;
 import com.siddhartha.garments.entity.OrderColorDetails;
+import com.siddhartha.garments.entity.OrderDetails;
 import com.siddhartha.garments.entity.ProductColorMaster;
 import com.siddhartha.garments.entity.ProductMaster;
-import com.siddhartha.garments.entity.ProductColorMaster;
-import com.siddhartha.garments.entity.ProductSizeMaster;
 import com.siddhartha.garments.entity.ProductSectionMaster;
+import com.siddhartha.garments.entity.ProductSizeMaster;
 import com.siddhartha.garments.entity.StateMaster;
 import com.siddhartha.garments.entity.UserTypeMaster;
 import com.siddhartha.garments.repository.CompanyMasterRepository;
-import com.siddhartha.garments.repository.ProductRepository;
 import com.siddhartha.garments.repository.DistrictMasterRepository;
 import com.siddhartha.garments.repository.OperatorMasterRepository;
 import com.siddhartha.garments.repository.OrderChallanDetailsRepository;
-import com.siddhartha.garments.repository.OrderDetailsRepository;
 import com.siddhartha.garments.repository.OrderColorDetailsRepository;
+import com.siddhartha.garments.repository.OrderDetailsRepository;
 import com.siddhartha.garments.repository.ProductColorMasterRepository;
 import com.siddhartha.garments.repository.ProductMasterRepository;
-import com.siddhartha.garments.repository.ProductColorMasterRepository;
+import com.siddhartha.garments.repository.ProductRepository;
+import com.siddhartha.garments.repository.ProductSectionMasterRepository;
 import com.siddhartha.garments.repository.ProductSizeMasterRepo;
 import com.siddhartha.garments.repository.ProductSizeMasterRepository;
-import com.siddhartha.garments.repository.ProductSectionMasterRepository;
 import com.siddhartha.garments.repository.StateMasterRepository;
 import com.siddhartha.garments.repository.UserTypeMasterRepository;
 import com.siddhartha.garments.response.CommonResponse;
@@ -90,6 +87,9 @@ public class DropDownServiceImpl implements DropDownService{
 	
 	@Autowired
 	private OrderDetailsRepository orderRepo;
+	
+	@Autowired
+	private ProductColorMasterRepository pcmRepo;
 
 	@Autowired
 	private OrderChallanDetailsRepository orderChallanRepo;
@@ -692,6 +692,33 @@ public class DropDownServiceImpl implements DropDownService{
 					HashMap<String, String> map = new HashMap<String, String>();
 					map.put("Code", p.getId().getChallanId());
 					map.put("CodeDesc", p.getSize().toString());
+					res.add(map);
+				});
+				response.setError(null);
+				response.setMessage("Success");
+				response.setResponse(res);
+			}else {
+				response.setError(null);
+				response.setMessage("Failed");
+				response.setResponse("No data found");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse getColorDetails(Integer companyId, Integer productId) {
+		CommonResponse response =new CommonResponse();
+		try {
+			List<ProductColorMaster>  list =pcmRepo.findByIdCompanyIdAndIdProductIdAndStatusIgnoreCase(companyId, productId, "Y");
+			if(!list.isEmpty()) {
+				List<Map<String,String>> res = new ArrayList<>();
+				list.forEach(p ->{
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("Code", p.getId().getColourCode().toString());
+					map.put("CodeDesc", p.getColourName());
 					res.add(map);
 				});
 				response.setError(null);

@@ -15,5 +15,8 @@ public class GetOrderSizeColorReq {
 	
 	@JsonProperty("ColorId")
 	private String colorId;
+	
+	@JsonProperty("IsUpdateColor")
+	private String isUpdateColor;
 
 }

@@ -304,4 +304,9 @@ public class DropDownController {
 		return service.orderSizes(req);
 	}
 	
+	@GetMapping("/getColorDetails/{companyId}/{productId}")
+	public CommonResponse getColorDetails(Integer companyId,Integer productId) {
+		return service.getColorDetails(companyId,productId);
+	}
+	
 }

@@ -50,4 +50,6 @@ public interface DropDownService {
 
 	CommonResponse orderSizes(EditOrderDetailsReq req);
 
+	CommonResponse getColorDetails(Integer companyId, Integer productId);
+
 }

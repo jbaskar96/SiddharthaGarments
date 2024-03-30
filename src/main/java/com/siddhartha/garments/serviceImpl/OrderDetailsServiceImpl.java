@@ -85,7 +85,7 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 						.lotNumber(req.getLotNumber())
 						.productId(Integer.valueOf(req.getProductId()))
 						.remarks(StringUtils.isBlank(req.getRemarks())?"":req.getRemarks())
-						.styleId(Integer.valueOf(req.getStyleId()))
+						//.styleId(Integer.valueOf(req.getStyleId()))
 						.status(req.getStatus())
 						.colorFoldingYn(StringUtils.isBlank(req.getOrderId())?"N":StringUtils.isBlank(ord.getColorFoldingYn())?"N":ord.getColorFoldingYn())
 						.sizefoldingYn(StringUtils.isBlank(req.getOrderId())?"N":StringUtils.isBlank(ord.getSizefoldingYn())?"N":ord.getSizefoldingYn())
@@ -144,9 +144,11 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 		if("O".equals(type)) {
 			Date date = new Date();
 			String strDate =sdf.format(date);
-			number="ORDER/"+strDate+"/100"+no+"";
+			number="ORDER/"+strDate+"/1"+no+"";
 		}else if("C".equals(type)) {
-			number="CHA/100"+no+"";
+			number="CHA/1"+no+"";
+		}else if("COL".equals(type)) {
+			number="COL/1"+no+"";
 		}
 		return number;
 	}
@@ -213,7 +215,9 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 					
 					OrderColorDetailsId colorDetailsId = OrderColorDetailsId.builder()
 							.orderId(r.getOrderId())
-							.colorId(null)
+							.challanId(r.getChallanId())							
+							.colorId(StringUtils.isBlank(r.getColorId())?generateNumber("COL", null)
+									:r.getColorId())
 							.build();
 
 					OrderColorDetails colorDetails = OrderColorDetails.builder()
@@ -243,61 +247,99 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 		return response;
 	}
 
-	private String getColorId(String orderId, String challanId) {
-		Integer no =orderColorDetailsRepo.findByIdOrderIdAndIdChallanId(orderId,challanId).size()+1;
-		return "COL/100"+no+"";
-	}
-
+	
 	@Override
 	public CommonResponse getOrderColorDetails(GetOrderSizeColorReq req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			
-			List<OrderColorDetails> colorData = orderColorDetailsRepo.findByIdOrderIdAndIdChallanId(req.getOrderId(),req.getChallanId());
-				
-			if(colorData.isEmpty()) {
-					
-			}else if(!colorData.isEmpty()) {
-					
+			List<OrderColorDetails> colorDet =orderColorDetailsRepo.findByIdOrderIdAndIdChallanId(req.getOrderId(), req.getChallanId());
+			List<Map<String,String>> mapList = new ArrayList<>();
+			if(!colorDet.isEmpty()) {
 				OrderDetails order =orderDetailsRepos.findById(req.getOrderId()).get();
 				Integer companyId =order.getCompanyId();
 				Integer productId =order.getProductId();
-					
-				List<ProductColorMaster> colorMaster =productColorRepo.findByIdCompanyIdAndIdProductId(companyId, productId);
+				List<ProductColorMaster>  metal_master =productColorRepo.findByIdCompanyIdAndIdProductIdAndStatusIgnoreCase(companyId, productId,"Y");
 				
-				if(colorData.size()==colorMaster.size()) {
+				List<String> filterCol = new ArrayList<>();
+				
+				String isUpdateColor =StringUtils.isBlank(req.getIsUpdateColor())?"N":req.getIsUpdateColor();
+				
+				if("Y".equals(isUpdateColor)) {
 					
+					List<String> colDet =colorDet.stream().map(p ->p.getColorCode().toString()).collect(Collectors.toList());
+					
+					filterCol =metal_master.stream()
+							.map(p ->p.getId().getColourCode().toString())
+							.filter(p -> checkContains(p,colDet))
+							.collect(Collectors.toList());				
+					
+					List<Map<String,String>> filColList = new ArrayList<>();
+					if(!filterCol.isEmpty()) {
+						 filColList =filterCol.stream()
+								.map(p ->{
+									Map<String,String> map = new HashMap<String, String>();
+									map.put("OrderId", colorDet.get(0).getId().getOrderId());
+									map.put("ChallanId", colorDet.get(0).getId().getChallanId());
+									map.put("ColorId", "");
+									map.put("ColorCode", p);
+									map.put("TotalPieces", "0");
+									return map;
+								}).collect(Collectors.toList());
+						 
+						 mapList.addAll(filColList);
+					}
 				}
 				
+				for (OrderColorDetails ocd :colorDet) {
+					Map<String,String> map = new HashMap<String, String>();
+					map.put("OrderId", ocd.getId().getOrderId());
+					map.put("ChallanId", ocd.getId().getChallanId());
+					map.put("ColorId", ocd.getId().getColorId());
+					map.put("ColorCode", ocd.getColorCode().toString());
+					map.put("TotalPieces", ocd.getTotalPieces().toString());
+					mapList.add(map);
+				}
+				
+				
+				
+			}else {
+				OrderDetails order =orderDetailsRepos.findById(req.getOrderId()).get();
+				Integer companyId =order.getCompanyId();
+				Integer productId =order.getProductId();
+				List<ProductColorMaster>  metal_master =productColorRepo.findByIdCompanyIdAndIdProductIdAndStatusIgnoreCase(companyId, productId,"Y");
+				 mapList =metal_master.stream()
+							.map(p ->{
+								Map<String,String> map = new HashMap<String, String>();
+								map.put("OrderId", "");
+								map.put("ChallanId",  "");
+								map.put("ColorId",  "");
+								map.put("ColorCode", p.getId().getColourCode().toString());
+								map.put("TotalPieces", "0");
+								return map;
+							}).collect(Collectors.toList());
+					
 			}
-				
-				
-				
-				/*List<Map<String,String>> colorList = new ArrayList<>();
-				list.forEach(p ->{
-					Map<String,String> colorRes =new HashMap<String,String>();
-					colorRes.put("OrderId", p.getId().getOrderId());
-					colorRes.put("ColorId", p.getId().getColorId());
-					colorRes.put("ColorCode", p.getColorCode().toString());
-					colorRes.put("ColorName", p.getColorName());
-					colorRes.put("TotalPieces", p.getTotalPieces().toString());
-					
-					colorList.add(colorRes);
-					
-				});
-				
+			
+			if(!mapList.isEmpty()) {
 				response.setMessage("Success");
-				response.setResponse(colorList);
+				response.setResponse(mapList);
 				response.setError(null);
 			}else {
 				response.setMessage("Failed");
 				response.setResponse("No Record Found");
 				response.setError(null);
-			}*/
+			}
+			
+			
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
 		return response;
+	}
+	
+	private boolean checkContains(String p, List<String> colDet) {
+		return !colDet.contains(p);
+		
 	}
 
 	@Override

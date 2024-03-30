@@ -770,9 +770,6 @@ public class InputValidationServiceImpl {
 			errorLists.add(new ErrorList("ProductId","101","Please enter ProductId"));
 		}
 		
-		if(StringUtils.isBlank(req.getStyleId())) {
-			errorLists.add(new ErrorList("StyleId","101","Please enter StyleId"));
-		}
 		
 		if(StringUtils.isBlank(req.getInwardDate())) {
 			errorLists.add(new ErrorList("InwardDate","101","Please enter InwardDate"));

@@ -190,81 +190,11 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 			OrderDetails od =orderDetailsRepo.findById(orderId).get();
 			Integer companyId =od.getCompanyId();
 			Integer productId =od.getProductId();
-			List<OrderChallanDetails> challan =challanRepo.findByIdOrderId(orderId);
+			//List<OrderColorDetails> challan =orderSizeColorRepo.findbyo
 			Map<Object,Object> orderMap =new HashMap<Object, Object>();
 			List<Map<String,Object>> listCha =new ArrayList<>();
 			
-			for(OrderChallanDetails c : challan) {
-				
-				List<OrderColorDetails> color =orderSizeColorRepo.findByIdOrderIdAndIdChallanId(orderId,c.getId().getChallanId());
-				Map<String,Object> chaMap =new HashMap<String, Object>();
-				List<Map<String,Object>> listMet =new ArrayList<>();
-				
-				for(OrderColorDetails col : color) {
-					
-					List<ProductColorMetalMaster> metal =colorMetalRepo.findByIdCompanyIdAndIdProductIdAndIdColourCodeAndStatusOrderByDisplayOrder(companyId, productId, col.getColorCode(),"Y");
-					int index=0;
-					String [] metalName =new String[metal.size()];
-					Object [] required =new Object[metal.size()];
-					Object [] received =new Object[metal.size()];
-					StringJoiner params =new StringJoiner(",");
-					Map<String,Object> map =new HashMap<String, Object>();
-					for(ProductColorMetalMaster met : metal) {
-						String calctype =met.getMesurementType();
-						Double calcVal =met.getMesurementValue();
-						Integer noOfpieces =met.getMesurementPieces();
-						/*Double overAllCalc =0D;
-						Integer piecesRate =0;
-						if("G".equals(calctype)) {// gram
-							piecesRate = col.getTotalPieces()/ noOfpieces;
-							overAllCalc =calcVal * piecesRate;
-						}else if("M".equals(calctype)) {// meter
-							piecesRate = col.getTotalPieces()/ noOfpieces;
-							overAllCalc = calcVal * piecesRate;
-						}else if("P".equals(calctype)) {//precentage
-							Double result =calcVal * noOfpieces;
-							overAllCalc =overAllCalc - result;
-						}else if("N".equals(calctype)) {// no calc or count
-							overAllCalc=Double.valueOf(col.getTotalPieces());
-						}else if("I".equals(calctype)) {// no calc or count
-							Double total=Double.valueOf(col.getTotalPieces());
-							overAllCalc =total * 2.54D /100;
-						}*/
-						
-						Object overAllCalc=calculate(calctype,col.getTotalPieces(),calcVal,noOfpieces);
-						
-						required[index] =overAllCalc;
-						received[index] =0;
-						metalName[index]=met.getMetalName() ;
-						params.add(met.getColumnName());
-						
-						index++;
-					}
-					map.put("Required", required);
-					map.put("Received", received);
-					map.put("ColorId", col.getId().getColorId());
-					map.put("ColorName", col.getColorName());
-					map.put("TotalPieces",col.getTotalPieces());
-					map.put("MetalName", metalName);
-					map.put("Params", params.toString());
-					
-					listMet.add(map);
-				
-				}
 			
-				chaMap.put("ChallanNo", c.getChallanNumber());
-				chaMap.put("ChallanId", c.getId().getChallanId());
-				chaMap.put("ChallanDate", sdf.format(c.getChallanDate()));
-				chaMap.put("SizeId", c.getSizeId());
-				chaMap.put("Size", c.getSize());
-				chaMap.put("TotalPieces",c.getTotalPieces());
-				chaMap.put("ColorFoldingDetails",listMet);
-				listCha.add(chaMap);
-			}
-			orderMap.put("OrderId", od.getOrderId());
-			orderMap.put("CompanyId", od.getCompanyId());
-			orderMap.put("ProductId", od.getProductId());
-			orderMap.put("ChallanDetails", listCha);
 			
 			GenerateCalcThread calcThread =new GenerateCalcThread(orderMap,metalServiceImpl,"COLOR_FOLDING");
 			Thread thread = new Thread(calcThread);

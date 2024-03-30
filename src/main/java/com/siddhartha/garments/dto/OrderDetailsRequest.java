@@ -18,9 +18,6 @@ public class OrderDetailsRequest {
 	@JsonProperty("ProductId")
 	private String productId;
 	
-	@JsonProperty("StyleId")
-	private String styleId;
-	
 	@JsonProperty("LotNumber")
 	private String lotNumber;
 	
