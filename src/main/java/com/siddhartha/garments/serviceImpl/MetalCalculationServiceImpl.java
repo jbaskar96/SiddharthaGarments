@@ -2,6 +2,8 @@ package com.siddhartha.garments.serviceImpl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,19 +29,22 @@ import com.siddhartha.garments.dto.EditOrderDetailsReq;
 import com.siddhartha.garments.dto.InsertSizeCalcRequest;
 import com.siddhartha.garments.dto.SizeFoldingDetailsReq;
 import com.siddhartha.garments.entity.OrderChallanDetails;
+import com.siddhartha.garments.entity.OrderColorDetails;
 import com.siddhartha.garments.entity.OrderDetails;
-import com.siddhartha.garments.entity.OrderSizeColorDetails;
 import com.siddhartha.garments.entity.ProductColorMetalMaster;
+import com.siddhartha.garments.entity.ProductMetalMaster;
 import com.siddhartha.garments.entity.ProductSizeMetalMaster;
 import com.siddhartha.garments.repository.OrderChallanDetailsRepository;
+import com.siddhartha.garments.repository.OrderColorDetailsRepository;
 import com.siddhartha.garments.repository.OrderDetailsRepository;
-import com.siddhartha.garments.repository.OrderSizeColorDetailsRepository;
 import com.siddhartha.garments.repository.ProductColorMetalMasterRepository;
+import com.siddhartha.garments.repository.ProductMetalRepository;
 import com.siddhartha.garments.repository.ProductSizeMetalMasterRepository;
 import com.siddhartha.garments.request.ChallanDetailsInfo;
 import com.siddhartha.garments.request.ColorFoldingDetailsReq;
 import com.siddhartha.garments.request.InserSizeColorRequest;
 import com.siddhartha.garments.response.CommonResponse;
+import com.siddhartha.garments.response.InsertProductCalcReq;
 import com.siddhartha.garments.service.MetalCalculationService;
 
 @Service
@@ -58,7 +63,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 	private ProductSizeMetalMasterRepository sizeMetalRepo;
 	
 	@Autowired
-	private OrderSizeColorDetailsRepository orderSizeColorRepo;
+	private OrderColorDetailsRepository orderSizeColorRepo;
 	
 	@Autowired
 	private ProductColorMetalMasterRepository colorMetalRepo;
@@ -79,12 +84,17 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 	
 	@Autowired
 	private InputValidationServiceImpl validation;
+	
+	@Autowired
+	private ProductMetalRepository productMetalRepo;
+	
+	public static final NumberFormat formatter = new DecimalFormat("#0.00"); 
 
 	@Override
 	public CommonResponse generateSizeCalc(EditOrderDetailsReq req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			//List<ErrorList> error = validation.sizeCalc(req);
+			
 			String orderId =req.getOrderId();
 			OrderDetails od =orderDetailsRepo.findById(orderId).get();
 			orderDetailsRepo.deleteSizeMetalByOrderId(orderId);
@@ -106,9 +116,8 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 					String calctype =met.getMesurementType();
 					Double calcVal =met.getMesurementValue();
 					Integer noOfpieces =met.getMesurementPieces();
-					Double overAllCalc =0D;
-					Integer piecesRate =0;
-					if("G".equals(calctype)) {// gram
+					
+					/*if("G".equals(calctype)) {// gram
 						piecesRate = ocd.getTotalPieces()/ noOfpieces;
 						overAllCalc =calcVal * piecesRate / 1000;
 					}else if("M".equals(calctype)) {// meter
@@ -122,7 +131,9 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 					}else if("I".equals(calctype)) {// no calc or count
 						Double total=Double.valueOf(ocd.getTotalPieces());
 						overAllCalc =total * 2.54D /100;
-					}
+					}*/
+					
+					Object overAllCalc=calculate(calctype,ocd.getTotalPieces(),calcVal,noOfpieces);
 					
 					required[index] =overAllCalc;
 					received[index] =0;
@@ -185,11 +196,11 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 			
 			for(OrderChallanDetails c : challan) {
 				
-				List<OrderSizeColorDetails> color =orderSizeColorRepo.findByIdOrderIdAndIdChallanId(orderId,c.getId().getChallanId());
+				List<OrderColorDetails> color =orderSizeColorRepo.findByIdOrderIdAndIdChallanId(orderId,c.getId().getChallanId());
 				Map<String,Object> chaMap =new HashMap<String, Object>();
 				List<Map<String,Object>> listMet =new ArrayList<>();
 				
-				for(OrderSizeColorDetails col : color) {
+				for(OrderColorDetails col : color) {
 					
 					List<ProductColorMetalMaster> metal =colorMetalRepo.findByIdCompanyIdAndIdProductIdAndIdColourCodeAndStatusOrderByDisplayOrder(companyId, productId, col.getColorCode(),"Y");
 					int index=0;
@@ -202,7 +213,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 						String calctype =met.getMesurementType();
 						Double calcVal =met.getMesurementValue();
 						Integer noOfpieces =met.getMesurementPieces();
-						Double overAllCalc =0D;
+						/*Double overAllCalc =0D;
 						Integer piecesRate =0;
 						if("G".equals(calctype)) {// gram
 							piecesRate = col.getTotalPieces()/ noOfpieces;
@@ -218,7 +229,9 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 						}else if("I".equals(calctype)) {// no calc or count
 							Double total=Double.valueOf(col.getTotalPieces());
 							overAllCalc =total * 2.54D /100;
-						}
+						}*/
+						
+						Object overAllCalc=calculate(calctype,col.getTotalPieces(),calcVal,noOfpieces);
 						
 						required[index] =overAllCalc;
 						received[index] =0;
@@ -480,6 +493,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 						
 			Map<String,List<Map<String,Object>>> sizeBasedGroup =list.stream()
 					.filter(p ->p.get("COLOR_ID")==null)
+					.filter(p ->p.get("CHALLAN_ID")!=null)
 					.collect(Collectors.groupingBy( p->p.get("CHALLAN_ID").toString()));
 			
 			HashMap<String, Object> calcResponse = new HashMap<String, Object>();
@@ -923,6 +937,344 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 		}
 		return response;
 	}
+	
+	private  synchronized Object calculate(String calcType,Integer totalPieces,Double mesurementValue,Integer perPieces) {
+		Object result =null;
+		try {
+			
+			if("M".equals(calcType)) {
+				
+				result = totalPieces / perPieces * mesurementValue;
+				
+			}else if("CM".equals(calcType)) {
+				
+				result = totalPieces / perPieces * mesurementValue;
+				
+			}else if("K".equals(calcType)) {
+				
+				result = totalPieces / perPieces * mesurementValue;
+				
+			}else if("G".equals(calcType)) {
+				
+				result = totalPieces / perPieces * mesurementValue / 1000;
+				
+			}else if("P".equals(calcType)) {
+				
+				result = totalPieces / perPieces;
+						
+			}else if("I".equals(calcType)) {
+				
+				result = totalPieces / perPieces * mesurementValue / 100 ;
+			}
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return formatter.format(result);
+	}
+
+	@Override
+	public CommonResponse generateProductCalc(EditOrderDetailsReq req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<OrderChallanDetails> list =challanRepo.findByIdOrderId(req.getOrderId());
+			Integer totalPieces =list.stream().map(p ->p.getTotalPieces())
+					.collect(Collectors.summingInt(p ->p));
+			OrderDetails order =orderDetailsRepo.findById(req.getOrderId()).get();
+			Integer companyId =order.getCompanyId();
+			Integer productId =order.getProductId();
+			orderDetailsRepo.deleteProductReceivedMetal(req.getOrderId());
+
+			List<ProductMetalMaster> metalList =productMetalRepo.findByIdCompanyIdAndIdProductIdAndStatusOrderByDisplayOrder(companyId, productId,"Y");
+			int index=0;
+			String [] metalName =new String[metalList.size()];
+			Object [] required =new Object[metalList.size()];
+			Object [] received =new Object[metalList.size()];
+			StringJoiner params =new StringJoiner(",");
+			for(ProductMetalMaster m : metalList) {
+				String calcType =m.getMesurementType();
+				Double calcVal =m.getMesurementValue();
+				Integer noOfpieces =m.getMesurementPieces();
+				
+				Object overAllCalc=calculate(calcType,totalPieces,calcVal,noOfpieces);
+				
+				required[index] =overAllCalc;
+				received[index] =0;
+				metalName[index]=m.getMetalName();
+				params.add(m.getColumnName());
+				
+				index++;
+			}
+			
+			Map<Object,Object> map = new HashMap<>();
+			map.put("OrderId", order.getOrderId());
+			map.put("TotalPieces", totalPieces);
+			map.put("Required", required);
+			map.put("Received", received);
+			map.put("MetalName", metalName);
+			map.put("Params", params.toString());
+			map.put("CompanyId", companyId);
+			map.put("ProductId", productId);
+			
+			response.setMessage("Success");
+			response.setError(null);
+			response.setResponse("Folding Calculated Successfully");
+			
+			
+			GenerateProductMetalThread calcThread =new GenerateProductMetalThread(map,metalServiceImpl,"PRODUCT_FOLDING");
+			Thread thread = new Thread(calcThread);
+			thread.setName("PRODUCT_FOLDING");
+			//thread.setPriority(Thread.MAX_PRIORITY);
+			thread.start();
+			
+			
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	public void inserProductCalc(Map<Object, Object> data) {
+		try {
+		
+			String companyId =data.get("CompanyId").toString();
+			String productId =data.get("ProductId").toString();
+			String orderId =data.get("OrderId").toString();
+			
+			Object[] required =(Object[]) data.get("Required");
+			String[] metalName =(String[])data.get("MetalName");
+			String columnsName =data.get("Params").toString();
+			String totalPieces =data.get("TotalPieces").toString();
+			List<String> prepare = new ArrayList<String>();
+				
+			prepare = getDyanamicColumn(required);
+				
+				
+				try {
+					String requiredQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,ORDER_ID,TYPE_NAME,PIECES,"
+							+ columnsName+") VALUES (?,?,?,?,?,"+StringUtils.join(prepare,",")+")";
+					
+					jdbcTemplate.execute(requiredQuery,new PreparedStatementCallback<Boolean>(){
+					    @Override
+					    public Boolean doInPreparedStatement(PreparedStatement ps) throws SQLException {
+					        ps.setString(1,companyId);
+					        ps.setString(2,productId);
+					        ps.setString(3,orderId);
+					        ps.setString(4,"REQUIRED");
+					        ps.setString(5,totalPieces);
+					        
+					        for (int i = 1; i <= required.length; i++) {
+								ps.setString(i + 5, required[i-1] == null ? null
+										: required[i-1].toString().trim());
+								log.info("rowid: "+i+", rowvalue : "+ required[i-1] );
+							}
+			 
+					        return ps.execute();
+					    }
+					});
+					
+					
+					String metalQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,ORDER_ID,TYPE_NAME,PIECES,METAL_COLUMNS"
+							+") VALUES (?,?,?,?,?,?)";
+					
+					jdbcTemplate.execute(metalQuery,new PreparedStatementCallback<Boolean>(){
+					    @Override
+					    public Boolean doInPreparedStatement(PreparedStatement ps) throws SQLException {
+					        ps.setString(1,companyId);
+					        ps.setString(2,productId);
+					        ps.setString(3,orderId);
+					        ps.setString(4,"METAL");
+					        ps.setString(5,totalPieces);
+					        ps.setString(6,StringUtils.join(metalName,","));
+					        
+					        return ps.execute();
+					    }
+					});
+					
+					
+					String paramsQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,ORDER_ID,TYPE_NAME,PIECES,METAL_COLUMNS"
+							+") VALUES (?,?,?,?,?,?)";
+					
+					jdbcTemplate.execute(paramsQuery,new PreparedStatementCallback<Boolean>(){
+					    @Override
+					    public Boolean doInPreparedStatement(PreparedStatement ps) throws SQLException {
+					        ps.setString(1,companyId);
+					        ps.setString(2,productId);
+					        ps.setString(3,orderId);					       
+					        ps.setString(4,"PARAMS");					        
+					        ps.setString(5,totalPieces);
+					        ps.setString(6,columnsName);
+					        
+					        return ps.execute();
+					    }
+					});
+				
+				}catch (Exception e) {
+					e.printStackTrace();
+				}finally {
+					jdbcTemplate.getDataSource().getConnection().close();
+				}
+	
+	}catch (Exception e) {
+		e.printStackTrace();
+	}
+	
+	}
+
+	@Override
+	public CommonResponse viewProductCalc(EditOrderDetailsReq req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			List<Map<String,Object>> list =orderDetailsRepo.getMetalDetails(req.getOrderId());
+						
+			List<Map<String,Object>> productFolding =list.stream()
+				.filter(p ->p.get("COLOR_ID")==null)
+				.filter(p ->p.get("CHALLAN_ID")==null)
+				.collect(Collectors.toList());
+					
+			
+			HashMap<String, Object> calcResponse = new HashMap<String, Object>();
+								
+				String params =productFolding.stream()
+					.filter(p ->p.get("TYPE_NAME").toString().equals("PARAMS"))
+					.map(P ->P.get("METAL_COLUMNS").toString())
+					.collect(Collectors.joining());
+				
+				String metal =productFolding.stream()
+						.filter(p ->p.get("TYPE_NAME").toString().equals("METAL"))
+						.map(P ->P.get("METAL_COLUMNS").toString())
+						.collect(Collectors.joining());
+					
+					
+				String required ="select "+params+" from METAL_CALC_DEATILS where ORDER_ID =? and (CHALLAN_ID is null and color_id is null) and TYPE_NAME=?";
+				
+				String received ="select "+params+" from METAL_CALC_DEATILS where ORDER_ID =? and (CHALLAN_ID is null and color_id is null) and  TYPE_NAME=?";
+				
+				query =em.createNativeQuery(required)
+						.setParameter(1, req.getOrderId())
+						.setParameter(2, "REQUIRED");
+				
+				Object reqArray =query.getSingleResult();
+				
+				if(reqArray instanceof String) {
+					
+					reqArray = new Object[] {reqArray};
+					
+				}
+				
+				query =em.createNativeQuery(received)
+						.setParameter(1, req.getOrderId())
+						.setParameter(2, "RECEIVED");
+				
+				Object receivedArray = null;
+				try {
+					receivedArray = query.getSingleResult();
+				} catch (NoResultException e) {
+				    log.debug("No result forund for... " +receivedArray);
+				}
+				
+				if(receivedArray instanceof String) {
+					
+					receivedArray = new Object[] {receivedArray};
+					
+				}
+				
+				
+				String[] metal_name =metal.split(",");
+				calcResponse.put("Required", reqArray);
+				calcResponse.put("Received", receivedArray ==null?new Object[]{} :receivedArray);
+				calcResponse.put("MetalName", metal_name);
+				calcResponse.put("TotalPieces",productFolding.get(0).get("PIECES"));	
+				calcResponse.put("OrderId",productFolding.get(0).get("ORDER_ID"));
+				calcResponse.put("CompanyId", productFolding.get(0).get("COMPANY_ID"));
+				calcResponse.put("ProductId", productFolding.get(0).get("PRODUCT_ID"));
+			
+			response.setMessage("Success");
+			response.setError(null);
+			response.setResponse(calcResponse);
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+			response.setMessage("Failed");
+			response.setError(null);
+			response.setResponse(null);
+		}
+		return response;
+	}
+
+	@Override
+	public CommonResponse insertProductCalc(InsertProductCalcReq req) {
+		CommonResponse response = new CommonResponse();
+		try {
+			Integer companyId =Integer.valueOf(req.getCompanyId());
+			Integer productId =Integer.valueOf(req.getProductId());
+			String orderId =req.getOrderId();
+			List<Map<String,Object>> metal =orderDetailsRepo.getMetalDetails(orderId);
+				
+				Map<String,Object> map =metal.stream()
+						.filter(p ->p.get("COLOR_ID")==null)
+						.filter(p ->p.get("CHALLAN_ID")==null)
+						.filter(p->p.get("TYPE_NAME").toString().equalsIgnoreCase("PARAMS"))
+								.collect(Collectors.toList()).get(0);
+				
+				String columnsName=map.get("METAL_COLUMNS")==null?"":map.get("METAL_COLUMNS").toString();
+				
+				String [] strArray =new String[req.getReceived().size()];
+				req.getReceived().toArray(strArray);
+				
+				List<String> prepare = getDyanamicColumn(strArray);
+				
+				orderDetailsRepo.deleteProductReceivedMetal(orderId,"RECEIVED");
+				
+				try {
+					String requiredQuery ="insert into METAL_CALC_DEATILS(COMPANY_ID,PRODUCT_ID,ORDER_ID,TYPE_NAME,PIECES,"
+							+ columnsName+") VALUES (?,?,?,?,?,"+StringUtils.join(prepare,",")+")";
+					
+					jdbcTemplate.execute(requiredQuery,new PreparedStatementCallback<Boolean>(){
+					    @Override
+					    public Boolean doInPreparedStatement(PreparedStatement ps) throws SQLException {
+					        ps.setString(1,companyId.toString());
+					        ps.setString(2,productId.toString());
+					        ps.setString(3,orderId);
+					        ps.setString(4,"RECEIVED");
+					        ps.setString(5,req.getTotalPieces());
+					        
+					        for (int i = 1; i <= strArray.length; i++) {
+								ps.setString(i + 5, strArray[i-1] == null ? null
+										: strArray[i-1].toString().trim());
+								log.info("rowid: "+i+", rowvalue : "+ strArray[i-1] );
+							}
+			 
+					        return ps.execute();
+					    }
+					});
+				}catch (Exception e) {
+					e.printStackTrace();
+				}finally {
+					jdbcTemplate.getDataSource().getConnection().close();
+				}	
+				
+				OrderDetails order =orderDetailsRepo.findById(req.getOrderId()).get();
+				order.setProductFoldingYn("Y");
+				orderDetailsRepo.save(order);
+				
+			
+			HashMap<String, Object> mapRes = new HashMap<String, Object>();
+			mapRes.put("OrderId", req.getOrderId());
+			
+			response.setMessage("Success");
+			response.setError(null);
+			response.setResponse(mapRes);
+		}catch (Exception e) {
+			e.printStackTrace();
+			response.setMessage("Failed");
+			response.setError(null);
+			response.setResponse(null);
+		}
+		return response;
+	}
+	
 
 }
 

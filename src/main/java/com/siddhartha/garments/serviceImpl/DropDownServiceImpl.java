@@ -17,7 +17,7 @@ import com.siddhartha.garments.entity.DistrictMaster;
 import com.siddhartha.garments.entity.OperatorMaster;
 import com.siddhartha.garments.entity.OrderChallanDetails;
 import com.siddhartha.garments.entity.OrderDetails;
-import com.siddhartha.garments.entity.OrderSizeColorDetails;
+import com.siddhartha.garments.entity.OrderColorDetails;
 import com.siddhartha.garments.entity.ProductColorMaster;
 import com.siddhartha.garments.entity.ProductMaster;
 import com.siddhartha.garments.entity.ProductColorMaster;
@@ -31,7 +31,7 @@ import com.siddhartha.garments.repository.DistrictMasterRepository;
 import com.siddhartha.garments.repository.OperatorMasterRepository;
 import com.siddhartha.garments.repository.OrderChallanDetailsRepository;
 import com.siddhartha.garments.repository.OrderDetailsRepository;
-import com.siddhartha.garments.repository.OrderSizeColorDetailsRepository;
+import com.siddhartha.garments.repository.OrderColorDetailsRepository;
 import com.siddhartha.garments.repository.ProductColorMasterRepository;
 import com.siddhartha.garments.repository.ProductMasterRepository;
 import com.siddhartha.garments.repository.ProductColorMasterRepository;
@@ -73,7 +73,7 @@ public class DropDownServiceImpl implements DropDownService{
 
 	
 	@Autowired
-	private OrderSizeColorDetailsRepository  orderColorRepo;
+	private OrderColorDetailsRepository  orderColorRepo;
 	
 	@Autowired
 	private CompanyMasterRepository companyRepo;
@@ -324,8 +324,8 @@ public class DropDownServiceImpl implements DropDownService{
 			List<Map<String,String>> res = new ArrayList<>();
 			
 			HashMap<String, String> map1 = new HashMap<String, String>();
-			map1.put("Code","G");
-			map1.put("CodeDesc","KilloGram");
+			map1.put("Code","K");
+			map1.put("CodeDesc","Killo(KG)");
 			
 			HashMap<String, String> map2 = new HashMap<String, String>();
 			map2.put("Code","M");
@@ -333,15 +333,19 @@ public class DropDownServiceImpl implements DropDownService{
 			
 			HashMap<String, String> map3 = new HashMap<String, String>();
 			map3.put("Code","P");
-			map3.put("CodeDesc","Percentage");
+			map3.put("CodeDesc","Pieces");
 			
 			HashMap<String, String> map4 = new HashMap<String, String>();
-			map4.put("Code","N");
-			map4.put("CodeDesc","NetQuantity");
+			map4.put("Code","CM");
+			map4.put("CodeDesc","CentiMeter");
 			
 			HashMap<String, String> map5 = new HashMap<String, String>();
 			map5.put("Code","I");
 			map5.put("CodeDesc","Inch");
+			
+			HashMap<String, String> map6 = new HashMap<String, String>();
+			map6.put("Code","G");
+			map6.put("CodeDesc","Gram");
 			
 			
 			res.add(map2);
@@ -349,6 +353,7 @@ public class DropDownServiceImpl implements DropDownService{
 			res.add(map3);
 			res.add(map4);
 			res.add(map5);
+			res.add(map6);
 			response.setError(null);
 			response.setMessage("Success");
 			response.setResponse(res);
@@ -652,7 +657,7 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse colorDeatilsByOrderId(GetSizeDetailsRequest req) {
 		CommonResponse response =new CommonResponse();
 		try {
-			List<OrderSizeColorDetails>  list =orderColorRepo.findByIdOrderIdAndIdChallanId(req.getOrderId(), req.getChallanId());
+			List<OrderColorDetails>  list =orderColorRepo.findByIdOrderIdAndIdChallanId(req.getOrderId(), req.getChallanId());
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{

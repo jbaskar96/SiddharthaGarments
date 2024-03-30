@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.siddhartha.garments.dto.EditOrderDetailsReq;
 import com.siddhartha.garments.dto.GetOrderSizeColorReq;
 import com.siddhartha.garments.dto.OrderChallanColorReq;
@@ -23,13 +22,15 @@ import com.siddhartha.garments.dto.OrderDetailsRequest;
 import com.siddhartha.garments.entity.OrderBillingDetails;
 import com.siddhartha.garments.entity.OrderChallanDetails;
 import com.siddhartha.garments.entity.OrderChallanDetailsId;
+import com.siddhartha.garments.entity.OrderColorDetails;
+import com.siddhartha.garments.entity.OrderColorDetailsId;
 import com.siddhartha.garments.entity.OrderDetails;
-import com.siddhartha.garments.entity.OrderSizeColorDetails;
-import com.siddhartha.garments.entity.OrderSizeColorDetailsId;
+import com.siddhartha.garments.entity.ProductColorMaster;
 import com.siddhartha.garments.repository.OrderBillingDetailRepository;
 import com.siddhartha.garments.repository.OrderChallanDetailsRepository;
+import com.siddhartha.garments.repository.OrderColorDetailsRepository;
 import com.siddhartha.garments.repository.OrderDetailsRepository;
-import com.siddhartha.garments.repository.OrderSizeColorDetailsRepository;
+import com.siddhartha.garments.repository.ProductColorMasterRepository;
 import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.response.CommonResponse;
 import com.siddhartha.garments.response.OrderBillingRequest;
@@ -49,13 +50,19 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 	private OrderChallanDetailsRepository orderChallanDetailsRepos;
 	
 	@Autowired
-	private OrderSizeColorDetailsRepository orderSizeColorDetailsRepo;
+	private OrderColorDetailsRepository orderColorDetailsRepo;
 	
 	@Autowired
 	private InputValidationServiceImpl validation;
 	
 	@Autowired
 	private OrderBillingDetailRepository orderBillingRepo;
+	
+	@Autowired
+	private SequenceGeneratorServiceImpl seq;
+	
+	@Autowired
+	private ProductColorMasterRepository productColorRepo;
 	
 	@Override
 	public CommonResponse saveOrder(OrderDetailsRequest req) {
@@ -132,13 +139,13 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 	private synchronized String generateNumber(String type,String orderId) {
 		String number ="";
 		
+		String no =seq.getSequenceNo();
+		
 		if("O".equals(type)) {
 			Date date = new Date();
 			String strDate =sdf.format(date);
-			Integer no =(int)orderDetailsRepos.count()+1;
 			number="ORDER/"+strDate+"/100"+no+"";
 		}else if("C".equals(type)) {
-			Integer no =orderChallanDetailsRepos.countByIdOrderId(orderId)+1;
 			number="CHA/100"+no+"";
 		}
 		return number;
@@ -164,7 +171,8 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 				orderRes.put("Remarks", StringUtils.isBlank(o.getRemarks())?"":o.getRemarks());
 				orderRes.put("SizeFoldingYn", StringUtils.isBlank(o.getSizefoldingYn())?"N":o.getSizefoldingYn());
 				orderRes.put("ColorFoldingYn", StringUtils.isBlank(o.getColorFoldingYn())?"N":o.getColorFoldingYn());
-				
+				orderRes.put("ProductFoldingYn", StringUtils.isBlank(o.getProductFoldingYn())?"N":o.getProductFoldingYn());
+
 				List<OrderChallanDetails> challan =orderChallanDetailsRepos.findByIdOrderId(o.getOrderId());
 				List<Map<String,String>> challanList = new ArrayList<>();
 				challan.forEach(p ->{
@@ -203,13 +211,12 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 				
 				for(OrderChallanColorReq r :req) {
 					
-					OrderSizeColorDetailsId colorDetailsId = OrderSizeColorDetailsId.builder()
+					OrderColorDetailsId colorDetailsId = OrderColorDetailsId.builder()
 							.orderId(r.getOrderId())
-							.challanId(r.getChallanId())
-							.colorId(StringUtils.isBlank(r.getColorId())?getColorId(r.getOrderId(),r.getChallanId()):r.getColorId())
+							.colorId(null)
 							.build();
 
-					OrderSizeColorDetails colorDetails = OrderSizeColorDetails.builder()
+					OrderColorDetails colorDetails = OrderColorDetails.builder()
 							.colorCode(Integer.valueOf(r.getColorCode()))
 							.colorName(r.getColorName())
 							.entryDate(new Date())
@@ -217,7 +224,7 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 							.totalPieces(Integer.valueOf(r.getTotalPieces()))
 							.build();
 					
-					orderSizeColorDetailsRepo.save(colorDetails);
+					orderColorDetailsRepo.save(colorDetails);
 				}
 				
 				
@@ -237,7 +244,7 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 	}
 
 	private String getColorId(String orderId, String challanId) {
-		Integer no =orderSizeColorDetailsRepo.findByIdOrderIdAndIdChallanId(orderId,challanId).size()+1;
+		Integer no =orderColorDetailsRepo.findByIdOrderIdAndIdChallanId(orderId,challanId).size()+1;
 		return "COL/100"+no+"";
 	}
 
@@ -245,14 +252,31 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 	public CommonResponse getOrderColorDetails(GetOrderSizeColorReq req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<OrderSizeColorDetails> list =orderSizeColorDetailsRepo.findByIdOrderIdAndIdChallanId(req.getOrderId(), req.getChallanId());
-			if(!list.isEmpty()) {
+			
+			List<OrderColorDetails> colorData = orderColorDetailsRepo.findByIdOrderIdAndIdChallanId(req.getOrderId(),req.getChallanId());
 				
-				List<Map<String,String>> colorList = new ArrayList<>();
+			if(colorData.isEmpty()) {
+					
+			}else if(!colorData.isEmpty()) {
+					
+				OrderDetails order =orderDetailsRepos.findById(req.getOrderId()).get();
+				Integer companyId =order.getCompanyId();
+				Integer productId =order.getProductId();
+					
+				List<ProductColorMaster> colorMaster =productColorRepo.findByIdCompanyIdAndIdProductId(companyId, productId);
+				
+				if(colorData.size()==colorMaster.size()) {
+					
+				}
+				
+			}
+				
+				
+				
+				/*List<Map<String,String>> colorList = new ArrayList<>();
 				list.forEach(p ->{
 					Map<String,String> colorRes =new HashMap<String,String>();
 					colorRes.put("OrderId", p.getId().getOrderId());
-					colorRes.put("ChallanId", p.getId().getChallanId());
 					colorRes.put("ColorId", p.getId().getColorId());
 					colorRes.put("ColorCode", p.getColorCode().toString());
 					colorRes.put("ColorName", p.getColorName());
@@ -269,7 +293,7 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 				response.setMessage("Failed");
 				response.setResponse("No Record Found");
 				response.setError(null);
-			}
+			}*/
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -280,20 +304,18 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 	public CommonResponse editOrderColorDetails(GetOrderSizeColorReq req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			OrderSizeColorDetailsId colorDetailsId =OrderSizeColorDetailsId.builder()
+			OrderColorDetailsId colorDetailsId =OrderColorDetailsId.builder()
 					.orderId(req.getOrderId())
-					.challanId(req.getChallanId())
 					.colorId(req.getColorId())
 					.build();
 			
-			Optional<OrderSizeColorDetails> data =orderSizeColorDetailsRepo.findById(colorDetailsId);
+			Optional<OrderColorDetails> data =orderColorDetailsRepo.findById(colorDetailsId);
 			
 			if(data.isPresent()) {
 				
-				OrderSizeColorDetails p =data.get();
+				OrderColorDetails p =data.get();
 				Map<String,String> colorRes =new HashMap<String,String>();
 				colorRes.put("OrderId", p.getId().getOrderId());
-				colorRes.put("ChallanId", p.getId().getChallanId());
 				colorRes.put("ColorId", p.getId().getColorId());
 				colorRes.put("ColorCode", p.getColorCode().toString());
 				colorRes.put("ColorName", p.getColorName());

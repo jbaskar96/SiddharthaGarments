@@ -10,6 +10,7 @@ import com.siddhartha.garments.dto.EditOrderDetailsReq;
 import com.siddhartha.garments.dto.InsertSizeCalcRequest;
 import com.siddhartha.garments.request.InserSizeColorRequest;
 import com.siddhartha.garments.response.CommonResponse;
+import com.siddhartha.garments.response.InsertProductCalcReq;
 import com.siddhartha.garments.service.MetalCalculationService;
 
 @RestController
@@ -31,6 +32,21 @@ public class MetalCalculationController {
 		return service.generateSizeColorCalc(req);
 	}
 	
+	@PostMapping("/generate/product/calc")
+	public CommonResponse generateProductCalc(@RequestBody EditOrderDetailsReq req) {
+		return service.generateProductCalc(req);
+	}
+	
+	@PostMapping("/view/product/calc")
+	public CommonResponse viewProductCalc(@RequestBody EditOrderDetailsReq req) {
+		return service.viewProductCalc(req);
+	}
+	
+	@PostMapping("/insert/product/calc")
+	public CommonResponse insertProductCalc(@RequestBody InsertProductCalcReq req) {
+		return service.insertProductCalc(req);
+	}
+
 	@PostMapping("/insert/size/calc")
 	public CommonResponse doInsertSizeCalc(@RequestBody InsertSizeCalcRequest req) {
 		return service.doInsertSizeCalc(req);

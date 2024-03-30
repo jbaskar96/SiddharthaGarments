@@ -68,4 +68,7 @@ public class OrderDetails {
 	@Column(name = "COLOR_FOLDINGYN")
 	private String colorFoldingYn;
 	
+	@Column(name = "PRODUCT_FOLDINGYN")
+	private String productFoldingYn;
+	
 }

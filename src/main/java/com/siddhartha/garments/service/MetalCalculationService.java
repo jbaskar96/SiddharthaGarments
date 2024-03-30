@@ -4,6 +4,7 @@ import com.siddhartha.garments.dto.EditOrderDetailsReq;
 import com.siddhartha.garments.dto.InsertSizeCalcRequest;
 import com.siddhartha.garments.request.InserSizeColorRequest;
 import com.siddhartha.garments.response.CommonResponse;
+import com.siddhartha.garments.response.InsertProductCalcReq;
 
 public interface MetalCalculationService {
 
@@ -18,5 +19,11 @@ public interface MetalCalculationService {
 	CommonResponse viewSizeColorCalc(EditOrderDetailsReq req);
 
 	CommonResponse insertSizeColorCalc(InserSizeColorRequest req);
+
+	CommonResponse generateProductCalc(EditOrderDetailsReq req);
+
+	CommonResponse viewProductCalc(EditOrderDetailsReq req);
+
+	CommonResponse insertProductCalc(InsertProductCalcReq req);
 
 }

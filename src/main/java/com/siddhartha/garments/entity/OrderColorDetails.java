@@ -20,10 +20,10 @@ import lombok.Setter;
 @Entity
 @Table(name ="ORDER_SIZE_COLOR_DETAILS")
 @Builder
-public class OrderSizeColorDetails {
+public class OrderColorDetails {
 	
 	@EmbeddedId
-	private OrderSizeColorDetailsId id;
+	private OrderColorDetailsId id;
 	
 	@Column(name ="COLOR_CODE")
 	private Integer colorCode;

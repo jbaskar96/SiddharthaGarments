@@ -10,11 +10,11 @@ public class OrderChallanColorReq {
 	@JsonProperty("OrderId")
 	private String orderId;
 	
-	@JsonProperty("ChallanId")
-	private String challanId;
-	
 	@JsonProperty("ColorId")
 	private String colorId;
+	
+	@JsonProperty("ChallanId")
+	private String ChallanId;
 	
 	@JsonProperty("ColorCode")
 	private String colorCode;

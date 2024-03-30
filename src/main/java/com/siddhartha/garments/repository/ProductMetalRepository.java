@@ -15,4 +15,10 @@ public interface ProductMetalRepository extends JpaRepository<ProductMetalMaster
 
 	List<ProductMetalMaster> findByIdCompanyIdAndIdProductId(Integer valueOf, Integer valueOf2);
 
+	List<ProductMetalMaster> findByIdCompanyIdAndIdProductIdAndStatus(Integer companyId, Integer productId,
+			String string);
+
+	List<ProductMetalMaster> findByIdCompanyIdAndIdProductIdAndStatusOrderByDisplayOrder(Integer companyId,
+			Integer productId, String string);
+
 }

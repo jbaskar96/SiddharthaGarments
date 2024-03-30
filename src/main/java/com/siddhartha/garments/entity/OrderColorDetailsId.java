@@ -17,7 +17,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Embeddable
 @Builder
-public class OrderSizeColorDetailsId implements Serializable {/**
+public class OrderColorDetailsId implements Serializable {/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
