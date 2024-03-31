@@ -15,4 +15,6 @@ public interface OrderChallanDetailsRepository extends JpaRepository<OrderChalla
 
 	Integer countByIdOrderId(String orderId);
 
+	OrderChallanDetails findByIdOrderIdAndIdChallanId(String orderId, String challanId);
+
 }

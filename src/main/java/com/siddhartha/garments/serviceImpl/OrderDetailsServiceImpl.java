@@ -165,7 +165,6 @@ public class OrderDetailsServiceImpl implements OrderDetailsService{
 				orderRes.put("OrderId", o.getOrderId());
 				orderRes.put("CompanyId", o.getCompanyId().toString());
 				orderRes.put("ProductId", o.getProductId().toString());
-				orderRes.put("StyleId", o.getStyleId().toString());
 				orderRes.put("LotNumber", o.getLotNumber());
 				orderRes.put("InwardDate", sdf.format(o.getInwardDate()));
 				orderRes.put("Status", o.getStatus());

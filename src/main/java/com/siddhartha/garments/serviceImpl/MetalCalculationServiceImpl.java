@@ -190,13 +190,70 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 			OrderDetails od =orderDetailsRepo.findById(orderId).get();
 			Integer companyId =od.getCompanyId();
 			Integer productId =od.getProductId();
-			//List<OrderColorDetails> challan =orderSizeColorRepo.findbyo
-			Map<Object,Object> orderMap =new HashMap<Object, Object>();
+			
 			List<Map<String,Object>> listCha =new ArrayList<>();
 			
+			List<OrderColorDetails> ocdList =orderSizeColorRepo.findByIdOrderId(req.getOrderId());
+			Map<String,List<OrderColorDetails>> challanGroup =ocdList.stream()
+					.collect(Collectors.groupingBy(p->p.getId().getChallanId()));
+			Map<Object,Object> response_map =new HashMap<Object,Object>();
 			
+			for (Map.Entry<String, List<OrderColorDetails>> entry :challanGroup.entrySet()) {
+				List<OrderColorDetails> value =entry.getValue();
+				List<Map<String,Object>> colorList =new ArrayList<>();
+				for(OrderColorDetails ood : value) {
+					Integer colorCode =ood.getColorCode();
+					List<ProductColorMetalMaster> pcmm = colorMetalRepo.findByIdCompanyIdAndIdProductIdAndIdColourCodeAndStatusOrderByDisplayOrder(companyId, productId, colorCode, "Y");
+					int index=0;
+					String [] metalName =new String[pcmm.size()];
+					Object [] required =new Object[pcmm.size()];
+					Object [] received =new Object[pcmm.size()];
+					StringJoiner params =new StringJoiner(",");
+					for(ProductColorMetalMaster met : pcmm) {
+						
+						String calcType =met.getMesurementType();
+						Integer noOfPieces =met.getMesurementPieces();
+						Double calVal =met.getMesurementValue();
+						
+						Object overAllCalc=calculate(calcType,ood.getTotalPieces(),calVal,noOfPieces);
+						
+						required[index] =overAllCalc;
+						received[index] =0;
+						metalName[index]=met.getMetalName();
+						params.add(met.getColumnName());
+						
+						index++;
+					}
+					Map<String,Object> map =new HashMap<String,Object>();
+					map.put("Required", required);
+					map.put("Received", received);
+					map.put("TotalPieces",ood.getTotalPieces());
+					map.put("MetalName", metalName);
+					map.put("Params", params.toString());
+					map.put("ColorId", ood.getId().getColorId());
+					map.put("ColorName", ood.getColorName());
+					colorList.add(map);
+				
+				
+				}
+				Map<String,Object> challanMap =new HashMap<String,Object>();
+				OrderChallanDetails cha =challanRepo.findByIdOrderIdAndIdChallanId(req.getOrderId(),value.get(0).getId().getChallanId());
+				challanMap.put("ChallanId", cha.getId().getChallanId());
+				challanMap.put("ChallanNo", cha.getChallanNumber());
+				challanMap.put("TotalPieces", cha.getTotalPieces());
+				challanMap.put("ChallanDate", cha.getChallanDate());
+				challanMap.put("SizeId", cha.getSizeId());
+				challanMap.put("Size", cha.getSize());
+				challanMap.put("ColorFoldingDetails", colorList);
+				listCha.add(challanMap);
+			}
+				
+			response_map.put("OrderId", req.getOrderId());
+			response_map.put("CompanyId", companyId);
+			response_map.put("ProductId", productId);
+			response_map.put("ChallanDetails", listCha);
 			
-			GenerateCalcThread calcThread =new GenerateCalcThread(orderMap,metalServiceImpl,"COLOR_FOLDING");
+			GenerateCalcThread calcThread =new GenerateCalcThread(response_map,metalServiceImpl,"COLOR_FOLDING");
 			Thread thread = new Thread(calcThread);
 			thread.setName("METAL_CALC"+req.getOrderId());
 			thread.setPriority(Thread.MAX_PRIORITY);
@@ -646,6 +703,8 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 			Map<String,Object> res =new HashMap<String,Object>();
 			
 			Map<String,List<Map<String,Object>>> sizeBasedGroup =list.stream()
+					.filter( p ->p.get("COLOR_ID")!=null)
+					.filter( p ->p.get("CHALLAN_ID")!=null)
 					.collect(Collectors.groupingBy( p->p.get("CHALLAN_ID").toString()));
 			
 			List<Map<String,Object>> challanSize =new ArrayList<Map<String,Object>>();

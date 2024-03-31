@@ -13,4 +13,6 @@ public interface OrderColorDetailsRepository  extends JpaRepository<OrderColorDe
 
 	List<OrderColorDetails> findByIdOrderIdAndIdChallanId(String orderId,String challanId);
 
+	List<OrderColorDetails> findByIdOrderId(String orderId);
+
 }
