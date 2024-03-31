@@ -71,6 +71,12 @@ public class WorkerEntryDetails {
 	@Column(name="TOTAL_AMOUNT")
 	private Double totalAmount;
 	
+	@Column(name="COMPANY_ID")
+	private Integer companyId;
+	
+	@Column(name="PRODUCT_ID")
+	private Integer productId;
+	
 	@Column(name="UPDATED_BY")
 	private String updatedBy;
 	

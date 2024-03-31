@@ -3,6 +3,7 @@ package com.siddhartha.garments.serviceImpl;
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,6 @@ import org.springframework.util.Base64Utils;
 
 import com.siddhartha.garments.entity.ExpensiveDetails;
 import com.siddhartha.garments.entity.PurchaseMaster;
-import com.siddhartha.garments.entity.WorkerEntryDetails;
 import com.siddhartha.garments.repository.WorkerEntryRepository;
 import com.siddhartha.garments.request.PurchaseReportReq;
 import com.siddhartha.garments.request.WorkerEntryDetailsReq;
@@ -44,35 +44,47 @@ public class ReportServiceImpl implements ReportService{
 	@Autowired
 	private WorkerEntryRepository workerEntryRepository;
 	
+	SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy/mm/dd");
+	
 	@Override
 	public CommonResponse getWorkerReport(WorkerReportReq req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<WorkerEntryDetails> list = query.getWorkerReportDetails(req);
-			if(!list.isEmpty()) {
-				List<Map<String,String>> mapList = new ArrayList<>();
-				list.forEach(p ->{
-					HashMap<String, String> map = new HashMap<String, String>();
-					map.put("SerialNo", p.getSerialNo().toString());
-					map.put("OrderId", p.getOrderId());
-					map.put("SectionId", p.getSectionId().toString());
-					map.put("OrderId", p.getOrderId());
-					map.put("ChallanId", p.getChallanId());
-					map.put("ColorId", p.getColorId().toString());
-					
-					map.put("UpdatedBy", p.getUpdatedBy());
-					map.put("EntryDate", sdf.format(p.getEntryDate()));
-					
-					mapList.add(map);
-				});
-				response.setError(null);
-				response.setMessage("Success");
-				response.setResponse(mapList);
+			Date startDate =sdf2.parse(req.getStartDate());
+			Date EndDate =sdf2.parse(req.getEndDate());
+			String start_date =sdf2.format(startDate);
+			String end_date =sdf2.format(EndDate);
+			List<Map<String,Object>> list =null;
+			if("ALL".equalsIgnoreCase(req.getOperatorId())) {
+			
+				 list = workerEntryRepository.getWorkerReport(start_date,end_date);
 			}else {
-				response.setError(null);
-				response.setMessage("Failed");
-				response.setResponse("No Record Found");
+				
+				list = workerEntryRepository.getWorkerReport(start_date,end_date,req.getOperatorId());
 			}
+			
+			if(list!=null) {
+				list.forEach(p ->{
+					Map<String,String> map = new HashMap<String, String>();
+					map.put("CompanyName", "");
+					map.put("ProductName", "");
+					map.put("OrderId", "");
+					map.put("LotNumber", "");
+					map.put("ChallanNo", "");
+					map.put("ColorName", "");
+					map.put("TotalPieces", "");
+					map.put("EmployeeWorkedPieces", "");
+					map.put("EmployeeFees", "");
+					map.put("SectionName", "");
+					map.put("OperatorName", "");
+					map.put("", "");
+					map.put("", "");
+					map.put("", "");
+				});
+			}else{
+				
+			}
+			
 		}catch (Exception e) {
 			e.printStackTrace();
 		}

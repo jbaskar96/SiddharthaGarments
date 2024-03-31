@@ -305,7 +305,7 @@ public class DropDownController {
 	}
 	
 	@GetMapping("/getColorDetails/{companyId}/{productId}")
-	public CommonResponse getColorDetails(Integer companyId,Integer productId) {
+	public CommonResponse getColorDetails(@PathVariable("companyId") Integer companyId,@PathVariable("productId")Integer productId) {
 		return service.getColorDetails(companyId,productId);
 	}
 	

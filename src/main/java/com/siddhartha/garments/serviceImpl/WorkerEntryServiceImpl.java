@@ -100,6 +100,8 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 						.perPiecesAmount(perPiecesAmt)
 						.totalAmount(Double.valueOf(formtAmt))
 						.numberOfPieces(noOfPieces)
+						.companyId(companyId)
+						.productId(productId)
 						.build();
 				workerEntryRepository.save(workerEntryDetails);
 				
