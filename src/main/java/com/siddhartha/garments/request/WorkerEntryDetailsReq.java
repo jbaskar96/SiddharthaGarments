@@ -43,14 +43,8 @@ public class WorkerEntryDetailsReq {
 	@JsonProperty("TotalPieces")
 	private String totalPieces;
 	
-	@JsonProperty("WorkedPieces")
-	private String workedPieces;
-	
-	@JsonProperty("DamagedPieces")
-	private String damagedPieces;
-	
-	@JsonProperty("GoodPieces")
-	private String goodPieces;
+	@JsonProperty("EmployeeWorkedPieces")
+	private String employeeWorkedPieces;
 	
 	@JsonProperty("UpdatedBy")
 	private String updatedBy;

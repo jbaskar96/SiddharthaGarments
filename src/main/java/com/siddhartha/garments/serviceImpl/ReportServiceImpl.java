@@ -59,9 +59,7 @@ public class ReportServiceImpl implements ReportService{
 					map.put("OrderId", p.getOrderId());
 					map.put("ChallanId", p.getChallanId());
 					map.put("ColorId", p.getColorId().toString());
-					map.put("WorkedPieces", p.getWorkedPieces().toString());
-					map.put("GoodPieces", p.getGoodPieces().toString());
-					map.put("DamagedPieces", p.getDamagedPieces().toString());
+					
 					map.put("UpdatedBy", p.getUpdatedBy());
 					map.put("EntryDate", sdf.format(p.getEntryDate()));
 					

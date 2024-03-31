@@ -1,5 +1,7 @@
 package com.siddhartha.garments.serviceImpl;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,8 +14,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.siddhartha.garments.entity.OrderDetails;
+import com.siddhartha.garments.entity.ProductSectionMaster;
+import com.siddhartha.garments.entity.ProductSectionMasterId;
 import com.siddhartha.garments.entity.WorkerEntryDetails;
+import com.siddhartha.garments.repository.OrderDetailsRepository;
+import com.siddhartha.garments.repository.ProductSectionMasterRepository;
 import com.siddhartha.garments.repository.WorkerEntryRepository;
 import com.siddhartha.garments.request.ErrorList;
 import com.siddhartha.garments.request.WorkerEntryDetailsReq;
@@ -31,7 +37,15 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 	private InputValidationServiceImpl validation;
 	
 	@Autowired
+	private ProductSectionMasterRepository psmRepo;
+	
+	@Autowired
+	private OrderDetailsRepository odRepo;
+	
+	@Autowired
 	private SimpleDateFormat sdf;
+	
+	public static final NumberFormat formatter = new DecimalFormat("#0.00"); 
 
 	@Override
 	public CommonResponse workerEntrySave(WorkerEntryDetailsReq req) {
@@ -41,26 +55,51 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 			List<ErrorList> error =validation.validateWorkerEntry(req);
 			
 			if(error.isEmpty()) {
+				
+				OrderDetails od = odRepo.findById(req.getOrderId()).get();
+				Integer companyId =od.getCompanyId();
+				Integer productId =od.getProductId();
+				Integer sectionId =Integer.valueOf(req.getSectionId());
+				
+				ProductSectionMasterId id = ProductSectionMasterId.builder()
+						.companyId(companyId)
+						.productId(productId)
+						.sectionId(sectionId)
+						.build();
+				
+				ProductSectionMaster psm =psmRepo.findById(id).get();
+				Double perPiecesAmt =psm.getPiecesAmount();
+				Integer noOfPieces =psm.getNoOfPieces();
+				Double totalAmount =0D;
+				if(StringUtils.isNotBlank(req.getSerialNo())) {
+					WorkerEntryDetails wed =workerEntryRepository.findById(Long.valueOf(req.getSerialNo())).get();
+					totalAmount = wed.getEmployeeWorkedPieces() / noOfPieces * perPiecesAmt;
+				}else {
+					totalAmount =Integer.valueOf(req.getEmployeeWorkedPieces()) / noOfPieces * perPiecesAmt;
+				}
+				
+				String formtAmt =formatter.format(totalAmount);
+				
 				WorkerEntryDetails workerEntryDetails =WorkerEntryDetails.builder()
 						.serialNo(StringUtils.isBlank(req.getSerialNo())?workerEntryRepository.count()+1:Long.valueOf(req.getSerialNo()))
 						.challanId(req.getChallanId())
 						.colorId(req.getColorId())
-						.damagedPieces(Integer.valueOf(req.getDamagedPieces()))
 						.entryDate(new Date())
-						.goodPieces(Integer.valueOf(req.getGoodPieces()))
 						.operatorId(req.getOperatorId())
 						.orderId(req.getOrderId())
 						.sectionId(Integer.valueOf(req.getSectionId()))
 						.status(StringUtils.isBlank(req.getStatus())?"Y":req.getStatus())
 						.updatedBy(req.getUpdatedBy())
-						.goodPieces(Integer.valueOf(req.getGoodPieces()))
-						.workedPieces(Integer.valueOf(req.getWorkedPieces()))
+						.employeeWorkedPieces(Integer.valueOf(req.getEmployeeWorkedPieces()))
 						.totalPieces(Integer.valueOf(req.getTotalPieces()))
 						.challanNo(req.getChallanNumber())
 						.operatorName(req.getOperatorName())
 						.sectionName(req.getSectionName())
 						.colorName(req.getColorName())
 						.lotNumber(req.getLotNumber())
+						.perPiecesAmount(perPiecesAmt)
+						.totalAmount(Double.valueOf(formtAmt))
+						.numberOfPieces(noOfPieces)
 						.build();
 				workerEntryRepository.save(workerEntryDetails);
 				
@@ -94,9 +133,8 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 					map.put("ChallanId", p.getChallanId());
 					map.put("ColorId", p.getColorId().toString());
 					map.put("WokedDate", sdf.format(p.getEntryDate()));
-					map.put("Wokedpieces", p.getWorkedPieces().toString());
-					map.put("GoodPieces", p.getGoodPieces().toString());
-					map.put("DamagePieces", p.getDamagedPieces().toString());
+					map.put("EmployeeWorkedPieces", p.getEmployeeWorkedPieces().toString());
+					map.put("TotalAmount", p.getTotalAmount().toString());
 					map.put("UpdatedBy", p.getUpdatedBy());
 					map.put("TotalPieces", p.getTotalPieces().toString());
 					map.put("OperatorName", p.getOperatorName());
@@ -104,6 +142,9 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 					map.put("LotNumber", p.getLotNumber());
 					map.put("ChallanNumber", p.getChallanNo());
 					map.put("ColorName", p.getColorName());
+					map.put("NoOfPieces", p.getNumberOfPieces().toString());
+					map.put("PerPiecesAmt", p.getPerPiecesAmount().toString());
+					
 					mapList.add(map);
 					
 				});
@@ -138,9 +179,8 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 					map.put("ChallanId", p.getChallanId());
 					map.put("ColorId", p.getColorId().toString());
 					map.put("WokedDate", sdf.format(p.getEntryDate()));
-					map.put("Wokedpieces", p.getWorkedPieces().toString());
-					map.put("GoodPieces", p.getGoodPieces().toString());
-					map.put("DamagePieces", p.getDamagedPieces().toString());
+					map.put("EmployeeWorkedPieces", p.getEmployeeWorkedPieces().toString());
+					map.put("TotalAmount", p.getTotalAmount().toString());
 					map.put("UpdatedBy", p.getUpdatedBy());
 					map.put("TotalPieces", p.getTotalPieces().toString());
 					map.put("OperatorName", p.getOperatorName());
@@ -148,6 +188,9 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 					map.put("LotNumber", p.getLotNumber());
 					map.put("ChallanNumber", p.getChallanNo());
 					map.put("ColorName", p.getColorName());
+					map.put("NoOfPieces", p.getNumberOfPieces().toString());
+					map.put("PerPiecesAmt", p.getPerPiecesAmount().toString());
+					
 					mapList.add(map);
 					
 				});
@@ -181,9 +224,8 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 				map.put("ChallanId", p.getChallanId());
 				map.put("ColorId", p.getColorId().toString());
 				map.put("WokedDate", sdf.format(p.getEntryDate()));
-				map.put("Wokedpieces", p.getWorkedPieces().toString());
-				map.put("GoodPieces", p.getGoodPieces().toString());
-				map.put("DamagePieces", p.getDamagedPieces().toString());
+				map.put("EmployeeWorkedPieces", p.getEmployeeWorkedPieces().toString());
+				map.put("TotalAmount", p.getTotalAmount().toString());
 				map.put("UpdatedBy", p.getUpdatedBy());
 				map.put("TotalPieces", p.getTotalPieces().toString());
 				map.put("OperatorName", p.getOperatorName());
@@ -191,6 +233,9 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 				map.put("LotNumber", p.getLotNumber());
 				map.put("ChallanNumber", p.getChallanNo());
 				map.put("ColorName", p.getColorName());
+				map.put("NoOfPieces", p.getNumberOfPieces().toString());
+				map.put("PerPiecesAmt", p.getPerPiecesAmount().toString());
+				
 				response.setError(null);
 				response.setMessage("Success");
 				response.setResponse(map);

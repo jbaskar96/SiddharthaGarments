@@ -59,14 +59,17 @@ public class WorkerEntryDetails {
 	@Column(name="TOTAL_PIECES")
 	private Integer totalPieces;
 	
-	@Column(name="WORKED_PIECES")
-	private Integer workedPieces;
+	@Column(name="EMPLOYEE_WORKED_PIECES")
+	private Integer employeeWorkedPieces;
 	
-	@Column(name="DAMAGED_PIECES")
-	private Integer damagedPieces;
+	@Column(name="NUMBER_OF_PIECES")
+	private Integer numberOfPieces;
 	
-	@Column(name="GOOD_PIECES")
-	private Integer goodPieces;
+	@Column(name="PER_PIECES_AMOUNT")
+	private Double perPiecesAmount;
+	
+	@Column(name="TOTAL_AMOUNT")
+	private Double totalAmount;
 	
 	@Column(name="UPDATED_BY")
 	private String updatedBy;

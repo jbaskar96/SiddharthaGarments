@@ -4,7 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,14 +75,9 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 	@Autowired
 	private  JdbcTemplate jdbcTemplate;
 	
-	@Autowired
-	private SimpleDateFormat sdf;
-	
+
 	@Autowired
 	private MetalCalculationServiceImpl metalServiceImpl;
-	
-	@Autowired
-	private InputValidationServiceImpl validation;
 	
 	@Autowired
 	private ProductMetalRepository productMetalRepo;

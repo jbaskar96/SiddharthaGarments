@@ -56,6 +56,7 @@ import com.siddhartha.garments.request.UserDetailsRequest;
 import com.siddhartha.garments.request.UserTypeRequest;
 import com.siddhartha.garments.request.WorkerEntryDetailsReq;
 import com.siddhartha.garments.response.OrderBillingRequest;
+import com.siddhartha.garments.response.ProductMetalReq;
 
 @Component
 public class InputValidationServiceImpl {
@@ -489,35 +490,43 @@ public class InputValidationServiceImpl {
 			if(StringUtils.isBlank(d.getChallanId())) {
 				errorLists.add(new ErrorList("Size","450","Please choose size"));
 			}
+			
+			if(StringUtils.isBlank(d.getChallanNumber())) {
+				errorLists.add(new ErrorList("ChallanNumber","450","Please enter ChallanNumber"));
+			}
+			
+			
 			if(StringUtils.isBlank(d.getColorId())) {
 				errorLists.add(new ErrorList("Color","450","Please choose color"));
 			}
 			
-			if(StringUtils.isBlank(d.getGoodPieces())) {
-				errorLists.add(new ErrorList("GoodPieces","450","Please enter GoodPieces"));
-			}else if(!NumberUtils.isCreatable(d.getGoodPieces())) {
-				errorLists.add(new ErrorList("GoodPieces","450","GoodPieces allows only digits"));
+			if(StringUtils.isBlank(d.getColorName())) {
+				errorLists.add(new ErrorList("ColorName","450","Please choose ColorName"));
 			}
 			
-			if(StringUtils.isBlank(d.getDamagedPieces())) {
-				errorLists.add(new ErrorList("DamagedPieces","450","Please enter DamagedPieces"));
-			}else if(!NumberUtils.isCreatable(d.getDamagedPieces())) {
-				errorLists.add(new ErrorList("DamagedPieces","450","DamagedPieces allows only digits"));
+			if(StringUtils.isBlank(d.getSectionId())) {
+				errorLists.add(new ErrorList("Section","450","Please choose section"));
+			}
+			
+			if(StringUtils.isBlank(d.getSectionName())) {
+				errorLists.add(new ErrorList("SectionName","450","Please enter SectionName"));
+			}
+			
+			if(StringUtils.isBlank(d.getEmployeeWorkedPieces())) {
+				errorLists.add(new ErrorList("EmployeeWorkedPieces","450","Please enter EmployeeWorkedPieces"));
+			}else if(!NumberUtils.isCreatable(d.getEmployeeWorkedPieces())) {
+				errorLists.add(new ErrorList("EmployeeWorkedPieces","450","EmployeeWorkedPieces allows only digits"));
 			}
 			
 			if(StringUtils.isBlank(d.getOperatorId())) {
 				errorLists.add(new ErrorList("Operator","450","Please choose operator"));
 			}
-			if(StringUtils.isBlank(d.getSectionId())) {
-				errorLists.add(new ErrorList("SectionId","450","Please choose section"));
+			if(StringUtils.isBlank(d.getOperatorName())) {
+				errorLists.add(new ErrorList("OperatorName","450","Please choose OperatorName"));
 			}
+			
 			if(StringUtils.isBlank(d.getUpdatedBy())) {
 				errorLists.add(new ErrorList("UpdatedBy","450","Please enter UpdatedBy"));
-			}
-			if(StringUtils.isBlank(d.getWorkedPieces())) {
-				errorLists.add(new ErrorList("WorkedPieces","450","Please enter WorkedPieces"));
-			}else if(!NumberUtils.isCreatable(d.getWorkedPieces())) {
-				errorLists.add(new ErrorList("WorkedPieces","450","WorkedPieces allows only digits"));
 			}
 			
 			if(StringUtils.isBlank(d.getTotalPieces())) {
@@ -527,51 +536,46 @@ public class InputValidationServiceImpl {
 			}
 			
 			if(StringUtils.isBlank(d.getOrderId())) {
-				errorLists.add(new ErrorList("Order","450","Please choose LotNumber"));
+				errorLists.add(new ErrorList("Order","450","Please enter OrderId"));
+			}else {
+				Long count =workerEntryRepo.checkDuplicateEntry(d.getOrderId(),d.getChallanId(),d.getColorId(),d.getSectionId(),d.getOperatorId());
+				if(count>0) {
+					errorLists.add(new ErrorList("Worker","450","You have already put entry for today.You cannot make another entry for today. if you want update ans existing data for today .. Contact Admin....!"));
+				}
+			}
+			
+			if(StringUtils.isBlank(d.getLotNumber())) {
+				errorLists.add(new ErrorList("LotNumber","450","Please choose LotNumber"));
 			}
 			
 			
-			if(StringUtils.isNotEmpty(d.getDamagedPieces()) && NumberUtils.isCreatable(d.getDamagedPieces()) &&
-					StringUtils.isNotEmpty(d.getWorkedPieces()) && NumberUtils.isCreatable(d.getWorkedPieces()) &&	
-							StringUtils.isNotEmpty(d.getGoodPieces()) && NumberUtils.isCreatable(d.getGoodPieces())){
-						
-					  Long workedPieces =Long.valueOf(d.getWorkedPieces());
-					  Long damage_pieces =Long.valueOf(d.getDamagedPieces());
-					  Long good_pieces =Long.valueOf(d.getGoodPieces());
-					  Long totalWorkerPieces = workedPieces + damage_pieces + good_pieces;
+			if(StringUtils.isNotEmpty(d.getEmployeeWorkedPieces()) && StringUtils.isNotEmpty(d.getTotalPieces())
+					&& NumberUtils.isCreatable(d.getEmployeeWorkedPieces()) &&  NumberUtils.isCreatable(d.getTotalPieces())
+					) {
+							
+					  Long employeeWorkedPieces =Long.valueOf(d.getEmployeeWorkedPieces());
 					  Long totalPieces =Long.valueOf(d.getTotalPieces());
 					  
-					  if(totalPieces>totalWorkerPieces) {
-							errorLists.add(new ErrorList("Error","450","Your daliy entry pieces should not greater than total pieces"));
+					  if(employeeWorkedPieces>totalPieces) {
+							errorLists.add(new ErrorList("Error","450","EmployeeWorkedPieces should not greater than total pieces"));
 
-					  }if(workedPieces>totalPieces) {
-						  
-							errorLists.add(new ErrorList("Error","450","Your daliy worked pieces should not greater than total pieces"));
-						  
-					  }if(damage_pieces>totalPieces) {
-						  
-							errorLists.add(new ErrorList("Error","450","Your daliy damage pieces should not greater than total pieces"));
-
-						  
-					  }if(good_pieces>totalPieces) {
-						  
-							errorLists.add(new ErrorList("Error","450","Your daliy good pieces should not greater than total pieces"));
- 
 					  }
-					  
 					  List<WorkerEntryDetails> workerList =workerEntryRepo.findByOrderIdAndChallanIdAndColorId(d.getOrderId(),d.getChallanId(),d.getColorId());
 					  
 					  Long existingPieces =workerList.stream()
-							  .map(p ->Long.valueOf(p.getWorkedPieces())
-							  ).collect(Collectors.summingLong(k ->k));
+							  .map(p ->Long.valueOf(p.getEmployeeWorkedPieces())
+							  ).collect(Collectors.summingLong(k ->k)) ;
 					  
-					  if(totalWorkerPieces > existingPieces) {
+					  Long total_existing_pieces = existingPieces + employeeWorkedPieces;
+					  
+					  if(total_existing_pieces > totalPieces) {
 						  
-							errorLists.add(new ErrorList("Error","450","Your daliy entry pieces ("+totalWorkerPieces+") should not greater than existing pieces  ("+existingPieces+""));
+							errorLists.add(new ErrorList("Error","450","This slot limit has exceed .. Already "+existingPieces+""
+									+ " pieces are there and you are trying to enter "+employeeWorkedPieces+" this slot total color pieces are "+totalPieces+""));
 
 					  }
 					  
-					}
+			}
 			
 			
 		}catch (Exception e) {
@@ -940,6 +944,22 @@ public class InputValidationServiceImpl {
 				
 				rowno++;
 			}
+			
+			if(errorLists.isEmpty()) {
+				
+				Map<String, Long> displayOrder =req.stream()
+						.collect(Collectors.groupingBy(p ->p.getDisplayOrder(),Collectors.counting()));
+				
+				for (Map.Entry<String, Long> entry : displayOrder.entrySet()) {
+					
+					if(entry.getValue()>1) {
+						errorLists.add(new ErrorList("DisplayOrder","Row : "+rowno+"","Duplicate DisplayOrder does not allow"));
+						break ;
+					}
+					
+				}
+				
+			}
 		}
 		return errorLists;
 	}
@@ -1028,6 +1048,23 @@ public class InputValidationServiceImpl {
 				
 				rowno++;
 			}
+			
+			if(errorLists.isEmpty()) {
+				
+				Map<String, Long> displayOrder =req.stream()
+						.collect(Collectors.groupingBy(p ->p.getDisplayOrder(),Collectors.counting()));
+				
+				for (Map.Entry<String, Long> entry : displayOrder.entrySet()) {
+					
+					if(entry.getValue()>1) {
+						errorLists.add(new ErrorList("DisplayOrder","Row : "+rowno+"","Duplicate DisplayOrder does not allow"));
+						break ;
+					}
+					
+				}
+				
+			}
+			
 		}
 		return errorLists;
 	}
@@ -1125,8 +1162,114 @@ public class InputValidationServiceImpl {
 	}
 
 	public List<ErrorList> validateSection(List<SectionSaveRequest> req) {
-		// TODO Auto-generated method stub
-		return new ArrayList<ErrorList>();
+		List<ErrorList> errorLists = new ArrayList<>();
+		if(req.isEmpty()) {
+			errorLists.add(new ErrorList("Section","101","Please enter sectionDetails"));
+		}else {
+			int rowno =1;
+			for(SectionSaveRequest r : req) {
+				
+				if(StringUtils.isBlank(r.getCompanyId())) {
+					errorLists.add(new ErrorList("CompanyId","Row : "+rowno+"","Please enter CompanyId"));
+				}
+				
+				if(StringUtils.isBlank(r.getNoOfPieces())) {
+					errorLists.add(new ErrorList("NoOfPieces","Row : "+rowno+"","Please enter NoOfPieces"));
+				}else if(!NumberUtils.isDigits(r.getNoOfPieces())){
+					errorLists.add(new ErrorList("NoOfPieces","Row : "+rowno+"","NoOfPiecesallows only digits"));
+				}
+				
+				if(StringUtils.isBlank(r.getPieceAmount())) {
+					errorLists.add(new ErrorList("PieceAmount","Row : "+rowno+"","Please enter PieceAmount"));
+				}else if(!NumberUtils.isDigits(r.getPieceAmount())){
+					errorLists.add(new ErrorList("PieceAmount","Row : "+rowno+"","PieceAmount only digits"));
+				}
+				
+				if(StringUtils.isBlank(r.getProductId())) {
+					errorLists.add(new ErrorList("ProductId","Row : "+rowno+"","Please enter ProductId"));
+				}
+				
+				if(StringUtils.isBlank(r.getSectionName())) {
+					errorLists.add(new ErrorList("SectionName","Row : "+rowno+"","Please enter SectionName"));
+				}
+				
+				if(StringUtils.isBlank(r.getStatus())) {
+					errorLists.add(new ErrorList("Status","Row : "+rowno+"","Please enter Status"));
+				}
+			}
+		}
+		return errorLists;
 	}
+
+	public List<ErrorList> productMetal(List<ProductMetalReq> req) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		if(req.isEmpty()) {
+			errorLists.add(new ErrorList("ColorInfo","101","Please enter SizeMetalInfo"));
+		}else {
+			int rowno =1;
+			for(ProductMetalReq r : req) {
+				
+				if(StringUtils.isBlank(r.getDisplayOrder())) {
+					errorLists.add(new ErrorList("DisplayOrder","Row : "+rowno+"","Please enter DisplayOrder"));
+				}else if(!r.getDisplayOrder().matches("[0-9]*")) {
+					errorLists.add(new ErrorList("DisplayOrder","Row : "+rowno+"","DisplayOrder only allows digits"));
+				}
+				
+				if(StringUtils.isBlank(r.getMesurementPieces())) {
+					errorLists.add(new ErrorList("MesurementPieces","Row : "+rowno+"","Please enter MesurementPieces"));
+				}else if(!r.getMesurementPieces().matches("[0-9]*")) {
+					errorLists.add(new ErrorList("MesurementPieces","Row : "+rowno+"","MesurementPieces allows only digits"));
+				}
+				
+				if(StringUtils.isBlank(r.getMesurementType())) {
+					errorLists.add(new ErrorList("MesurementType","Row : "+rowno+"","Please enter MesurementType"));
+				}
+				
+				if(StringUtils.isBlank(r.getMesurementValue())) {
+					errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","Please enter MesurementValue"));
+				}else if(NumberUtils.isParsable(r.getMesurementValue())) {
+					//errorLists.add(new ErrorList("MesurementValue","Row : "+rowno+"","MesurementValue allows only digits"));
+				}
+				
+				if(StringUtils.isBlank(r.getMetalName())) {
+					errorLists.add(new ErrorList("MetalName","Row : "+rowno+"","Please enter MetalName"));
+				}
+				
+				
+				if(StringUtils.isBlank(r.getCompanyId())) {
+					errorLists.add(new ErrorList("CompanyId","Row : "+rowno+"","Please enter CompanyId"));
+				}
+				
+				if(StringUtils.isBlank(r.getProductId())) {
+					errorLists.add(new ErrorList("ProductId","Row : "+rowno+"","Please enter ProductId"));
+				}
+				
+				
+				if(StringUtils.isBlank(r.getStatus())) {
+					errorLists.add(new ErrorList("Status","Row : "+rowno+"","Please enter Status"));
+				}
+				
+				rowno++;
+			}
+			
+			if(errorLists.isEmpty()) {
+				
+				Map<String, Long> displayOrder =req.stream()
+						.collect(Collectors.groupingBy(p ->p.getDisplayOrder(),Collectors.counting()));
+				
+				for (Map.Entry<String, Long> entry : displayOrder.entrySet()) {
+					
+					if(entry.getValue()>1) {
+						errorLists.add(new ErrorList("DisplayOrder","Row : "+rowno+"","Duplicate DisplayOrder does not allow"));
+						break ;
+					}
+					
+				}
+				
+			}
+		}
+		return errorLists;
+	}
+
 		
 }

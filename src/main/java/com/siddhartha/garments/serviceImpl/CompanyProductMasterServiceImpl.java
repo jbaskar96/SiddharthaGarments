@@ -954,7 +954,7 @@ public class CompanyProductMasterServiceImpl implements CompanyProductMasterServ
 	public CommonResponse saveProductMetal(List<ProductMetalReq> req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<ErrorList> error = new ArrayList<>();
+			List<ErrorList> error = validation.productMetal(req);
 			if(error.isEmpty()) {
 				
 				int sno =1;

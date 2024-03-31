@@ -18,4 +18,7 @@ public interface WorkerEntryRepository  extends JpaRepository<WorkerEntryDetails
 
 	List<WorkerEntryDetails> findByOrderIdAndChallanIdAndColorId(String orderId, String challanId, String colorId);
 
+	@Query(value ="SELECT COUNT(*) FROM worker_entry_details WHERE order_id =?1 AND challan_id=?2 AND color_id=?3 AND section_id=?4 AND operator_id=?5 AND DATE(entry_date)=DATE(CURRENT_DATE)",nativeQuery=true)
+	Long checkDuplicateEntry(String orderId,String challanId,String colorId,String sectionId,String operatorId);
+
 }
