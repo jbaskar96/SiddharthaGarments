@@ -23,6 +23,7 @@ import org.springframework.util.Base64Utils;
 
 import com.siddhartha.garments.entity.ExpensiveDetails;
 import com.siddhartha.garments.entity.PurchaseMaster;
+import com.siddhartha.garments.repository.PurchaseRepository;
 import com.siddhartha.garments.repository.WorkerEntryRepository;
 import com.siddhartha.garments.request.PurchaseReportReq;
 import com.siddhartha.garments.request.WorkerEntryDetailsReq;
@@ -44,17 +45,22 @@ public class ReportServiceImpl implements ReportService{
 	@Autowired
 	private WorkerEntryRepository workerEntryRepository;
 	
-	SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy/mm/dd");
+	@Autowired
+	private PurchaseRepository purchaseRepo;
 	
+	SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+	SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd");
+
 	@Override
 	public CommonResponse getWorkerReport(WorkerReportReq req) {
 		CommonResponse response = new CommonResponse();
 		try {
 			Date startDate =sdf2.parse(req.getStartDate());
 			Date EndDate =sdf2.parse(req.getEndDate());
-			String start_date =sdf2.format(startDate);
-			String end_date =sdf2.format(EndDate);
+			String start_date =sdf3.format(startDate);
+			String end_date =sdf3.format(EndDate);
 			List<Map<String,Object>> list =null;
+			List<Map<String,String>> mapList =new ArrayList<>();
 			if("ALL".equalsIgnoreCase(req.getOperatorId())) {
 			
 				 list = workerEntryRepository.getWorkerReport(start_date,end_date);
@@ -66,23 +72,27 @@ public class ReportServiceImpl implements ReportService{
 			if(list!=null) {
 				list.forEach(p ->{
 					Map<String,String> map = new HashMap<String, String>();
-					map.put("CompanyName", "");
-					map.put("ProductName", "");
-					map.put("OrderId", "");
-					map.put("LotNumber", "");
-					map.put("ChallanNo", "");
-					map.put("ColorName", "");
-					map.put("TotalPieces", "");
-					map.put("EmployeeWorkedPieces", "");
-					map.put("EmployeeFees", "");
-					map.put("SectionName", "");
-					map.put("OperatorName", "");
-					map.put("", "");
-					map.put("", "");
-					map.put("", "");
+					map.put("CompanyName", p.get("company_name")==null?"":p.get("company_name").toString());
+					map.put("ProductName",p.get("product_name")==null?"":p.get("product_name").toString());
+					map.put("OrderId", p.get("order_id")==null?"":p.get("order_id").toString());
+					map.put("LotNumber", p.get("lot_number")==null?"":p.get("lot_number").toString());
+					map.put("ChallanNo", p.get("challan_no")==null?"":p.get("challan_no").toString());
+					map.put("ColorName", p.get("color_name")==null?"":p.get("color_name").toString());
+					map.put("TotalPieces", p.get("total_pieces")==null?"":p.get("total_pieces").toString());
+					map.put("EmployeeWorkedPieces",p.get("employee_worked_pieces")==null?"":p.get("employee_worked_pieces").toString());
+					map.put("EmployeeFees", p.get("total_pieces")==null?"":p.get("total_pieces").toString());
+					map.put("SectionName", p.get("operator_name")==null?"":p.get("operator_name").toString());
+					map.put("OperatorName", p.get("section_name")==null?"":p.get("section_name").toString());
+					mapList.add(map);
 				});
-			}else{
+				response.setResponse(mapList);
+				response.setMessage("Success");
+				response.setError(null);
+			}else {
 				
+				response.setResponse("No data found");
+				response.setMessage("Failed");
+				response.setError(null);
 			}
 			
 		}catch (Exception e) {
@@ -204,33 +214,42 @@ public class ReportServiceImpl implements ReportService{
 	public CommonResponse getPurchaseReport(PurchaseReportReq req) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<PurchaseMaster> list =query.getPurchaseReport(req);
-			if(!list.isEmpty()) {
-				List<Map<String,String>> mapList = new ArrayList<>();
+			Date startDate =sdf2.parse(req.getStartDate());
+			Date EndDate =sdf2.parse(req.getEndDate());
+			String start_date =sdf3.format(startDate);
+			String end_date =sdf3.format(EndDate);
+			List<Map<String,Object>> list =null;
+			List<Map<String,String>> mapList =new ArrayList<>();
+			if("ALL".equalsIgnoreCase(req.getCategoryType())) {
+				list =purchaseRepo.getPurchaseReport(start_date,end_date);
+			}else {
+				list =purchaseRepo.getPurchaseReport(start_date,end_date,req.getCategoryType());
+			}
+			
+			if(list!=null) {
 				list.forEach(p ->{
 					HashMap<String, String> map = new HashMap<String, String>();
-					map.put("SerialNo", p.getSerialNo().toString());
-					map.put("CategoryId", p.getCategoryId().toString());
-					map.put("BillRefNo", p.getBillRefNo());
-					map.put("SupplierName", p.getSupplierName());
-					map.put("AmountBeforeTax", p.getAmountBeforetax().toString());
-					map.put("Sgst", p.getSgst().toString());
-					map.put("Cgst", p.getCgst().toString());
-					map.put("SgstTax", p.getSgstTax().toString());
-					map.put("cgstTax", p.getCgstTax().toString());
-					map.put("TotalAmount", p.getTotalAmount().toString());
-					map.put("BillReferenceDate", sdf.format(p.getBillDate()));
-					
+					//map.put("SerialNo",p.get("")==null?"":p.get("").toString());
+					map.put("CategoryId", p.get("bill_type")==null?"":p.get("bill_type").toString());
+					map.put("BillRefNo", p.get("bill_ref_no")==null?"":p.get("bill_ref_no").toString());
+					map.put("SupplierName", p.get("supplier_name")==null?"":p.get("supplier_name").toString());
+					map.put("AmountBeforeTax",p.get("amount_before_tax")==null?"":p.get("amount_before_tax").toString());
+					map.put("SgstTax", p.get("sgst_tax")==null?"":p.get("sgst_tax").toString());
+					map.put("cgstTax", p.get("cgst_tax")==null?"":p.get("cgst_tax").toString());
+					map.put("TotalAmount",p.get("total_amount")==null?"":p.get("total_amount").toString());
+					map.put("BillReferenceDate", p.get("bill_date")==null?"":p.get("bill_date").toString());
 					mapList.add(map);
 				});
-				response.setError(null);
-				response.setMessage("Success");
 				response.setResponse(mapList);
-			}else {
+				response.setMessage("Success");
 				response.setError(null);
+			}else {
+				
+				response.setResponse("No data found");
 				response.setMessage("Failed");
-				response.setResponse("No Record Found");
+				response.setError(null);
 			}
+			
 		}catch (Exception e) {
 			e.printStackTrace();
 		}

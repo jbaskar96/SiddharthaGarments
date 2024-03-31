@@ -98,7 +98,7 @@ public class CriteriaQueryServiceImpl {
 			Root<WorkerEntryDetails> worker =query.from(WorkerEntryDetails.class);
 			List<Predicate> predicates = new ArrayList<Predicate>();
 			
-			if("OPT".equalsIgnoreCase(req.getReportType())) {
+			/*if("OPT".equalsIgnoreCase(req.getReportType())) {
 				predicates.add(cb.equal(worker.get("operatorId"), req.getReportValue()));
 			}else if("O".equalsIgnoreCase(req.getReportType())) {
 				predicates.add(cb.equal(worker.get("orderId"), req.getReportValue()));
@@ -108,7 +108,7 @@ public class CriteriaQueryServiceImpl {
 				Date start_date =sdf.parse(req.getStartDate());
 				Date end_date =sdf.parse(req.getEndDate());
 				predicates.add(cb.between(worker.get("entryDate"),start_date,end_date));
-			}
+			}*/
 				
 			Predicate wh[] = new Predicate[predicates.size()];
 			predicates.toArray(wh);
@@ -138,7 +138,7 @@ public class CriteriaQueryServiceImpl {
 			
 			Date startDate =sdf.parse(req.getStartDate());
 			Date endDate =sdf.parse(req.getEndDate());
-			if("1".equals(req.getReportType())) {
+			/*if("1".equals(req.getReportType())) {
 				predicates.add(cb.between(root.get("billDate"),startDate,endDate));
 				predicates.add(cb.equal(root.get("categoryId"), 1));
 			}else if ("2".equals(req.getReportType())) {
@@ -146,7 +146,7 @@ public class CriteriaQueryServiceImpl {
 				predicates.add(cb.equal(root.get("categoryId"), 2));
 			}else if("ALL".equalsIgnoreCase(req.getReportType())) {
 				predicates.add(cb.between(root.get("billDate"),startDate,endDate));
-			}
+			}*/
 			
 			TypedQuery<PurchaseMaster> list =em.createQuery(query);
 			

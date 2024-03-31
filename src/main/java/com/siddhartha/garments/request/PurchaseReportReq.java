@@ -13,8 +13,8 @@ public class PurchaseReportReq {
 	@JsonProperty("EndDate")
 	private String endDate;
 
-	@JsonProperty("ReportType")
-	private String reportType;
+	@JsonProperty("CategoryType")
+	private String categoryType;
 
 	
 

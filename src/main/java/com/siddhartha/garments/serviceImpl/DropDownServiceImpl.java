@@ -262,24 +262,29 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse operator() {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<OperatorMaster> list =operatorRepo.findByStatusIgnoreCase("Y");
-			if(!list.isEmpty()) {
-				List<Map<String,String>> res = new ArrayList<>();
-				list.forEach(p ->{
-					String desc =p.getFirstName().concat(StringUtils.isBlank(p.getLastName())?"":p.getLastName());
-					HashMap<String, String> map = new HashMap<String, String>();
-					map.put("Code", p.getOperatorId());
-					map.put("CodeDesc",desc);
-					res.add(map);
-				});
-				response.setError(null);
-				response.setMessage("Success");
-				response.setResponse(res);
-			}else {
-				response.setError(null);
-				response.setMessage("Success");
-				response.setResponse("No data found");
-			}
+			List<Map<String,String>> res = new ArrayList<>();
+			
+			HashMap<String, String> map1 = new HashMap<String, String>();
+			map1.put("Code","OPT_1");
+			map1.put("CodeDesc","baskar");
+			
+			HashMap<String, String> map2 = new HashMap<String, String>();
+			map2.put("Code","OPT_2");
+			map2.put("CodeDesc","Saravanan");
+			
+			HashMap<String, String> map3 = new HashMap<String, String>();
+			map3.put("Code","OPT_3");
+			map3.put("CodeDesc","Kalaivanan");
+			
+			
+			
+			res.add(map2);
+			res.add(map1);
+			res.add(map3);
+			response.setError(null);
+			response.setMessage("Success");
+			response.setResponse(res);
+
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
