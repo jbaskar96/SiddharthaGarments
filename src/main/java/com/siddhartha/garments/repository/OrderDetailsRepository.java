@@ -44,7 +44,7 @@ public interface OrderDetailsRepository extends JpaRepository<OrderDetails, Stri
 	
 	@Transactional
 	@Modifying		
-	@Query(nativeQuery = true,value ="delete from METAL_CALC_DEATILS where order_id=?1 and CHALLAN_ID is null and color_id is null and TYPE_NAME=?3")
+	@Query(nativeQuery = true,value ="delete from METAL_CALC_DEATILS where order_id=?1 and CHALLAN_ID is null and color_id is null and TYPE_NAME=?2")
 	Integer deleteProductReceivedMetal(String orderId,String type);
 	
 	

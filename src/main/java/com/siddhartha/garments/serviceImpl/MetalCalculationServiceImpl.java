@@ -276,8 +276,9 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 			List<Map<String,Object>> metal =orderDetailsRepo.getMetalDetails(orderId);
 			for(SizeFoldingDetailsReq r :req.getSizeFoldingDetails()) {
 				
-				Map<String,Object> map =metal.stream().
-						filter(p->p.get("CHALLAN_ID").toString().equalsIgnoreCase(r.getChallanId()))
+				Map<String,Object> map =metal.stream()
+						.filter(p->p.get("CHALLAN_ID")!=null)
+						.filter(p->p.get("CHALLAN_ID").toString().equalsIgnoreCase(r.getChallanId()))
 						.filter(p ->p.get("COLOR_ID")==null)
 						.filter(p->p.get("TYPE_NAME").toString().equalsIgnoreCase("PARAMS"))
 								.collect(Collectors.toList()).get(0);
