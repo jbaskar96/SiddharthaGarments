@@ -47,8 +47,8 @@ public class WorkerEntryDetails {
 	@Column(name="CHALLAN_ID")
 	private String challanId;
 	
-	@Column(name="CHALLAN_NO")
-	private String challanNo;
+	@Column(name="SIZE")
+	private Integer size;
 	
 	@Column(name="COLOR_ID")
 	private String colorId;

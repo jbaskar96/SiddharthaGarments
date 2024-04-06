@@ -491,8 +491,8 @@ public class InputValidationServiceImpl {
 				errorLists.add(new ErrorList("Size","450","Please choose size"));
 			}
 			
-			if(StringUtils.isBlank(d.getChallanNumber())) {
-				errorLists.add(new ErrorList("ChallanNumber","450","Please enter ChallanNumber"));
+			if(StringUtils.isBlank(d.getSize())) {
+				errorLists.add(new ErrorList("Size","450","Please enter size"));
 			}
 			
 			

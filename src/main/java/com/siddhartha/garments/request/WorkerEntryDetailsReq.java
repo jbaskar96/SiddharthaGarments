@@ -31,8 +31,8 @@ public class WorkerEntryDetailsReq {
 	@JsonProperty("ChallanId")
 	private String challanId;
 	
-	@JsonProperty("ChallanNumber")
-	private String challanNumber;
+	@JsonProperty("Size")
+	private String Size;
 	
 	@JsonProperty("ColorId")
 	private String colorId;

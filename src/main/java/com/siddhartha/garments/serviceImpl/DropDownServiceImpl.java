@@ -500,7 +500,7 @@ public class DropDownServiceImpl implements DropDownService{
 	public CommonResponse getOrderDetails() {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<OrderDetails> list =orderRepo.findByStatusIgnoreCase("Y", Sort.by("lotNumber").ascending());
+			List<OrderDetails> list =orderRepo.findByStatusIgnoreCase("P", Sort.by("lotNumber").ascending());
 			if(!list.isEmpty()) {
 				List<Map<String,String>> res = new ArrayList<>();
 				list.forEach(p ->{

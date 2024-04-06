@@ -92,7 +92,7 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 						.updatedBy(req.getUpdatedBy())
 						.employeeWorkedPieces(Integer.valueOf(req.getEmployeeWorkedPieces()))
 						.totalPieces(Integer.valueOf(req.getTotalPieces()))
-						.challanNo(req.getChallanNumber())
+						.size(Integer.valueOf(req.getSize()))
 						.operatorName(req.getOperatorName())
 						.sectionName(req.getSectionName())
 						.colorName(req.getColorName())
@@ -109,9 +109,9 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 				response.setMessage("Success");
 				response.setResponse("Data Saved Successfully");
 			}else {
-				response.setError(null);
+				response.setError(error);
 				response.setMessage("Error");
-				response.setResponse(error);
+				response.setResponse(null);
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -142,7 +142,7 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 					map.put("OperatorName", p.getOperatorName());
 					map.put("SectionName", p.getSectionName());
 					map.put("LotNumber", p.getLotNumber());
-					map.put("ChallanNumber", p.getChallanNo());
+					map.put("Size", p.getSize().toString());
 					map.put("ColorName", p.getColorName());
 					map.put("NoOfPieces", p.getNumberOfPieces().toString());
 					map.put("PerPiecesAmt", p.getPerPiecesAmount().toString());
@@ -188,7 +188,7 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 					map.put("OperatorName", p.getOperatorName());
 					map.put("SectionName", p.getSectionName());
 					map.put("LotNumber", p.getLotNumber());
-					map.put("ChallanNumber", p.getChallanNo());
+					map.put("Size", p.getSize().toString());
 					map.put("ColorName", p.getColorName());
 					map.put("NoOfPieces", p.getNumberOfPieces().toString());
 					map.put("PerPiecesAmt", p.getPerPiecesAmount().toString());
@@ -233,7 +233,7 @@ public class WorkerEntryServiceImpl implements WorkerEntryService {
 				map.put("OperatorName", p.getOperatorName());
 				map.put("SectionName", p.getSectionName());
 				map.put("LotNumber", p.getLotNumber());
-				map.put("ChallanNumber", p.getChallanNo());
+				map.put("Size", p.getSize().toString());
 				map.put("ColorName", p.getColorName());
 				map.put("NoOfPieces", p.getNumberOfPieces().toString());
 				map.put("PerPiecesAmt", p.getPerPiecesAmount().toString());
