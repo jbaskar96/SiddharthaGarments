@@ -20,4 +20,6 @@ public interface ProductColorMasterRepository extends JpaRepository<ProductColor
 
 	List<ProductColorMaster> findByStatusIgnoreCase(String string);
 
+
+
 }

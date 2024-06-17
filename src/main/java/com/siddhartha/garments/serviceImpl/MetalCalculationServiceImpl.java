@@ -27,12 +27,14 @@ import org.springframework.stereotype.Service;
 import com.siddhartha.garments.dto.EditOrderDetailsReq;
 import com.siddhartha.garments.dto.InsertSizeCalcRequest;
 import com.siddhartha.garments.dto.SizeFoldingDetailsReq;
+import com.siddhartha.garments.entity.CompanyMeterialMaster;
 import com.siddhartha.garments.entity.OrderChallanDetails;
 import com.siddhartha.garments.entity.OrderColorDetails;
 import com.siddhartha.garments.entity.OrderDetails;
 import com.siddhartha.garments.entity.ProductColorMetalMaster;
 import com.siddhartha.garments.entity.ProductMetalMaster;
 import com.siddhartha.garments.entity.ProductSizeMetalMaster;
+import com.siddhartha.garments.repository.CompanyMeterialMasterRepository;
 import com.siddhartha.garments.repository.OrderChallanDetailsRepository;
 import com.siddhartha.garments.repository.OrderColorDetailsRepository;
 import com.siddhartha.garments.repository.OrderDetailsRepository;
@@ -67,6 +69,9 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 	@Autowired
 	private ProductColorMetalMasterRepository colorMetalRepo;
 	
+	@Autowired
+	private CompanyMeterialMasterRepository cmmRepository;
+	
 	@PersistenceContext
 	private EntityManager em;
 	
@@ -99,40 +104,26 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 			List<Map<Object,Object>> list =new ArrayList<>();
 			for(OrderChallanDetails ocd : challan) {
 				
+				Integer sizeId =ocd.getSizeId();
 				Map<Object,Object> map = new HashMap<Object,Object>();
-				List<ProductSizeMetalMaster> metal =sizeMetalRepo.findByIdCompanyIdAndIdProductIdAndIdSizeIdAndStatusOrderByDisplayOrder(companyId,productId,ocd.getSizeId(),"Y");
+				
+				List<CompanyMeterialMaster> metalList =cmmRepository.findByCompanyIdAndProductIdAndSizeIdAndColorIdAndStatusIgnoreCaseOrderByMeasurementDisplayOrder(companyId, productId, sizeId, 99999,"Y");
 				int index=0;
-				String [] metalName =new String[metal.size()];
-				Object [] required =new Object[metal.size()];
-				Object [] received =new Object[metal.size()];
+				String [] metalName =new String[metalList.size()];
+				Object [] required =new Object[metalList.size()];
+				Object [] received =new Object[metalList.size()];
 				StringJoiner params =new StringJoiner(",");
-				for(ProductSizeMetalMaster met : metal) {
-					String calctype =met.getMesurementType();
-					Double calcVal =met.getMesurementValue();
-					Integer noOfpieces =met.getMesurementPieces();
-					
-					/*if("G".equals(calctype)) {// gram
-						piecesRate = ocd.getTotalPieces()/ noOfpieces;
-						overAllCalc =calcVal * piecesRate / 1000;
-					}else if("M".equals(calctype)) {// meter
-						piecesRate = ocd.getTotalPieces()/ noOfpieces;
-						overAllCalc = calcVal * piecesRate/100;
-					}else if("P".equals(calctype)) {//precentage
-						Double result =calcVal * noOfpieces;
-						overAllCalc =overAllCalc - result;
-					}else if("N".equals(calctype)) {// no calc or count
-						overAllCalc=Double.valueOf(ocd.getTotalPieces());
-					}else if("I".equals(calctype)) {// no calc or count
-						Double total=Double.valueOf(ocd.getTotalPieces());
-						overAllCalc =total * 2.54D /100;
-					}*/
+				for(CompanyMeterialMaster met : metalList) {
+					String calctype =met.getMeasurementType();
+					Double calcVal =met.getMeasurementValue();
+					Integer noOfpieces =met.getMeasurementPieces();					
 					
 					Object overAllCalc=calculate(calctype,ocd.getTotalPieces(),calcVal,noOfpieces);
 					
 					required[index] =overAllCalc;
 					received[index] =0;
-					metalName[index]=met.getMetalName();
-					params.add(met.getColumnName());
+					metalName[index]=met.getMeasurementDisplayName();
+					params.add(met.getDbColumnName());
 					
 					index++;
 				}
@@ -197,24 +188,24 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 				List<Map<String,Object>> colorList =new ArrayList<>();
 				for(OrderColorDetails ood : value) {
 					Integer colorCode =ood.getColorCode();
-					List<ProductColorMetalMaster> pcmm = colorMetalRepo.findByIdCompanyIdAndIdProductIdAndIdColourCodeAndStatusOrderByDisplayOrder(companyId, productId, colorCode, "Y");
+					List<CompanyMeterialMaster> pcmm =cmmRepository.findByCompanyIdAndProductIdAndSizeIdAndColorIdAndStatusIgnoreCaseOrderByMeasurementDisplayOrder(companyId, productId, 99999, colorCode,"Y");
 					int index=0;
 					String [] metalName =new String[pcmm.size()];
 					Object [] required =new Object[pcmm.size()];
 					Object [] received =new Object[pcmm.size()];
 					StringJoiner params =new StringJoiner(",");
-					for(ProductColorMetalMaster met : pcmm) {
+					for(CompanyMeterialMaster met : pcmm) {
 						
-						String calcType =met.getMesurementType();
-						Integer noOfPieces =met.getMesurementPieces();
-						Double calVal =met.getMesurementValue();
+						String calcType =met.getMeasurementType();
+						Double calVal =met.getMeasurementValue();
+						Integer noOfPieces =met.getMeasurementPieces();		
 						
 						Object overAllCalc=calculate(calcType,ood.getTotalPieces(),calVal,noOfPieces);
 						
 						required[index] =overAllCalc;
 						received[index] =0;
-						metalName[index]=met.getMetalName();
-						params.add(met.getColumnName());
+						metalName[index]=met.getMeasurementDisplayName();
+						params.add(met.getDbColumnName());					
 						
 						index++;
 					}
@@ -969,23 +960,24 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 			Integer productId =order.getProductId();
 			orderDetailsRepo.deleteProductReceivedMetal(req.getOrderId());
 
-			List<ProductMetalMaster> metalList =productMetalRepo.findByIdCompanyIdAndIdProductIdAndStatusOrderByDisplayOrder(companyId, productId,"Y");
+			List<CompanyMeterialMaster> metalList =cmmRepository.findByCompanyIdAndProductIdAndSizeIdAndColorIdAndStatusIgnoreCaseOrderByMeasurementDisplayOrder(companyId, productId, 99999, 99999,"Y");
+			
 			int index=0;
 			String [] metalName =new String[metalList.size()];
 			Object [] required =new Object[metalList.size()];
 			Object [] received =new Object[metalList.size()];
 			StringJoiner params =new StringJoiner(",");
-			for(ProductMetalMaster m : metalList) {
-				String calcType =m.getMesurementType();
-				Double calcVal =m.getMesurementValue();
-				Integer noOfpieces =m.getMesurementPieces();
+			for(CompanyMeterialMaster m : metalList) {
+				String calcType =m.getMeasurementType();
+				Double calcVal =m.getMeasurementValue();
+				Integer noOfpieces =m.getMeasurementPieces();
 				
 				Object overAllCalc=calculate(calcType,totalPieces,calcVal,noOfpieces);
 				
 				required[index] =overAllCalc;
 				received[index] =0;
-				metalName[index]=m.getMetalName();
-				params.add(m.getColumnName());
+				metalName[index]=m.getMeasurementDisplayName();
+				params.add(m.getDbColumnName());
 				
 				index++;
 			}

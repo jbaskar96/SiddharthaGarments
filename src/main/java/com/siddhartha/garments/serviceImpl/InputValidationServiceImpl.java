@@ -22,11 +22,11 @@ import com.siddhartha.garments.dto.ProductSizeMasterReq;
 import com.siddhartha.garments.dto.ProductSizeMetalReq;
 import com.siddhartha.garments.dto.SaveProductSizeColorMetalReq;
 import com.siddhartha.garments.dto.SizeFoldingDetailsReq;
+import com.siddhartha.garments.entity.CompanyMeterialMaster;
 import com.siddhartha.garments.entity.LoginMaster;
 import com.siddhartha.garments.entity.WorkerEntryDetails;
+import com.siddhartha.garments.repository.CompanyMeterialMasterRepository;
 import com.siddhartha.garments.repository.LoginMasterRepository;
-import com.siddhartha.garments.repository.OrderChallanDetailsRepository;
-import com.siddhartha.garments.repository.ProductSizeMetalMasterRepository;
 import com.siddhartha.garments.repository.WorkerEntryRepository;
 import com.siddhartha.garments.request.ChallanDetailsInfo;
 import com.siddhartha.garments.request.ChallanInfoRequest;
@@ -35,6 +35,7 @@ import com.siddhartha.garments.request.ColorFoldingDetailsReq;
 import com.siddhartha.garments.request.ColorInfoReq;
 import com.siddhartha.garments.request.ColorSaveRequest;
 import com.siddhartha.garments.request.CompanyMasterRequest;
+import com.siddhartha.garments.request.CompanyMeterialMasterReq;
 import com.siddhartha.garments.request.CompanyProductRequest;
 import com.siddhartha.garments.request.DisrictRequest;
 import com.siddhartha.garments.request.ErrorList;
@@ -66,10 +67,7 @@ public class InputValidationServiceImpl {
 	private LoginMasterRepository loginMasterRepository;
 	
 	@Autowired
-	private OrderChallanDetailsRepository challanDetailsRepo;
-	
-	@Autowired
-	private ProductSizeMetalMasterRepository sizeMetalRepo;
+	private CompanyMeterialMasterRepository cmmRepository;
 	
 	@Autowired
 	private WorkerEntryRepository workerEntryRepo;
@@ -1268,6 +1266,67 @@ public class InputValidationServiceImpl {
 				
 			}
 		}
+		return errorLists;
+	}
+
+	public List<ErrorList> validateCompanyMeterial(List<CompanyMeterialMasterReq> request) {
+		List<ErrorList> errorLists = new ArrayList<>();
+		
+		int rowNum =1;
+		for(CompanyMeterialMasterReq req : request) {
+			
+			if(StringUtils.isBlank(req.getMeasurementDispalyName())) {
+				errorLists.add(new ErrorList("MeasurementDispalyName",""+rowNum+"","Please enter MeasurementDispalyName"));
+			}
+			
+			if(StringUtils.isBlank(req.getMeasurementDisplayOrder())) {
+				errorLists.add(new ErrorList("MeasurementDisplayOrder",""+rowNum+"","Please enter MeasurementDisplayOrder"));
+			}else if(!req.getMeasurementDisplayOrder().matches("[0-9]+")) {
+				errorLists.add(new ErrorList("MeasurementDisplayOrder",""+rowNum+"","digits only allows"));
+
+			}
+			
+			if(StringUtils.isBlank(req.getMeasurementName())) {
+				errorLists.add(new ErrorList("MeasurementName",""+rowNum+"","Please enter MeasurementName"));
+			}
+			
+			if(StringUtils.isBlank(req.getMeasurementPieces())) {
+				errorLists.add(new ErrorList("MeasurementPieces",""+rowNum+"","Please enter MeasurementPieces"));
+			}else if(!req.getMeasurementPieces().matches("[0-9]+")) {
+				errorLists.add(new ErrorList("MeasurementPieces",""+rowNum+"","digits only allows"));
+			}
+			
+			if(StringUtils.isBlank(req.getMeasurementType())) {
+				errorLists.add(new ErrorList("MeasurementType",""+rowNum+"","Please enter MeasurementType"));
+			}
+			
+			if(StringUtils.isBlank(req.getMeasurementValue())) {
+				errorLists.add(new ErrorList("MeasurementValue",""+rowNum+"","Please enter MeasurementValue"));
+			}else if(!NumberUtils.isParsable(req.getMeasurementValue())) {
+				errorLists.add(new ErrorList("MeasurementPieces",""+rowNum+"","digits only allows or decimal"));
+			}
+			
+			if(errorLists.isEmpty() && StringUtils.isNotBlank(req.getMeterialId())) {
+				
+				Integer companyId =Integer.valueOf(req.getCompanyId());
+				Integer productId =Integer.valueOf(req.getProductId());
+				Integer sizeId =Integer.valueOf(req.getSizeId());
+				Integer colorId =Integer.valueOf(req.getColorId());
+				
+				List<CompanyMeterialMaster> list =cmmRepository.findByCompanyIdAndProductIdAndSizeIdAndColorId(companyId,productId,sizeId,colorId);
+				
+				if(list.size()>0 ) {
+					
+					errorLists.add(new ErrorList("Duplicate Setup",""+rowNum+"","Duplicate meterial setup has availble "));
+
+				}if(StringUtils.isNotBlank(req.getDbColumnName())) {
+					
+					errorLists.add(new ErrorList("DbColumnName",""+rowNum+"","DB column should not be null or blank"));
+
+				}
+			}
+		}
+		
 		return errorLists;
 	}
 
