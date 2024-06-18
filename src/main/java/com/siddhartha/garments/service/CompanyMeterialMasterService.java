@@ -10,7 +10,7 @@ public interface CompanyMeterialMasterService {
 
 	CommonResponse saveMeterial(List<CompanyMeterialMasterReq> req);
 
-	CommonResponse getAllMeterialByCompanyId(Integer companyId);
+	CommonResponse getAllMeterialByCompanyId(Integer companyId, Integer productId);
 
 	CommonResponse productDropdown(CompanyMeterialDropdownReq req);
 

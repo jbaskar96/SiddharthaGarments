@@ -30,9 +30,9 @@ public class CompanyMeterialMasterController {
 		return service.saveMeterial(req);
 	}
 
-	@GetMapping("/getAllMeterialByCompanyId/{companyId}")
-	public CommonResponse getAllMeterialByCompanyId(@PathVariable("companyId") Integer companyId) {
-		return service.getAllMeterialByCompanyId(companyId);
+	@GetMapping("/getAllMeterial/{companyId}/{productId}")
+	public CommonResponse getAllMeterialByCompanyId(@PathVariable("companyId") Integer companyId,@PathVariable("productId") Integer productId) {
+		return service.getAllMeterialByCompanyId(companyId,productId);
 	}
 	
 	@PostMapping("/product/dropdown")

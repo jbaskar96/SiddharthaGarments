@@ -100,10 +100,10 @@ public class CompanyMeterialMasterServiceImpl implements CompanyMeterialMasterSe
 	}
 
 	@Override
-	public CommonResponse getAllMeterialByCompanyId(Integer companyId) {
+	public CommonResponse getAllMeterialByCompanyId(Integer companyId, Integer productId) {
 		CommonResponse response = new CommonResponse();
 		try {
-			List<CompanyMeterialMaster> list = repository.findByCompanyId(companyId);
+			List<CompanyMeterialMaster> list = repository.findByCompanyIdAndProductId(companyId,productId);
 			if(list.size()>0) {
 				List<Map<String,String>> mapList =new ArrayList<>();
 				list.forEach(p ->{
@@ -120,6 +120,7 @@ public class CompanyMeterialMasterServiceImpl implements CompanyMeterialMasterSe
 					map.put("MeasurementDisplayName", p.getMeasurementDisplayName());
 					map.put("MeasurementDisplayOrder", p.getMeasurementDisplayOrder().toString());
 					map.put("Status", p.getStatus());
+					map.put("DBColumnName", StringUtils.isBlank(p.getDbColumnName())?"":p.getDbColumnName());
 					map.put("EntryDate", DD_MM_YYYY.format(p.getEntryDate()));
 					
 					mapList.add(map);

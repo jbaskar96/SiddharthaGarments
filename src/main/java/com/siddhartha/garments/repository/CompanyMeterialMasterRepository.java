@@ -19,6 +19,8 @@ public interface CompanyMeterialMasterRepository extends JpaRepository<CompanyMe
 	List<CompanyMeterialMaster> findByCompanyIdAndProductIdAndSizeIdAndColorIdAndStatusIgnoreCaseOrderByMeasurementDisplayOrder(Integer companyId, Integer productId, Integer sizeId,
 			Integer colorId, String status);
 
+	List<CompanyMeterialMaster> findByCompanyIdAndProductId(Integer companyId, Integer productId);
+
 	
 
 }
