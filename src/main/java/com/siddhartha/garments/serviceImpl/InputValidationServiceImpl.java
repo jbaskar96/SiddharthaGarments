@@ -1276,7 +1276,7 @@ public class InputValidationServiceImpl {
 		for(CompanyMeterialMasterReq req : request) {
 			
 			if(StringUtils.isBlank(req.getMeasurementDispalyName())) {
-				errorLists.add(new ErrorList("MeasurementDispalyName",""+rowNum+"","Please enter MeasurementDispalyName"));
+				//errorLists.add(new ErrorList("MeasurementDispalyName",""+rowNum+"","Please enter MeasurementDispalyName"));
 			}
 			
 			if(StringUtils.isBlank(req.getMeasurementDisplayOrder())) {
@@ -1325,6 +1325,22 @@ public class InputValidationServiceImpl {
 
 				}
 			}
+		}
+		
+		Boolean duplicate = false;
+		
+		Map<String,Long> map =request.stream()
+		.collect(Collectors.groupingBy(CompanyMeterialMasterReq :: getMeasurementDisplayOrder,Collectors.counting()));
+		
+		for(Map.Entry<String, Long> entry : map.entrySet()) {
+			if(entry.getValue()>1) {
+				duplicate =true;
+				break;
+			}
+		}
+		
+		if(duplicate) {
+			errorLists.add(new ErrorList("MeasurementDisplayOrder","500","Duplicate display numbers are found"));
 		}
 		
 		return errorLists;

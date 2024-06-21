@@ -122,7 +122,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 					
 					required[index] =overAllCalc;
 					received[index] =0;
-					metalName[index]=met.getMeasurementDisplayName();
+					metalName[index]=met.getMeasurementName();
 					params.add(met.getDbColumnName());
 					
 					index++;
@@ -204,7 +204,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 						
 						required[index] =overAllCalc;
 						received[index] =0;
-						metalName[index]=met.getMeasurementDisplayName();
+						metalName[index]=met.getMeasurementName();
 						params.add(met.getDbColumnName());					
 						
 						index++;
@@ -976,7 +976,7 @@ public class MetalCalculationServiceImpl implements MetalCalculationService{
 				
 				required[index] =overAllCalc;
 				received[index] =0;
-				metalName[index]=m.getMeasurementDisplayName();
+				metalName[index]=m.getMeasurementName();
 				params.add(m.getDbColumnName());
 				
 				index++;
